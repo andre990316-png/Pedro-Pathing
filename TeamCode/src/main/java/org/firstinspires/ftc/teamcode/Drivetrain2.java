@@ -17,7 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 @TeleOp(name = "Drivetrain2")
 public class Drivetrain2 extends OpMode {
 
-    public static final double TICKS_PER_REV = 112;
+    public static final double TICKS_PER_REV = 28;
 
     // Drive + mechanisms
     private DcMotor MotorBackLeft;
