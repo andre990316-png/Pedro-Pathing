@@ -21,10 +21,10 @@ public class LimelightAim {
     private final IMU imu;
 
     // ===== Your original variable names (values live here) =====
-    public double Kp = 0.3;        // <-- requested: single value for both Auto/TeleOp
-    public double Kd = 0.0025;
-    public double deadband = 1.0;
-    public double maxTurretPower = 1.0;
+    public double Kp = 0.03;        // <-- requested: single value for both Auto/TeleOp
+    public double Kd = 0.003;
+    public double deadband = 0.6;
+    public double maxTurretPower = 0.8;
 
     public double lastTx = 0;
     public double lastAimTime = 0;
@@ -46,8 +46,17 @@ public class LimelightAim {
     }
 
     /** Change pipeline from Auto/TeleOp whenever you want. */
-    public void setPipeline(int pipeline) {
-        this.pipeline = pipeline;
+    public void setPipeline(String newPipeline) {
+        if(newPipeline.equals("GPP"))
+            pipeline = 0;
+        else if(newPipeline.equals("PGP"))
+            pipeline = 1;
+        else if(newPipeline.equals("PPG"))
+            pipeline = 2;
+        else if(newPipeline.equals("Blue"))
+            pipeline = 3;
+        else if(newPipeline.equals("Red"))
+            pipeline = 4;
         limelight.pipelineSwitch(pipeline);
     }
 
@@ -66,22 +75,28 @@ public class LimelightAim {
         lastAimTime = runtimeSeconds;
         lastTx = 0;
     }
+    public void resetHistory(double runtimeSeconds) {
+        lastTx = 0;
+        lastAimTime = runtimeSeconds;
+        lastTurretPower = 0;
+    }
 
-    /** Returns turretPower (you still choose the sign when setting motor power). */
+    /** Returns MOTOR power (already sign-corrected to match AprilTagLimelightTest). */
     public double update(double runtimeSeconds, Telemetry telemetry) {
         // ----- IMU -> Limelight orientation -----
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         limelight.updateRobotOrientation(orientation.getYaw() + yawOffsetDeg);
 
+        // This variable matches AprilTagLimelightTest's "turretPower" meaning:
+        // "PD output before the motor sign flip"
         double turretPower = 0;
 
         LLResult llResult = limelight.getLatestResult();
         if (llResult != null && llResult.isValid()) {
             double tx = llResult.getTx();
-            double error = -tx;
+            double error = -tx; // SAME as AprilTagLimelightTest
 
-            double Aim_now = runtimeSeconds;
-            double Aim_dt = Aim_now - lastAimTime;
+            double Aim_dt = runtimeSeconds - lastAimTime;
             if (Aim_dt <= 0) Aim_dt = 0.02;
 
             double dTx = (tx - lastTx) / Aim_dt;
@@ -89,13 +104,13 @@ public class LimelightAim {
             if (Math.abs(tx) <= deadband) {
                 turretPower = 0;
             } else {
-                turretPower = Kp * error - Kd * dTx;
+                turretPower = Kp * error - Kd * dTx; // SAME as AprilTagLimelightTest
             }
 
             turretPower = Range.clip(turretPower, -maxTurretPower, maxTurretPower);
 
             lastTx = tx;
-            lastAimTime = Aim_now;
+            lastAimTime = runtimeSeconds;
             lastTurretPower = turretPower;
 
             if (telemetry != null) {
@@ -106,19 +121,23 @@ public class LimelightAim {
                 telemetry.addData("tx", tx);
                 telemetry.addData("ta", llResult.getTa());
                 telemetry.addData("dTx", dTx);
-                telemetry.addData("Turret PD", turretPower);
+                telemetry.addData("Turret PD", turretPower);     // same number you see in your test
+                telemetry.addData("Motor Power", -turretPower);  // what actually gets applied
                 telemetry.addData("IMU Yaw", orientation.getYaw());
             }
         } else {
-            turretPower = lastTurretPower; // keep your current behavior
+            // SAME behavior as your test
+            turretPower = lastTurretPower;
 
             if (telemetry != null) {
                 telemetry.addData("AutoAim", "ON (no valid tag)");
                 telemetry.addData("pipeline", pipeline);
                 telemetry.addData("llResult", (llResult == null) ? "null" : "invalid");
+                telemetry.addData("Motor Power", -turretPower);
             }
         }
 
-        return turretPower;
+        // IMPORTANT: return MOTOR power so Drivetrain2 can just setPower(returnValue)
+        return -turretPower;
     }
 }

@@ -1,20 +1,18 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.pedroPathing;
+
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.mechanisms.LimelightAim;
 
 @TeleOp(name = "Drivetrain2")
-public class Drivetrain2 extends OpMode {
+public class TeleopForTwoLogiControllers extends OpMode {
 
     public static final double TICKS_PER_REV = 28;
 
@@ -46,6 +44,7 @@ public class Drivetrain2 extends OpMode {
     private double Sensitivity;
     private double XL, YL, XR, YR;
     private double TempMax1, TempMax2, MaxPower;
+
     private double shooterPower = 0.0;
     private boolean shooterEnabled = false;
     private long lastShooterTime;
@@ -77,7 +76,6 @@ public class Drivetrain2 extends OpMode {
         // Motor setup
         MotorBackLeft.setDirection(DcMotor.Direction.REVERSE);
         MotorFrontLeft.setDirection(DcMotor.Direction.REVERSE);
-        //ShooterM2.setDirection(DcMotorSimple.Direction.REVERSE);
 
         ShooterM1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         ShooterM2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -158,7 +156,7 @@ public class Drivetrain2 extends OpMode {
         }
         CirclePrev = gamepad1.circle;*/
         GateOpen = gamepad1.circle;
-        ShooterS2.setPosition(GateOpen? 0.2 : 0.8);
+        ShooterS2.setPosition(GateOpen? 0.7 : 0);
 
         // ---------------------------
         // Shooter motors (gamepad2 trigger)
@@ -287,7 +285,7 @@ public class Drivetrain2 extends OpMode {
             telemetry.addData("AutoAim", "OFF");
             telemetry.addData("Turret Manual", turretPower);
         }
-        ShooterRotateMotor.setPower(turretPower);
+        ShooterRotateMotor.setPower(-turretPower);
 
         // Shooter Input Sum
         double shooterPowerSum = ShooterM1.getPower() + Math.abs(ShooterM2.getPower());

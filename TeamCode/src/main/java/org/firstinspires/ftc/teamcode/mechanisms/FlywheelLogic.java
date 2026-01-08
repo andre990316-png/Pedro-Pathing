@@ -28,8 +28,8 @@ public class FlywheelLogic {
     private FlywheelState flyWheelState = FlywheelState.IDLE;
 
     // --- Gate / shot settings ---
-    private double gateCloseAngle = 0.0;
-    private double gateOpenAngle  = 0.7;
+    private double gateCloseAngle = 0.8;
+    private double gateOpenAngle  = 0.2;
     private double gateOpenTime   = 0.3;
     private double gateCloseTime  = 0.3;
 
@@ -78,23 +78,23 @@ public class FlywheelLogic {
         if (dt <= 0.0) return;
 
         int p1 = ShooterM1.getCurrentPosition();
-        int p2 = ShooterM2.getCurrentPosition();
+        //int p2 = ShooterM2.getCurrentPosition();
 
         int d1 = p1 - lastPos1;
-        int d2 = p2 - lastPos2;
+        //int d2 = p2 - lastPos2;
 
         lastPos1 = p1;
-        lastPos2 = p2;
+        //lastPos2 = p2;
         velTimer.reset();
 
         double tps1 = d1 / dt; // ticks per second
-        double tps2 = d2 / dt;
+        //double tps2 = d2 / dt;
 
         double rpm1 = (tps1 / TICKS_PER_REV) * 60.0;
-        double rpm2 = (tps2 / TICKS_PER_REV) * 60.0;
+        //double rpm2 = (tps2 / TICKS_PER_REV) * 60.0;
 
         // take magnitude + average (since one motor is reversed)
-        flywheelRpm = (Math.abs(rpm1) + Math.abs(rpm2)) / 2.0;
+        flywheelRpm = (Math.abs(rpm1));
     }
 
     public void update() {
