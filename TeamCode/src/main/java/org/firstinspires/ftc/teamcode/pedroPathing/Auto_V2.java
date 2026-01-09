@@ -296,12 +296,13 @@ public class Auto_V2 extends OpMode {
 
         // turret auto-aim
         double turretPower = 0;
+
         if (autoAimEnabled) {
             turretPower = limelight.update(getRuntime(), telemetry);
         } else {
             turretPower = 0;
         }
-        ShooterRotateMotor.setPower(-turretPower);
+        ShooterRotateMotor.setPower(turretPower);
 
         telemetry.addData("Step", currentIndex + " / " + CHAINS.size());
         telemetry.addData("Busy", follower.isBusy());
