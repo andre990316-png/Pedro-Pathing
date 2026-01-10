@@ -158,7 +158,7 @@ public class Drivetrain2 extends OpMode {
         }
         CirclePrev = gamepad1.circle;*/
         GateOpen = gamepad1.circle;
-        ShooterS2.setPosition(GateOpen? 0.3 : 0.8);
+        ShooterS2.setPosition(GateOpen? 0.4 : 0.8);
 
         // ---------------------------
         // Shooter motors (gamepad2 trigger)
