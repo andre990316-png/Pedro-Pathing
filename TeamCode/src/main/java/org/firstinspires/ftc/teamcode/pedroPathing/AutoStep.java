@@ -32,7 +32,10 @@ public class AutoStep {
     public static ArrayList<AutoStep> flipped(ArrayList<AutoStep> arr){
         ArrayList<AutoStep> ret = new ArrayList<>();
         for(AutoStep a:arr){
-            Pose p = new Pose(144-a.getPose().getX(), a.getPose().getY(), Math.PI-a.getPose().getHeading());
+            Pose p = null;
+            if(a.getPose()!=null){
+                p = new Pose(144-a.getPose().getX(), a.getPose().getY(), Math.PI-a.getPose().getHeading());
+            }
             //flips x coordinate along x=72, and flips heading along PI/2 radians
             ret.add(new AutoStep(p, a.getAction(), a.getValueMs()));
         }
