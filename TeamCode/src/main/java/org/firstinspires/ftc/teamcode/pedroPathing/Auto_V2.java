@@ -188,7 +188,55 @@ public class Auto_V2 extends OpMode {
 
 
 
-        STEPS.addAll(AUTOTEST);//change path here
+        STEPS.addAll(AUTOTOPLEFT
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        );//change path here
     }
 
     // ------------------------------------------------------------
