@@ -52,7 +52,7 @@ public class Drivetrain2 extends OpMode {
     private int lastPos1;
 
     // Linear Flywheels
-    double targetRPM = 4000;
+    double targetRPM = 0;
 
     double kP = 0.0003;   // tune this
     double kI = 0.000010;  // optional
@@ -174,13 +174,9 @@ public class Drivetrain2 extends OpMode {
         // Shooter motors (gamepad2 trigger)
         // ---------------------------
 
-        // Increase / decrease target RPM while holding
-        double rpmAdjustRate = 400;   // RPM per second
 
-        if (gamepad2.dpad_up && !DpadUpPrev)   targetRPM += rpmAdjustRate * Shooter_dt;
-        if (gamepad2.dpad_down && !DpadDownPrev) targetRPM -= rpmAdjustRate * Shooter_dt;
-        DpadUpPrev = gamepad2.dpad_up;
-        DpadDownPrev = gamepad2.dpad_down;
+        if (gamepad2.dpad_up && !DpadUpPrev)   targetRPM = targetRPM + 100;
+        if (gamepad2.dpad_down && !DpadDownPrev) targetRPM = targetRPM - 100;
         targetRPM = Range.clip(targetRPM, 0, 6000);
 
         double error = targetRPM - rpm;
