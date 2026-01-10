@@ -54,6 +54,10 @@ public class Drivetrain2 extends OpMode {
     // Linear Flywheels
     double targetRPM = 0;
 
+    //Automatic shooter
+    double autoRpm = 0;
+    double autoHood = 0;
+
     double kP = 0.0003;   // tune this
     double kI = 0.000010;  // optional
     double kD = 0.00002;   // optional
