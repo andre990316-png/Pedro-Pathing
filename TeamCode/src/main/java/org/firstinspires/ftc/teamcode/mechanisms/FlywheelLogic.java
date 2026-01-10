@@ -28,8 +28,8 @@ public class FlywheelLogic {
     private FlywheelState flyWheelState = FlywheelState.IDLE;
 
     // --- Gate / shot settings ---
-    private double gateCloseAngle = 0.8;
-    private double gateOpenAngle  = 0.55;
+    private double gateCloseAngle = 0.2;
+    private double gateOpenAngle  = 0.7;
     private double gateOpenTime   = 0.3;
     private double gateCloseTime  = 0.3;
 
@@ -102,14 +102,6 @@ public class FlywheelLogic {
         intake.update();
         switch (flyWheelState) {
             case IDLE:
-                if (shotsRemaining > 0) {
-                    // Command target RPM (not power)
-                    ShooterM1.setVelocity(rpmToTicksPerSec(targetFlywheelRpm));
-                    ShooterM2.setVelocity(-rpmToTicksPerSec(targetFlywheelRpm));
-                    intake.intakeReady(true);
-                    stateTimer.reset();
-                    flyWheelState = FlywheelState.WAIT;
-                }
                 break;
             case WAIT:
                 if (stateTimer.seconds() > 2) {
@@ -151,10 +143,19 @@ public class FlywheelLogic {
     public void fireShots(int numberOfShots) {
         if (flyWheelState == FlywheelState.IDLE) {
             shotsRemaining = numberOfShots;
+            if (shotsRemaining > 0) {
+                // Command target RPM (not power)
+                ShooterM1.setVelocity(rpmToTicksPerSec(targetFlywheelRpm));
+                ShooterM2.setVelocity(-rpmToTicksPerSec(targetFlywheelRpm));
+                intake.intakeReady(true);
+                stateTimer.reset();
+                flyWheelState = FlywheelState.WAIT;
+            }
+
         }
     }
     public boolean isBusy() {
-        return shotsRemaining > 0;
+        return flyWheelState != FlywheelState.IDLE;
     }
     public double getFlywheelRpm() {
         return flywheelRpm;

@@ -58,7 +58,7 @@ public class Auto_V2 extends OpMode {
     private int currentIndex = 0;
     private long pauseEndTimeMs = 0;
     private boolean waitingForShooter = false;
-    private boolean timerStart = false;
+    private boolean timerStart = true;
 
     // ===== Poses you already had =====
     //start poses
@@ -364,6 +364,7 @@ public class Auto_V2 extends OpMode {
         telemetry.addData("Current State", STEPS.get(currentIndex).action.name());
         telemetry.addData("Step", currentIndex + " / " + CHAINS.size());
         telemetry.addData("Busy", follower.isBusy());
+        telemetry.addData("Shooter Busy", shooter.isBusy());
         telemetry.addData("WaitingShooter", waitingForShooter);
         telemetry.addData("PauseMsLeft", (pauseEndTimeMs > 0) ? (pauseEndTimeMs - System.currentTimeMillis()) : 0);
         telemetry.addData("x", follower.getPose().getX());
