@@ -140,6 +140,12 @@ public class Auto_V2 extends OpMode {
 
         /// add AUTO1, 2, ... initializations here
 
+        //top left auto
+        AUTOTOPLEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
+        AUTOTOPLEFT.add(new AutoStep(blueShootPoseMed, AutoAction.NONE, 0));
+        AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        AUTOTOPLEFT.add(new AutoStep(new Pose(102, 35.5, Math.toRadians(0)), AutoAction.NONE, 0));
+
 
 
         STEPS.addAll(AUTOTEST);//change path here
