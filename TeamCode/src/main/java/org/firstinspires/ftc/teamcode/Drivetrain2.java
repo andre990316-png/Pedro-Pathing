@@ -174,7 +174,6 @@ public class Drivetrain2 extends OpMode {
         // Shooter motors (gamepad2 trigger)
         // ---------------------------
 
-        // Increase / decrease target RPM while holding
 
         if (gamepad2.dpad_up && !DpadUpPrev)   targetRPM = targetRPM + 100;
         if (gamepad2.dpad_down && !DpadDownPrev) targetRPM = targetRPM - 100;
