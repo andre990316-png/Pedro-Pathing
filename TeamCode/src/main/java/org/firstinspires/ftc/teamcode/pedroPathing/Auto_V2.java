@@ -46,13 +46,13 @@ public class Auto_V2 extends OpMode {
 
 
 
-    private final ArrayList<AutoStep> STEPS = new ArrayList<>();
-    private final ArrayList<PathChain> CHAINS = new ArrayList<>();
-    private final ArrayList<AutoStep> AUTOTEST = new ArrayList<>();
-    private final ArrayList<AutoStep> AUTOTOPLEFT = new ArrayList<>();
-    private final ArrayList<AutoStep> AUTOBOTTOMLEFT = new ArrayList<>();
-    private final ArrayList<AutoStep> AUTOTOPRIGHT = new ArrayList<>();
-    private final ArrayList<AutoStep> AUTOBOTTOMRIGHT = new ArrayList<>();
+    private ArrayList<AutoStep> STEPS = new ArrayList<>();
+    private ArrayList<PathChain> CHAINS = new ArrayList<>();
+    private ArrayList<AutoStep> AUTOTEST = new ArrayList<>();
+    private ArrayList<AutoStep> AUTOTOPLEFT = new ArrayList<>();
+    private ArrayList<AutoStep> AUTOBOTTOMLEFT = new ArrayList<>();
+    private ArrayList<AutoStep> AUTOTOPRIGHT = new ArrayList<>();
+    private ArrayList<AutoStep> AUTOBOTTOMRIGHT = new ArrayList<>();
 
     private int currentIndex = 0;
     private long pauseEndTimeMs = 0;
@@ -128,13 +128,63 @@ public class Auto_V2 extends OpMode {
         AUTOTEST.add(new AutoStep(null, AutoAction.PAUSE_MS, 500));
 
 
-        /// add AUTO1, 2, ... initializations here
 
-        //top left auto
+        ///top left auto
+
+        //shoots preload, gets row 2 and shoots
         AUTOTOPLEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
         AUTOTOPLEFT.add(new AutoStep(blueShootPoseMed, AutoAction.NONE, 0));
         AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
-        AUTOTOPLEFT.add(new AutoStep(new Pose(10, 62, Math.toRadians(120)), AutoAction.NONE, 0));
+        AUTOTOPLEFT.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
+        AUTOTOPLEFT.add(new AutoStep(blueBallPosition2End, AutoAction.NONE, 0));
+        AUTOTOPLEFT.add(new AutoStep(blueShootPoseMed, AutoAction.INTAKE_OFF, 0));
+        AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+
+        //opens GATE and sucks GATE balls (great wording i know) and shoots
+        //does this thrice
+        for(int i=0; i<3; i++){
+            AUTOTOPLEFT.add(new AutoStep(new Pose(10,62,Math.toRadians(120)), AutoAction.NONE, 0));
+            AUTOTOPLEFT.add(new AutoStep(null, AutoAction.INTAKE_ON, 3000));
+            AUTOTOPLEFT.add(new AutoStep(blueShootPoseMed, AutoAction.INTAKE_OFF, 0));
+            AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        }
+
+        //gets row 3 and shoots
+        AUTOTOPLEFT.add(new AutoStep(blueBallPosition3Start, AutoAction.INTAKE_ON, 0));
+        AUTOTOPLEFT.add(new AutoStep(blueBallPosition3End, AutoAction.NONE, 0));
+        AUTOTOPLEFT.add(new AutoStep(blueShootPoseMed, AutoAction.INTAKE_OFF, 0));
+        AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+
+        //the video has more stuff but they're way faster so i think this is about as far as we're gonna get
+
+        /// bottom left auto
+
+        //shoot preload
+        AUTOBOTTOMLEFT.add(new AutoStep(bottomLeftStartPose, AutoAction.NONE, 0));
+        AUTOBOTTOMLEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
+        AUTOBOTTOMLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+
+        //get loading zone balls and shoot
+        //does this thrice
+        for(int i=0; i<3; i++){
+            AUTOBOTTOMLEFT.add(new AutoStep(blueLoadingZoneStart, AutoAction.INTAKE_ON, 0));
+            AUTOBOTTOMLEFT.add(new AutoStep(blueLoadingZoneEnd, AutoAction.NONE, 0));
+            AUTOBOTTOMLEFT.add(new AutoStep(blueShootPoseFar, AutoAction.INTAKE_OFF, 0));
+            AUTOBOTTOMLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+
+        }
+
+
+        /// top right auto
+
+        //flipped copy of top left
+        AUTOTOPRIGHT = AutoStep.flipped(AUTOTOPLEFT);
+
+
+        /// bottom right auto
+
+        AUTOBOTTOMRIGHT = AutoStep.flipped(AUTOBOTTOMLEFT);
+
 
 
 
