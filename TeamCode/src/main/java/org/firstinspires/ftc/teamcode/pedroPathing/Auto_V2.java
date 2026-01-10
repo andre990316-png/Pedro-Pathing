@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.mechanisms.FlywheelLogic;
 import org.firstinspires.ftc.teamcode.mechanisms.LimelightAim;
@@ -57,6 +58,7 @@ public class Auto_V2 extends OpMode {
     private int currentIndex = 0;
     private long pauseEndTimeMs = 0;
     private boolean waitingForShooter = false;
+    private boolean timerStart = false;
 
     // ===== Poses you already had =====
     //start poses
@@ -100,6 +102,8 @@ public class Auto_V2 extends OpMode {
     //loading zone intaking poses (blue)
     private final Pose blueLoadingZoneStart = new Pose(114,12,Math.toRadians(0));
     private final Pose blueLoadingZoneEnd = new Pose(134,12,Math.toRadians(0));
+    private ElapsedTime stateTimer = new ElapsedTime();
+    private boolean actionActioned=false;
 
     // ------------------------------------------------------------
     // Build Steps (pose + action) ONCE
@@ -202,7 +206,8 @@ public class Auto_V2 extends OpMode {
             AutoStep start = STEPS.get(i);
             AutoStep end = STEPS.get(i + 1);
 
-            if (start.pose == null || end.pose == null) {
+            if (end.pose == null) {
+                end.setPose(start.getPose());
                 CHAINS.add(null);
                 continue;
             }
@@ -261,45 +266,39 @@ public class Auto_V2 extends OpMode {
     private void updateAuto() {
         if (currentIndex >= CHAINS.size()) return;
 
-        long now = System.currentTimeMillis();
-
-        // Wait for pause to finish
-        if (pauseEndTimeMs > 0) {
-            if (now >= pauseEndTimeMs) {
-                pauseEndTimeMs = 0;
-                currentIndex++;
+        if(!timerStart) {
+            if (follower.isBusy()) {
+                return;
             }
+            if(!actionActioned){
+                AutoStep step = STEPS.get(currentIndex);
+                executeAction(step);
+                actionActioned=true;
+            }
+            if (waitingForShooter) {
+                if (!shooter.isBusy()) {
+                    waitingForShooter = false;
+                } else {
+                    return;
+                }
+            }
+            stateTimer.reset();
+            timerStart = true;
+        }
+        if (stateTimer.milliseconds()<pauseEndTimeMs) {
             return;
         }
-
-        // Wait for shooter sequence to finish
-        if (waitingForShooter) {
-            if (!shooter.isBusy()) {
-                waitingForShooter = false;
-                currentIndex++;
-            }
-            return;
-        }
-
-        // Don’t start next segment while path follower is moving
-        if (follower.isBusy()) return;
-
-        // Start this segment: run its action FIRST (as you requested)
-        AutoStep step = STEPS.get(currentIndex);
-        executeAction(step);
-        telemetry.addData("Current State", step.action.name());
-
         PathChain chain = CHAINS.get(currentIndex);
 
         if (chain != null) {
             follower.followPath(chain, true);
-            currentIndex++; // advance immediately after starting movement
-        } else {
-            // No movement step; if it didn't set a wait condition, just skip it
-            if (!waitingForShooter && pauseEndTimeMs == 0) {
-                currentIndex++;
-            }
         }
+        currentIndex++;
+        stateTimer.reset();
+        timerStart = false;
+        waitingForShooter = false;
+        actionActioned = false;
+
     }
 
     @Override
@@ -349,6 +348,7 @@ public class Auto_V2 extends OpMode {
         shooter.update();
 
         // run sequencer
+
         updateAuto();
 
         // turret auto-aim
@@ -361,6 +361,7 @@ public class Auto_V2 extends OpMode {
         }
         ShooterRotateMotor.setPower(turretPower);
 
+        telemetry.addData("Current State", STEPS.get(currentIndex).action.name());
         telemetry.addData("Step", currentIndex + " / " + CHAINS.size());
         telemetry.addData("Busy", follower.isBusy());
         telemetry.addData("WaitingShooter", waitingForShooter);
