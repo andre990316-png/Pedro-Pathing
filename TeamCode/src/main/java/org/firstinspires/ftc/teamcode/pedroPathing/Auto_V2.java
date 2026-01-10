@@ -270,11 +270,11 @@ public class Auto_V2 extends OpMode {
             if (follower.isBusy()) {
                 return;
             }
-            if(!actionActioned){
-                AutoStep step = STEPS.get(currentIndex);
-                executeAction(step);
-                actionActioned=true;
-            }
+//            if(!actionActioned){
+//                AutoStep step = STEPS.get(currentIndex);
+//                executeAction(step);
+//                actionActioned=true;
+//            }
             if (waitingForShooter) {
                 if (!shooter.isBusy()) {
                     waitingForShooter = false;
@@ -288,15 +288,15 @@ public class Auto_V2 extends OpMode {
         if (stateTimer.milliseconds()<pauseEndTimeMs) {
             return;
         }
+        AutoStep step = STEPS.get(currentIndex);
+        executeAction(step);
         PathChain chain = CHAINS.get(currentIndex);
-
         if (chain != null) {
             follower.followPath(chain, true);
         }
         currentIndex++;
         stateTimer.reset();
         timerStart = false;
-        waitingForShooter = false;
         actionActioned = false;
 
     }

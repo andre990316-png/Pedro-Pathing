@@ -154,7 +154,7 @@ public class FlywheelLogic {
         }
     }
     public boolean isBusy() {
-        return flyWheelState != FlywheelState.IDLE;
+        return shotsRemaining > 0;
     }
     public double getFlywheelRpm() {
         return flywheelRpm;

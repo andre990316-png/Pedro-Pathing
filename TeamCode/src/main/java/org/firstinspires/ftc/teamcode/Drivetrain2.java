@@ -175,19 +175,11 @@ public class Drivetrain2 extends OpMode {
             pos -= 0.02;
         }
         DpadLeftPrev = gamepad2.dpad_left;
-        pos = Range.clip(pos, 0.8, 1.0);
+        pos = Range.clip(pos, 0.84, 1.0);
         ShooterS1.setPosition(pos);
-        /*if (gamepad1.circle && !CirclePrev) {
-            GateOpen = !GateOpen;
-        }
-        CirclePrev = gamepad1.circle;*/
-        if (gamepad2.right_trigger > 0.03) {
-            GateOpen = true;
-        } else {
-            GateOpen = false;
-        }
 
-        ShooterS2.setPosition(GateOpen? 0.55 : 0.8);
+        GateOpen = gamepad2.right_trigger > 0.03;
+        ShooterS2.setPosition(GateOpen? 0.25 : 0.55);
 
         // AutoShooting
         double ta = 0;
@@ -329,11 +321,7 @@ public class Drivetrain2 extends OpMode {
             autoAimEnabled = !autoAimEnabled;
         }
         AimTogglePrev = gamepad1.triangle;*/
-        if (gamepad2.left_trigger > 0.3) {
-            autoAimEnabled = true;
-        } else {
-            autoAimEnabled = false;
-        }
+        autoAimEnabled = gamepad2.left_trigger > 0.3;
 
         // ---------------------------
         // Update IMU yaw
