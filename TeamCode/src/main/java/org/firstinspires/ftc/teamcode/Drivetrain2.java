@@ -189,7 +189,7 @@ public class Drivetrain2 extends OpMode {
 
         ShooterS2.setPosition(GateOpen? 0.55 : 0.8);
 
-// AutoShooting
+        // AutoShooting
         double ta = 0;
         LLResult ll = limelight.limelight.getLatestResult();
         if (ll != null && ll.isValid()) {
@@ -217,6 +217,8 @@ public class Drivetrain2 extends OpMode {
 
         if (gamepad2.dpad_up && !DpadUpPrev)   targetRPM = targetRPM + 100;
         if (gamepad2.dpad_down && !DpadDownPrev) targetRPM = targetRPM - 100;
+        DpadUpPrev = gamepad2.dpad_up;
+        DpadDownPrev = gamepad2.dpad_down;
         targetRPM = Range.clip(targetRPM, 0, 6000);
 
         double error = targetRPM - rpm;
