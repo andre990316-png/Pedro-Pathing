@@ -52,7 +52,7 @@ public class Drivetrain2 extends OpMode {
     private int lastPos1;
 
     // Linear Flywheels
-    double targetRPM = 4000;
+    double targetRPM = 0;
 
     double kP = 0.0003;   // tune this
     double kI = 0.000010;  // optional
