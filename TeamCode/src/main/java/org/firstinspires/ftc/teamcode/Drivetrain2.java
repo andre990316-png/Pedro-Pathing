@@ -96,7 +96,7 @@ public class Drivetrain2 extends OpMode {
         ShooterM2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // ===== Init state (what you did before waitForStart) =====
-        pos = ShooterS1.getPosition();
+        ShooterS1.setPosition(0.8);
         Sensitivity = 1.0;
 
         Mode = false;
@@ -155,16 +155,16 @@ public class Drivetrain2 extends OpMode {
         // ---------------------------
         // Shooter angle servo manual trim (gamepad2)
         // ---------------------------
-        if (gamepad1.dpad_right) {
-            pos += 0.01;
-            if (pos > 1.0) pos = 1.0;
-            ShooterS1.setPosition(pos);
+        if (gamepad2.dpad_right && !DpadRightPrev) {
+            pos += 0.02;
         }
-        if (gamepad1.dpad_left) {
-            pos -= 0.01;
-            if (pos < 0.0) pos = 0.0;
-            ShooterS1.setPosition(pos);
+        DpadRightPrev = gamepad2.dpad_right;
+        if (gamepad2.dpad_left && !DpadLeftPrev) {
+            pos -= 0.02;
         }
+        DpadLeftPrev = gamepad2.dpad_left;
+        pos = Range.clip(pos, 0.8, 1.0);
+        ShooterS1.setPosition(pos);
         /*if (gamepad1.circle && !CirclePrev) {
             GateOpen = !GateOpen;
         }
@@ -175,7 +175,7 @@ public class Drivetrain2 extends OpMode {
             GateOpen = false;
         }
 
-        ShooterS2.setPosition(GateOpen? 0.4 : 0.8);
+        ShooterS2.setPosition(GateOpen? 0.55 : 0.8);
 
         // ---------------------------
         // Shooter motors (gamepad2 trigger)
@@ -298,7 +298,7 @@ public class Drivetrain2 extends OpMode {
             autoAimEnabled = !autoAimEnabled;
         }
         AimTogglePrev = gamepad1.triangle;*/
-        if (gamepad2.right_trigger > 0.3) {
+        if (gamepad2.left_trigger > 0.3) {
             autoAimEnabled = true;
         } else {
             autoAimEnabled = false;

@@ -21,8 +21,8 @@ public class LimelightAim {
     private final IMU imu;
 
     // ===== Your original variable names (values live here) =====
-    public double Kp = 0.023;        // <-- requested: single value for both Auto/TeleOp
-    public double Kd = 0.0025;
+    public double Kp = 0.015;        // <-- requested: single value for both Auto/TeleOp
+    public double Kd = 0.002 ;
     public double deadband = 0.6;
     public double maxTurretPower = 1;
 

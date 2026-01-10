@@ -44,17 +44,7 @@ public class Auto_V2 extends OpMode {
         AIM_OFF
     }
 
-    public static class AutoStep {
-        public Pose pose;              // null means "no movement step" (pause / wait step)
-        public AutoAction action;
-        public long valueMs;           // used by PAUSE_MS
 
-        public AutoStep(Pose pose, AutoAction action, long valueMs) {
-            this.pose = pose;
-            this.action = action;
-            this.valueMs = valueMs;
-        }
-    }
 
     private final ArrayList<AutoStep> STEPS = new ArrayList<>();
     private final ArrayList<PathChain> CHAINS = new ArrayList<>();
@@ -139,6 +129,12 @@ public class Auto_V2 extends OpMode {
 
 
         /// add AUTO1, 2, ... initializations here
+
+        //top left auto
+        AUTOTOPLEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
+        AUTOTOPLEFT.add(new AutoStep(blueShootPoseMed, AutoAction.NONE, 0));
+        AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        AUTOTOPLEFT.add(new AutoStep(new Pose(10, 62, Math.toRadians(120)), AutoAction.NONE, 0));
 
 
 
