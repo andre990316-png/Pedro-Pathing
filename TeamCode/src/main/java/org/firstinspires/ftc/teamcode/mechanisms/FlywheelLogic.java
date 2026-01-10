@@ -29,7 +29,7 @@ public class FlywheelLogic {
 
     // --- Gate / shot settings ---
     private double gateCloseAngle = 0.8;
-    private double gateOpenAngle  = 0.2;
+    private double gateOpenAngle  = 0.3;
     private double gateOpenTime   = 0.3;
     private double gateCloseTime  = 0.3;
 
@@ -37,8 +37,8 @@ public class FlywheelLogic {
 
     // --- Velocity targets (RPM) ---
     private double flywheelRpm = 0.0;          // measured RPM
-    private double minFlywheelRpm = 3300.0;     // RPM threshold to shoot
-    private double targetFlywheelRpm = 3600.0; // desired RPM
+    private double minFlywheelRpm = 800;     // RPM threshold to shoot
+    private double targetFlywheelRpm = 1000; // desired RPM
     private double flywheelMaxSpinupTime = 2.0;
     private IntakeLogic intake = new IntakeLogic();
 

@@ -22,7 +22,7 @@ public class LimelightAim {
 
     // ===== Your original variable names (values live here) =====
     public double Kp = 0.03;        // <-- requested: single value for both Auto/TeleOp
-    public double Kd = 0.003;
+    public double Kd = 0.0001;
     public double deadband = 0.6;
     public double maxTurretPower = 0.8;
 

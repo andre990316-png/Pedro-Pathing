@@ -129,7 +129,7 @@ public class Auto_V2 extends OpMode {
 
         // Start returning: turn intake off at start of this segment
         STEPS.add(new AutoStep(blueBallPosition3Start, AutoAction.INTAKE_OFF, 0));
-        STEPS.add(new AutoStep(blueShootPoseMed, AutoAction.NONE, 0));
+        STEPS.add(new AutoStep(blueShootPoseMed, AutoAction.SHOOT_3, 0));
 
         // Optional: pause at shoot pose
         STEPS.add(new AutoStep(null, AutoAction.PAUSE_MS, 500));
