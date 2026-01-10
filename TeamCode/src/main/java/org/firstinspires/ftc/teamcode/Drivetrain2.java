@@ -12,9 +12,27 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.mechanisms.LimelightAim;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 
 @TeleOp(name = "Drivetrain2")
 public class Drivetrain2 extends OpMode {
+
+
+    public AutoShooting lookupA(double ta) {
+        if (ta >= 2.37) return new AutoShooting(3200, 0.90);
+        if (ta >= 1.10) return new AutoShooting(3900, 0.94);
+        if (ta >= 0.70) return new AutoShooting(4400, 1.00);
+        return new AutoShooting(4800, 1.00);
+    }
+
+    public AutoShooting lookupB(double ta) {
+        if (ta >= 0.38) return new AutoShooting(4800, 1.00);
+        if (ta >= 0.32) return new AutoShooting(4900, 1.00);
+        if (ta >= 0.29) return new AutoShooting(5200, 1.00);
+        return new AutoShooting(5400, 1.00);
+    }
+
 
     public static final double TICKS_PER_REV = 28;
 
@@ -54,16 +72,13 @@ public class Drivetrain2 extends OpMode {
     // Linear Flywheels
     double targetRPM = 0;
 
-    //Automatic shooter
-    double autoRpm = 0;
-    double autoHood = 0;
-
     double kP = 0.0003;   // tune this
     double kI = 0.000010;  // optional
     double kD = 0.00002;   // optional
 
     double rpmErrorSum = 0;
     double lastError = 0;
+
 
 
     @Override
@@ -173,6 +188,27 @@ public class Drivetrain2 extends OpMode {
         }
 
         ShooterS2.setPosition(GateOpen? 0.55 : 0.8);
+
+// AutoShooting
+        double ta = 0;
+        LLResult ll = limelight.limelight.getLatestResult();
+        if (ll != null && ll.isValid()) {
+            ta = ll.getTa();
+        }
+
+        if (autoAimEnabled) {
+            AutoShooting shot;
+
+            if (ta >= 0.7)
+                shot = lookupA(ta);
+            else
+                shot = lookupB(ta);
+
+            targetRPM = shot.rpm;
+            ShooterS1.setPosition(shot.hood);
+        }
+
+
 
         // ---------------------------
         // Shooter motors (gamepad2 trigger)
