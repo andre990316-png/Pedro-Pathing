@@ -51,6 +51,17 @@ public class Drivetrain2 extends OpMode {
     private long lastShooterTime;
     private int lastPos1, lastPos2;
 
+    // Linear Flywheels
+    double targetRPM = 4000;
+
+    double kP = 0.0003;   // tune this
+    double kI = 0.000010;  // optional
+    double kD = 0.00002;   // optional
+
+    double rpmErrorSum = 0;
+    double lastError = 0;
+
+
     @Override
     public void init() {
         // ===== Hardware map =====
@@ -129,6 +140,7 @@ public class Drivetrain2 extends OpMode {
 
         int dPos1 = pos1 - lastPos1;
         int dPos2 = pos2 - lastPos2;
+        dPos1 = -dPos1;
 
         double rev1 = dPos1 / TICKS_PER_REV;
         double rev2 = dPos2 / TICKS_PER_REV;
@@ -144,11 +156,11 @@ public class Drivetrain2 extends OpMode {
         // Shooter angle servo manual trim (gamepad2)
         // ---------------------------
         if (gamepad2.dpad_right && !DpadRightPrev) {
-            pos += 0.05;
+            pos += 0.02;
         }
         DpadRightPrev = gamepad2.dpad_right;
         if (gamepad2.dpad_left && !DpadLeftPrev) {
-            pos -= 0.05;
+            pos -= 0.02;
         }
         DpadLeftPrev = gamepad2.dpad_left;
         pos = Range.clip(pos, 0.8, 1.0);
@@ -169,17 +181,39 @@ public class Drivetrain2 extends OpMode {
         // Shooter motors (gamepad2 trigger)
         // ---------------------------
 
-        if (gamepad2.dpad_up  && !DpadUpPrev) {
-            shooterPower += 0.1;
-        }
-        DpadUpPrev = gamepad2.dpad_up;
-        if (gamepad2.dpad_down && !DpadDownPrev) {
-            shooterPower -= 0.1;
-        }
-        DpadDownPrev = gamepad2.dpad_down;
-        shooterPower = Range.clip(shooterPower, 0.0, 1.0);
-        ShooterM1.setPower(shooterPower);
-        ShooterM2.setPower(-shooterPower);
+        // Increase / decrease target RPM while holding
+        double rpmAdjustRate = 400;   // RPM per second
+
+        if (gamepad2.dpad_up)   targetRPM += rpmAdjustRate * Shooter_dt;
+        if (gamepad2.dpad_down) targetRPM -= rpmAdjustRate * Shooter_dt;
+
+        targetRPM = Range.clip(targetRPM, 0, 6000);
+
+        double avgRPM = (rpm1 + rpm2) / 2.0;
+        double error = targetRPM - avgRPM;
+
+        rpmErrorSum += error * Shooter_dt;
+        rpmErrorSum = Range.clip(rpmErrorSum, -2000, 2000);
+
+        double dError = (error - lastError) / Shooter_dt;
+
+        // Feedforward (motor model)
+                double kF = 1.0 / 5785.0;
+                double ffPower = kF * targetRPM;
+
+        // PID
+                double pidPower =
+                        kP * error +
+                                kI * rpmErrorSum +
+                                kD * dError;
+
+                shooterPower = Range.clip(ffPower + pidPower, 0.0, 1.0);
+
+                ShooterM1.setPower(shooterPower);
+                ShooterM2.setPower(-shooterPower);
+
+                lastError = error;
+
         // ---------------------------
         // Intake toggle (gamepad1 left bumper)
         // ---------------------------
@@ -314,9 +348,15 @@ public class Drivetrain2 extends OpMode {
         telemetry.addData("Shooter M1 Input", ShooterM1.getPower());
         telemetry.addData("Shooter M2 Input", ShooterM2.getPower());
         telemetry.addData("Shooter Input Sum", shooterPowerSum);
-        telemetry.addData("Shooter M1 RPM", rpm1);
-        telemetry.addData("Shooter M2 RPM", rpm2);
         telemetry.addData("Intake Power", IntakeMotor.getPower());
+
+        telemetry.addData("Target RPM", targetRPM);
+        telemetry.addData("RPM 1", rpm1);
+        telemetry.addData("RPM 2", rpm2);
+        telemetry.addData("Avg RPM", avgRPM);
+        telemetry.addData("Flywheel Error", error);
+        telemetry.addData("Flywheel Power", shooterPower);
+
         //telemetry.addData("Sensitivity Output", currentSensitivity);
         //telemetry.addData("Mode", Mode);
         //telemetry.addData("Precision toggle", Precision_mode_toggle);
