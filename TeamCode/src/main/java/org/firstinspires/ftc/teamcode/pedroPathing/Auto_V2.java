@@ -59,10 +59,10 @@ public class Auto_V2 extends OpMode {
     private final ArrayList<AutoStep> STEPS = new ArrayList<>();
     private final ArrayList<PathChain> CHAINS = new ArrayList<>();
     private final ArrayList<AutoStep> AUTOTEST = new ArrayList<>();
-    private final ArrayList<AutoStep> AUTO1 = new ArrayList<>();
-    private final ArrayList<AutoStep> AUTO2 = new ArrayList<>();
-    private final ArrayList<AutoStep> AUTO3 = new ArrayList<>();
-    private final ArrayList<AutoStep> AUTO4 = new ArrayList<>();
+    private final ArrayList<AutoStep> AUTOTOPLEFT = new ArrayList<>();
+    private final ArrayList<AutoStep> AUTOBOTTOMLEFT = new ArrayList<>();
+    private final ArrayList<AutoStep> AUTOTOPRIGHT = new ArrayList<>();
+    private final ArrayList<AutoStep> AUTOBOTTOMRIGHT = new ArrayList<>();
 
     private int currentIndex = 0;
     private long pauseEndTimeMs = 0;
