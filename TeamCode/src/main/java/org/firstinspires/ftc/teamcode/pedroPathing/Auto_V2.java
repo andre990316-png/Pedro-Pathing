@@ -10,9 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.mechanisms.FlywheelLogic;
 import org.firstinspires.ftc.teamcode.mechanisms.LimelightAim;
 
@@ -60,6 +58,11 @@ public class Auto_V2 extends OpMode {
 
     private final ArrayList<AutoStep> STEPS = new ArrayList<>();
     private final ArrayList<PathChain> CHAINS = new ArrayList<>();
+    private final ArrayList<AutoStep> AUTOTEST = new ArrayList<>();
+    private final ArrayList<AutoStep> AUTOTOPLEFT = new ArrayList<>();
+    private final ArrayList<AutoStep> AUTOBOTTOMLEFT = new ArrayList<>();
+    private final ArrayList<AutoStep> AUTOTOPRIGHT = new ArrayList<>();
+    private final ArrayList<AutoStep> AUTOBOTTOMRIGHT = new ArrayList<>();
 
     private int currentIndex = 0;
     private long pauseEndTimeMs = 0;
@@ -114,25 +117,32 @@ public class Auto_V2 extends OpMode {
     // ------------------------------------------------------------
     private void buildSteps() {
         STEPS.clear();
-
+        AUTOTEST.clear();
         // Start -> shoot
-        STEPS.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
-        STEPS.add(new AutoStep(blueShootPoseMed, AutoAction.NONE, 0));
+        AUTOTEST.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
+        AUTOTEST.add(new AutoStep(blueShootPoseMed, AutoAction.NONE, 0));
 
         // At shoot pose: shoot 3, wait until shooter done (no movement)
-        STEPS.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        AUTOTEST.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
         // Start moving to intake area: turn intake on at start of this segment
-        STEPS.add(new AutoStep(blueShootPoseMed, AutoAction.INTAKE_ON, 0));
-        STEPS.add(new AutoStep(blueBallPosition3Start, AutoAction.NONE, 0));
-        STEPS.add(new AutoStep(blueBallPosition3End, AutoAction.NONE, 0));
+        AUTOTEST.add(new AutoStep(blueShootPoseMed, AutoAction.INTAKE_ON, 0));
+        AUTOTEST.add(new AutoStep(blueBallPosition3Start, AutoAction.NONE, 0));
+        AUTOTEST.add(new AutoStep(blueBallPosition3End, AutoAction.NONE, 0));
 
         // Start returning: turn intake off at start of this segment
-        STEPS.add(new AutoStep(blueBallPosition3Start, AutoAction.INTAKE_OFF, 0));
-        STEPS.add(new AutoStep(blueShootPoseMed, AutoAction.SHOOT_3, 0));
+        AUTOTEST.add(new AutoStep(blueBallPosition3Start, AutoAction.INTAKE_OFF, 0));
+        AUTOTEST.add(new AutoStep(blueShootPoseMed, AutoAction.SHOOT_3, 0));
 
         // Optional: pause at shoot pose
-        STEPS.add(new AutoStep(null, AutoAction.PAUSE_MS, 500));
+        AUTOTEST.add(new AutoStep(null, AutoAction.PAUSE_MS, 500));
+
+
+        /// add AUTO1, 2, ... initializations here
+
+
+
+        STEPS.addAll(AUTOTEST);//change path here
     }
 
     // ------------------------------------------------------------
