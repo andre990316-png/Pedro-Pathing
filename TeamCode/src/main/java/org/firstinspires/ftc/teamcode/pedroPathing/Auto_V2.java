@@ -188,55 +188,7 @@ public class Auto_V2 extends OpMode {
 
 
 
-        STEPS.addAll(AUTOTOPLEFT
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        );//change path here
+        STEPS.addAll(AUTOTOPLEFT);//change path here
     }
 
     // ------------------------------------------------------------
@@ -335,6 +287,7 @@ public class Auto_V2 extends OpMode {
         // Start this segment: run its action FIRST (as you requested)
         AutoStep step = STEPS.get(currentIndex);
         executeAction(step);
+        telemetry.addData("Current State", step.action.name());
 
         PathChain chain = CHAINS.get(currentIndex);
 
