@@ -103,6 +103,7 @@ public class Auto_V2 extends OpMode {
     private final Pose blueLoadingZoneStart = new Pose(114,12,Math.toRadians(0));
     private final Pose blueLoadingZoneEnd = new Pose(134,12,Math.toRadians(0));
     private ElapsedTime stateTimer = new ElapsedTime();
+    private boolean actionActioned=false;
 
     // ------------------------------------------------------------
     // Build Steps (pose + action) ONCE
@@ -269,7 +270,11 @@ public class Auto_V2 extends OpMode {
             if (follower.isBusy()) {
                 return;
             }
-
+            if(!actionActioned){
+                AutoStep step = STEPS.get(currentIndex);
+                executeAction(step);
+                actionActioned=true;
+            }
             if (waitingForShooter) {
                 if (!shooter.isBusy()) {
                     waitingForShooter = false;
@@ -283,8 +288,6 @@ public class Auto_V2 extends OpMode {
         if (stateTimer.milliseconds()<pauseEndTimeMs) {
             return;
         }
-        AutoStep step = STEPS.get(currentIndex);
-        executeAction(step);
         PathChain chain = CHAINS.get(currentIndex);
 
         if (chain != null) {
@@ -293,6 +296,9 @@ public class Auto_V2 extends OpMode {
         currentIndex++;
         stateTimer.reset();
         timerStart = false;
+        waitingForShooter = false;
+        actionActioned = false;
+
     }
 
     @Override
