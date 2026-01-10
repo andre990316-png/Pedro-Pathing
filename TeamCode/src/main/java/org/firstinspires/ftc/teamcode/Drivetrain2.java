@@ -157,21 +157,26 @@ public class Drivetrain2 extends OpMode {
             GateOpen = !GateOpen;
         }
         CirclePrev = gamepad1.circle;*/
-        GateOpen = gamepad1.circle;
+        if (gamepad2.right_trigger > 0.03) {
+            GateOpen = true;
+        } else {
+            GateOpen = false;
+        }
+
         ShooterS2.setPosition(GateOpen? 0.4 : 0.8);
 
         // ---------------------------
         // Shooter motors (gamepad2 trigger)
         // ---------------------------
 
-        if (gamepad1.dpad_up  && !DpadUpPrev) {
+        if (gamepad2.dpad_up  && !DpadUpPrev) {
             shooterPower += 0.1;
         }
-        DpadUpPrev = gamepad1.dpad_up;
-        if (gamepad1.dpad_down && !DpadDownPrev) {
+        DpadUpPrev = gamepad2.dpad_up;
+        if (gamepad2.dpad_down && !DpadDownPrev) {
             shooterPower -= 0.1;
         }
-        DpadDownPrev = gamepad1.dpad_down;
+        DpadDownPrev = gamepad2.dpad_down;
         shooterPower = Range.clip(shooterPower, 0.0, 1.0);
         ShooterM1.setPower(shooterPower);
         ShooterM2.setPower(-shooterPower);
@@ -259,7 +264,11 @@ public class Drivetrain2 extends OpMode {
             autoAimEnabled = !autoAimEnabled;
         }
         AimTogglePrev = gamepad1.triangle;*/
-        autoAimEnabled = gamepad1.triangle;
+        if (gamepad2.right_trigger > 0.3) {
+            autoAimEnabled = true;
+        } else {
+            autoAimEnabled = false;
+        }
 
         // ---------------------------
         // Update IMU yaw
