@@ -49,7 +49,7 @@ public class Drivetrain2 extends OpMode {
     private double shooterPower = 0.0;
     private boolean shooterEnabled = false;
     private long lastShooterTime;
-    private int lastPos1, lastPos2;
+    private int lastPos1;
 
     // Linear Flywheels
     double targetRPM = 4000;
@@ -91,7 +91,6 @@ public class Drivetrain2 extends OpMode {
         //ShooterM2.setDirection(DcMotorSimple.Direction.REVERSE);
 
         ShooterM1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        ShooterM2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         ShooterM1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         ShooterM2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -112,7 +111,6 @@ public class Drivetrain2 extends OpMode {
 
         lastShooterTime = System.nanoTime();
         lastPos1 = ShooterM1.getCurrentPosition();
-        lastPos2 = ShooterM2.getCurrentPosition();
 
         telemetry.addData("Initialize", "Completed");
         telemetry.update();
@@ -136,20 +134,15 @@ public class Drivetrain2 extends OpMode {
         if (Shooter_dt <= 0) Shooter_dt = 0.02;
 
         int pos1 = ShooterM1.getCurrentPosition();
-        int pos2 = ShooterM2.getCurrentPosition();
 
         int dPos1 = pos1 - lastPos1;
-        int dPos2 = pos2 - lastPos2;
         dPos1 = -dPos1;
 
         double rev1 = dPos1 / TICKS_PER_REV;
-        double rev2 = dPos2 / TICKS_PER_REV;
 
-        double rpm1 = (rev1 / Shooter_dt) * 60.0;
-        double rpm2 = (rev2 / Shooter_dt) * 60.0;
+        double rpm = (rev1 / Shooter_dt) * 60.0;
 
         lastPos1 = pos1;
-        lastPos2 = pos2;
         lastShooterTime = Shooter_now;
 
         // ---------------------------
@@ -189,8 +182,7 @@ public class Drivetrain2 extends OpMode {
 
         targetRPM = Range.clip(targetRPM, 0, 6000);
 
-        double avgRPM = (rpm1 + rpm2) / 2.0;
-        double error = targetRPM - avgRPM;
+        double error = targetRPM - rpm;
 
         rpmErrorSum += error * Shooter_dt;
         rpmErrorSum = Range.clip(rpmErrorSum, -2000, 2000);
@@ -351,9 +343,7 @@ public class Drivetrain2 extends OpMode {
         telemetry.addData("Intake Power", IntakeMotor.getPower());
 
         telemetry.addData("Target RPM", targetRPM);
-        telemetry.addData("RPM 1", rpm1);
-        telemetry.addData("RPM 2", rpm2);
-        telemetry.addData("Avg RPM", avgRPM);
+        telemetry.addData("RPM", rpm);
         telemetry.addData("Flywheel Error", error);
         telemetry.addData("Flywheel Power", shooterPower);
 
