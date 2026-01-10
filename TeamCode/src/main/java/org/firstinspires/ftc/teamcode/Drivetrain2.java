@@ -144,11 +144,11 @@ public class Drivetrain2 extends OpMode {
         // Shooter angle servo manual trim (gamepad2)
         // ---------------------------
         if (gamepad2.dpad_right && !DpadRightPrev) {
-            pos += 0.05;
+            pos += 0.02;
         }
         DpadRightPrev = gamepad2.dpad_right;
         if (gamepad2.dpad_left && !DpadLeftPrev) {
-            pos -= 0.05;
+            pos -= 0.02;
         }
         DpadLeftPrev = gamepad2.dpad_left;
         pos = Range.clip(pos, 0.8, 1.0);
