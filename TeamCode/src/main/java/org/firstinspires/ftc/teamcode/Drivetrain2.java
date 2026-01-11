@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.teamcode.mechanisms.FlywheelLogic;
 import org.firstinspires.ftc.teamcode.mechanisms.LimelightAim;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -19,14 +20,14 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 public class Drivetrain2 extends OpMode {
 
 
-    public AutoShooting lookupA(double ta) {
+    public static AutoShooting lookupA(double ta) {
         if (ta >= 2.37) return new AutoShooting(3200, 0.90);
         if (ta >= 1.10) return new AutoShooting(3900, 0.94);
         if (ta >= 0.70) return new AutoShooting(4400, 1.00);
         return new AutoShooting(4800, 1.00);
     }
 
-    public AutoShooting lookupB(double ta) {
+    public static AutoShooting lookupB(double ta) {
         if (ta >= 0.38) return new AutoShooting(4800, 1.00);
         if (ta >= 0.32) return new AutoShooting(4900, 1.00);
         if (ta >= 0.29) return new AutoShooting(5200, 1.00);
@@ -71,12 +72,14 @@ public class Drivetrain2 extends OpMode {
     // Linear Flywheels
     double targetRPM = 0;
 
-    double kP = 0.39;   // tune this
-    double kI = 0.000010;  // optional
-    double kD = 0.00002;   // optional
+    public static final double kP = 0.39;   // tune this
+    public static final double kI = 0.000010;  // optional
+    public static final double kD = 0.00002;   // optional
 
     double rpmErrorSum = 0;
     double lastError = 0;
+
+    private FlywheelLogic shooter = new FlywheelLogic();
 
 
 
@@ -124,7 +127,7 @@ public class Drivetrain2 extends OpMode {
         Precision_mode_toggle = false;
         IntakeToggle = false;
 
-        targetRPM = 0;
+        shooter.setTargetRPM(0);
         flywheelAutoMode = false;
         rpmErrorSum = 0;
         lastError = 0;
@@ -134,6 +137,8 @@ public class Drivetrain2 extends OpMode {
 
         telemetry.addData("Initialize", "Completed");
         telemetry.update();
+
+        shooter.init(hardwareMap);
     }
 
     @Override
@@ -145,10 +150,7 @@ public class Drivetrain2 extends OpMode {
     @Override
     public void loop() {
 
-        // ---------------------------
-        // Shooter Motors' speed
-        // ---------------------------
-        long Shooter_now = System.nanoTime();
+        /**long Shooter_now = System.nanoTime();
         double Shooter_dt = (Shooter_now - lastShooterTime) / 1e9;
 
         if (Shooter_dt <= 0) Shooter_dt = 0.02;
@@ -163,8 +165,8 @@ public class Drivetrain2 extends OpMode {
         double rpm = (rev1 / Shooter_dt) * 60.0;
 
         lastPos1 = pos1;
-        lastShooterTime = Shooter_now;
-
+        lastShooterTime = Shooter_now;*/
+        shooter.update();
         // ---------------------------
         // Shooter angle servo manual trim (gamepad2)
         // ---------------------------
@@ -180,9 +182,10 @@ public class Drivetrain2 extends OpMode {
         ShooterS1.setPosition(pos);
 
         GateOpen = gamepad2.right_trigger > 0.03;
-        ShooterS2.setPosition(GateOpen? 0.7 : 0.2);
+        ShooterS2.setPosition(GateOpen? 0 : 0.2);
 
         // Read ta only if valid
+
         double ta = 0;
         boolean llValid = false;
         LLResult ll = limelight.limelight.getLatestResult();
@@ -193,25 +196,25 @@ public class Drivetrain2 extends OpMode {
 
         if (gamepad2.right_bumper && !flywheelTogglePrev) {
             flywheelAutoMode = !flywheelAutoMode;
-            targetRPM = 0;
+            shooter.setTargetRPM(0);
         }
         flywheelTogglePrev = gamepad2.right_bumper;
 
         if (flywheelAutoMode) {
             if (llValid) {
                 AutoShooting shot = (ta >= 0.7) ? lookupA(ta) : lookupB(ta);
-                targetRPM = shot.rpm;
-                ShooterS1.setPosition(shot.hood);
+                shooter.setTargetRPM(shot.rpm);
+                shooter.setHoodPosition(shot.hood);
             } else {
-                targetRPM = 0;
+                shooter.setTargetRPM(0);
             }
         } else {
-            if (gamepad2.dpad_up && !DpadUpPrev)   targetRPM += 500;
-            if (gamepad2.dpad_down && !DpadDownPrev) targetRPM -= 500;
+            if (gamepad2.dpad_up && !DpadUpPrev)   shooter.setTargetRPM(shooter.getTargetRPM()+500);
+            if (gamepad2.dpad_down && !DpadDownPrev) shooter.setTargetRPM(shooter.getTargetRPM()-500);
             DpadUpPrev = gamepad2.dpad_up;
             DpadDownPrev = gamepad2.dpad_down;
         }
-        targetRPM = Range.clip(targetRPM, 0, 6000);
+        /**targetRPM = Range.clip(targetRPM, 0, 6000);
 
         double error = targetRPM - rpm;
         double dError = (error - lastError) / Shooter_dt;
@@ -225,7 +228,9 @@ public class Drivetrain2 extends OpMode {
         ShooterM1.setPower(shooterPower);
         ShooterM2.setPower(-shooterPower);
 
-        lastError = error;
+        lastError = error;*/
+
+
 
         // ---------------------------
         // Intake toggle (gamepad1 left bumper)
@@ -236,48 +241,7 @@ public class Drivetrain2 extends OpMode {
         IntakeMotor.setPower(IntakeToggle ? -1.0 : 0.0);
         Left_BumperPrev = gamepad1.left_bumper;
 
-        // ---------------------------
-        // Precision mode toggle + hold
-        // ---------------------------
-        /*if (gamepad1.circle && !CirclePrev) {
-            Precision_mode_toggle = !Precision_mode_toggle;
-        }
-        CirclePrev = gamepad1.circle;
 
-        Precision_mode = gamepad1.cross;
-
-        currentSensitivity = (Precision_mode_toggle || Precision_mode) ? 0.3 : Sensitivity;
-
-        // ---------------------------
-        // Mode toggle (gamepad1 right bumper)
-        // ---------------------------
-        if (gamepad1.right_bumper && !Right_BumperPrev) {
-            Mode = !Mode;
-        }
-        Right_BumperPrev = gamepad1.right_bumper;
-
-        if (Mode) {
-            gamepad1.setLedColor(1, 0, 0, Gamepad.LED_DURATION_CONTINUOUS);
-        } else {
-            gamepad1.setLedColor(0, 0, 1, Gamepad.LED_DURATION_CONTINUOUS);
-        }
-
-        // ---------------------------
-        // Sensitivity adjust (dpad up/down)
-        // ---------------------------
-        if (gamepad1.dpad_up && !DpadUpPrev && !Precision_mode) {
-            Sensitivity = Math.min(Math.max(Sensitivity + 0.1, 0.1), 1.0);
-        }
-        DpadUpPrev = gamepad1.dpad_up;
-
-        if (gamepad1.dpad_down && !DpadDownPrev && !Precision_mode) {
-            Sensitivity = Math.min(Math.max(Sensitivity - 0.1, 0.1), 1.0);
-        }
-        DpadDownPrev = gamepad1.dpad_down;*/
-
-        // ---------------------------
-        // Drivetrain mixing
-        // ---------------------------
         XL = gamepad1.left_stick_x;// * currentSensitivity;
         YL = -gamepad1.left_stick_y;// * currentSensitivity;
         XR = gamepad1.right_stick_x;// * currentSensitivity;
@@ -351,16 +315,14 @@ public class Drivetrain2 extends OpMode {
         telemetry.addData("Shooter Input Sum", shooterPowerSum);
         telemetry.addData("Intake Power", IntakeMotor.getPower());
 
-        telemetry.addData("Target RPM", targetRPM);
-        telemetry.addData("RPM", rpm);
-        telemetry.addData("Flywheel Error", error);
+        telemetry.addData("Target RPM", shooter.getTargetRPM());
+        telemetry.addData("RPM", shooter.getFlywheelRpm());
+        telemetry.addData("Flywheel Error", shooter.getError());
         telemetry.addData("Flywheel Power", shooterPower);
 
-        //telemetry.addData("Sensitivity Output", currentSensitivity);
-        //telemetry.addData("Mode", Mode);
-        //telemetry.addData("Precision toggle", Precision_mode_toggle);
-        //telemetry.addData("Precision hold", Precision_mode);
-        //telemetry.addData("Sensitivity", Sensitivity);
+
         telemetry.update();
     }
+
+
 }

@@ -269,15 +269,16 @@ public class Auto_V2 extends OpMode {
                 }
 
                 FlywheelLogic.AutoShooting shot;
-                if (llValid) {
-                    shot = (ta >= 0.7) ? lookupA(ta) : lookupB(ta);
-                } else {
-                    // fallback if no tag (choose something safe)
-                    shot = new FlywheelLogic.AutoShooting(0, 0.84); // rpm=0 means don't spin; hood default
+
+                if(llValid){
+                    shooter.autoAim(ta);
+                }else{
+                    shot = new FlywheelLogic.AutoShooting(0, 0.84);
+                    shooter.setTargetRPM(shot.rpm);
+                    shooter.setHoodPosition(shot.hood);
                 }
 
-                shooter.setTargetFlywheelRpm(shot.rpm);
-                shooter.setHoodPosition(shot.hood);
+
                 shooter.fireShots(3);
                 waitingForShooter = true;   // keep your existing blocking behavior
                 break;
