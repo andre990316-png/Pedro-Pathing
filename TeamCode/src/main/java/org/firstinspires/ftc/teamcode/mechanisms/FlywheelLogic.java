@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 public class FlywheelLogic {
 
@@ -76,7 +77,6 @@ public class FlywheelLogic {
     private void updateFlywheelRpm() {
         double dt = velTimer.seconds();
         if (dt <= 0.0) return;
-
         int p1 = ShooterM1.getCurrentPosition();
         //int p2 = ShooterM2.getCurrentPosition();
 
@@ -164,4 +164,24 @@ public class FlywheelLogic {
     public IntakeLogic getIntake(){
         return intake;
     }
+
+    public void setTargetFlywheelRpm(double rpm) {
+        targetFlywheelRpm = Range.clip(rpm, 0, 6000);
+    }
+
+    public void setHoodPosition(double hood) {
+        // hood is a servo position in [0,1]
+        ShooterS1.setPosition(Range.clip(hood, 0.0, 1.0));
+    }
+
+    public static class AutoShooting {
+        public double rpm;
+        public double hood;
+        public AutoShooting(double rpm, double hood) {
+            this.rpm = rpm;
+            this.hood = hood;
+        }
+    }
+
+
 }

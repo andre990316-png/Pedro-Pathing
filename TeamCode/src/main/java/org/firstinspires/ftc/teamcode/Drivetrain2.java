@@ -53,10 +53,8 @@ public class Drivetrain2 extends OpMode {
     private IMU imu;
 
     // ===== These USED to be locals in runOpMode(); now they MUST be fields =====
-    private boolean Mode, CirclePrev, DpadUpPrev, DpadDownPrev, DpadLeftPrev, DpadRightPrev, Right_BumperPrev, Left_BumperPrev, GateOpen;
+    private boolean DpadUpPrev, DpadDownPrev, DpadLeftPrev, DpadRightPrev, Right_BumperPrev, Left_BumperPrev, GateOpen;
     private boolean Precision_mode_toggle, Precision_mode, IntakeToggle;
-
-    private boolean AimTogglePrev = false;
     private boolean autoAimEnabled = true;
     private boolean flywheelAutoMode = false;
     private boolean flywheelTogglePrev = false;
@@ -67,14 +65,13 @@ public class Drivetrain2 extends OpMode {
     private double XL, YL, XR, YR;
     private double TempMax1, TempMax2, MaxPower;
     private double shooterPower = 0.0;
-    private boolean shooterEnabled = false;
     private long lastShooterTime;
     private int lastPos1;
 
     // Linear Flywheels
     double targetRPM = 0;
 
-    double kP = 0.0003;   // tune this
+    double kP = 0.39;   // tune this
     double kI = 0.000010;  // optional
     double kD = 0.00002;   // optional
 
@@ -116,11 +113,8 @@ public class Drivetrain2 extends OpMode {
         ShooterM2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // ===== Init state (what you did before waitForStart) =====
-        ShooterS1.setPosition(0.8);
-        Sensitivity = 1.0;
+        ShooterS1.setPosition(0.84);
 
-        Mode = false;
-        CirclePrev = false;
         DpadUpPrev = false;
         DpadDownPrev = false;
         Left_BumperPrev = false;
@@ -197,10 +191,11 @@ public class Drivetrain2 extends OpMode {
             ta = ll.getTa();
         }
 
-        if (gamepad2.square && !flywheelTogglePrev) {
+        if (gamepad2.right_bumper && !flywheelTogglePrev) {
             flywheelAutoMode = !flywheelAutoMode;
+            targetRPM = 0;
         }
-        flywheelTogglePrev = gamepad2.square;
+        flywheelTogglePrev = gamepad2.right_bumper;
 
         if (flywheelAutoMode) {
             if (llValid) {
@@ -211,17 +206,11 @@ public class Drivetrain2 extends OpMode {
                 targetRPM = 0;
             }
         } else {
-            if (gamepad2.dpad_up && !DpadUpPrev)   targetRPM += 100;
-            if (gamepad2.dpad_down && !DpadDownPrev) targetRPM -= 100;
+            if (gamepad2.dpad_up && !DpadUpPrev)   targetRPM += 500;
+            if (gamepad2.dpad_down && !DpadDownPrev) targetRPM -= 500;
             DpadUpPrev = gamepad2.dpad_up;
             DpadDownPrev = gamepad2.dpad_down;
         }
-        targetRPM = Range.clip(targetRPM, 0, 6000);
-
-        if (gamepad2.dpad_up && !DpadUpPrev)   targetRPM = targetRPM + 100;
-        if (gamepad2.dpad_down && !DpadDownPrev) targetRPM = targetRPM - 100;
-        DpadUpPrev = gamepad2.dpad_up;
-        DpadDownPrev = gamepad2.dpad_down;
         targetRPM = Range.clip(targetRPM, 0, 6000);
 
         double error = targetRPM - rpm;
@@ -314,14 +303,6 @@ public class Drivetrain2 extends OpMode {
             MotorBackLeft.setPower((YL - XL) + XR);
             MotorBackRight.setPower((YL + XL) - XR);
         }
-
-        // ---------------------------
-        // Auto-aim toggle (gamepad2 triangle)
-        // ---------------------------
-        /*if (gamepad1.triangle && !AimTogglePrev) {
-            autoAimEnabled = !autoAimEnabled;
-        }
-        AimTogglePrev = gamepad1.triangle;*/
         autoAimEnabled = gamepad2.left_trigger > 0.3;
 
         // ---------------------------

@@ -5,6 +5,7 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
+import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -21,6 +22,19 @@ import java.util.ArrayList;
 public class Auto_V2 extends OpMode {
 
     // Motors / hardware you already had
+    public FlywheelLogic.AutoShooting lookupA(double ta) {
+        if (ta >= 2.37) return new FlywheelLogic.AutoShooting(3200, 0.90);
+        if (ta >= 1.10) return new FlywheelLogic.AutoShooting(3900, 0.94);
+        if (ta >= 0.70) return new FlywheelLogic.AutoShooting(4400, 1.00);
+        return new FlywheelLogic.AutoShooting(4800, 1.00);
+    }
+
+    public FlywheelLogic.AutoShooting lookupB(double ta) {
+        if (ta >= 0.38) return new FlywheelLogic.AutoShooting(4800, 1.00);
+        if (ta >= 0.32) return new FlywheelLogic.AutoShooting(4900, 1.00);
+        if (ta >= 0.29) return new FlywheelLogic.AutoShooting(5200, 1.00);
+        return new FlywheelLogic.AutoShooting(5400, 1.00);
+    }
     private DcMotor ShooterRotateMotor;
     private LimelightAim limelight;
     private IMU imu;
@@ -245,8 +259,27 @@ public class Auto_V2 extends OpMode {
                 break;
 
             case SHOOT_3:
+                double ta = 0;
+                boolean llValid = false;
+
+                LLResult ll = limelight.limelight.getLatestResult(); // same access pattern you used in TeleOp
+                if (ll != null && ll.isValid()) {
+                    llValid = true;
+                    ta = ll.getTa();
+                }
+
+                FlywheelLogic.AutoShooting shot;
+                if (llValid) {
+                    shot = (ta >= 0.7) ? lookupA(ta) : lookupB(ta);
+                } else {
+                    // fallback if no tag (choose something safe)
+                    shot = new FlywheelLogic.AutoShooting(0, 0.84); // rpm=0 means don't spin; hood default
+                }
+
+                shooter.setTargetFlywheelRpm(shot.rpm);
+                shooter.setHoodPosition(shot.hood);
                 shooter.fireShots(3);
-                waitingForShooter = true;
+                waitingForShooter = true;   // keep your existing blocking behavior
                 break;
 
             case AIM_ON:
@@ -266,39 +299,43 @@ public class Auto_V2 extends OpMode {
     private void updateAuto() {
         if (currentIndex >= CHAINS.size()) return;
 
-        if(!timerStart) {
-            if (follower.isBusy()) {
-                return;
-            }
-//            if(!actionActioned){
-//                AutoStep step = STEPS.get(currentIndex);
-//                executeAction(step);
-//                actionActioned=true;
-//            }
-            if (waitingForShooter) {
-                if (!shooter.isBusy()) {
-                    waitingForShooter = false;
-                } else {
-                    return;
-                }
-            }
-            stateTimer.reset();
-            timerStart = true;
+        // 1) 車子還在跑路徑，就不要進行下一步
+        if (follower.isBusy()) return;
+
+        // 2) 正在射球就卡在這裡，直到射完
+        if (waitingForShooter) {
+            if (shooter.isBusy()) return;   // shooter 還忙
+            waitingForShooter = false;      // shooter 完成
         }
-        if (stateTimer.milliseconds()<pauseEndTimeMs) {
-            return;
+
+        // 3) Pause（如果你有用 PAUSE_MS）
+        if (pauseEndTimeMs > 0) {
+            long now = System.currentTimeMillis();
+            if (now < pauseEndTimeMs) return;
+            pauseEndTimeMs = 0;
         }
+
         AutoStep step = STEPS.get(currentIndex);
-        executeAction(step);
+
+        // 4) 每個 step 的 action 只執行一次（避免射球被重複觸發）
+        if (!actionActioned) {
+            executeAction(step);
+            actionActioned = true;
+        }
+
+        // 5) 如果這個 action 觸發了「阻塞行為」（射球 / pause），就先不要啟動 path
+        if (waitingForShooter) return;
+        if (pauseEndTimeMs > 0 && System.currentTimeMillis() < pauseEndTimeMs) return;
+
+        // 6) action 都做完了，才開始跑到下一個 pose
         PathChain chain = CHAINS.get(currentIndex);
         if (chain != null) {
             follower.followPath(chain, true);
         }
-        currentIndex++;
-        stateTimer.reset();
-        timerStart = false;
-        actionActioned = false;
 
+        // 7) 進下一步
+        currentIndex++;
+        actionActioned = false;
     }
 
     @Override
