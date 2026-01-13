@@ -1,20 +1,22 @@
-package org.firstinspires.ftc.teamcode.pedroPathing;
+package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
-import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+import org.firstinspires.ftc.teamcode.Mechanisms.LimelightAim;
+import org.firstinspires.ftc.teamcode.Data.FlywheelAndHoodData;
 
-import org.firstinspires.ftc.teamcode.mechanisms.FlywheelLogic;
-import org.firstinspires.ftc.teamcode.mechanisms.LimelightAim;
+import org.firstinspires.ftc.teamcode.Mechanisms.FlywheelLogic;
 
 import java.util.ArrayList;
 
@@ -22,22 +24,7 @@ import java.util.ArrayList;
 public class Auto_V2 extends OpMode {
 
     // Motors / hardware you already had
-    public FlywheelLogic.AutoShooting lookupA(double ta) {
-        if (ta >= 2.37) return new FlywheelLogic.AutoShooting(3200, 0.90);
-        if (ta >= 1.10) return new FlywheelLogic.AutoShooting(3900, 0.94);
-        if (ta >= 0.70) return new FlywheelLogic.AutoShooting(4400, 1.00);
-        return new FlywheelLogic.AutoShooting(4800, 1.00);
-    }
-
-    public FlywheelLogic.AutoShooting lookupB(double ta) {
-        if (ta >= 0.38) return new FlywheelLogic.AutoShooting(4800, 1.00);
-        if (ta >= 0.32) return new FlywheelLogic.AutoShooting(4900, 1.00);
-        if (ta >= 0.29) return new FlywheelLogic.AutoShooting(5200, 1.00);
-        return new FlywheelLogic.AutoShooting(5400, 1.00);
-    }
     private DcMotor ShooterRotateMotor;
-    private LimelightAim limelight;
-    private IMU imu;
 
     private Follower follower;
     private Timer pathTimer, opModeTimer;
@@ -47,6 +34,9 @@ public class Auto_V2 extends OpMode {
 
     // Auto aim toggle
     private boolean autoAimEnabled = true;
+    private Limelight3A limelight;
+    private IMU imu;
+    private LimelightAim autoAim = new LimelightAim();
 
     // ====== STEP SYSTEM ======
     public enum AutoAction {
@@ -198,13 +188,9 @@ public class Auto_V2 extends OpMode {
         //flipped copy of top left
         AUTOTOPRIGHT = AutoStep.flipped(AUTOTOPLEFT);
 
-
         /// bottom right auto
 
         AUTOBOTTOMRIGHT = AutoStep.flipped(AUTOBOTTOMLEFT);
-
-
-
 
         STEPS.addAll(AUTOTOPLEFT);//change path here
     }
@@ -262,22 +248,23 @@ public class Auto_V2 extends OpMode {
                 double ta = 0;
                 boolean llValid = false;
 
-                LLResult ll = limelight.limelight.getLatestResult(); // same access pattern you used in TeleOp
+                LLResult ll = limelight.getLatestResult();
                 if (ll != null && ll.isValid()) {
                     llValid = true;
                     ta = ll.getTa();
                 }
 
                 FlywheelLogic.AutoShooting shot;
-                if (llValid) {
-                    shot = (ta >= 0.7) ? lookupA(ta) : lookupB(ta);
-                } else {
-                    // fallback if no tag (choose something safe)
-                    shot = new FlywheelLogic.AutoShooting(0, 0.84); // rpm=0 means don't spin; hood default
+
+                if(llValid){
+                    shooter.autoAim(ta);
+                }else{
+                    shot = new FlywheelLogic.AutoShooting(0, 0.84);
+                    shooter.setTargetRPM(shot.rpm);
+                    shooter.setHoodPosition(shot.hood);
                 }
 
-                shooter.setTargetFlywheelRpm(shot.rpm);
-                shooter.setHoodPosition(shot.hood);
+
                 shooter.fireShots(3);
                 waitingForShooter = true;   // keep your existing blocking behavior
                 break;
@@ -288,7 +275,7 @@ public class Auto_V2 extends OpMode {
 
             case AIM_OFF:
                 autoAimEnabled = false;
-                limelight.resetHistory(getRuntime());
+                autoAim.resetHistory(getRuntime());
                 break;
         }
     }
@@ -355,8 +342,8 @@ public class Auto_V2 extends OpMode {
         );
         imu.initialize(new IMU.Parameters(revHubOrientationOnRobot));
 
-        limelight = new LimelightAim(hardwareMap, imu, "Limelight");
-        limelight.setPipeline("Blue");
+        limelight = hardwareMap.get(Limelight3A.class, "Limelight");
+        limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
 
         shooter.init(hardwareMap);
 
@@ -376,7 +363,8 @@ public class Auto_V2 extends OpMode {
         pauseEndTimeMs = 0;
         waitingForShooter = false;
 
-        limelight.start(getRuntime());
+        limelight.start();
+        autoAim.resetHistory(getRuntime());
     }
 
     @Override
@@ -392,7 +380,8 @@ public class Auto_V2 extends OpMode {
         double turretPower = 0;
 
         if (autoAimEnabled) {
-            turretPower = limelight.update(getRuntime(), telemetry);
+            LLResult ll = limelight.getLatestResult();
+            turretPower = autoAim.update(getRuntime(), ll, telemetry);
         } else {
             turretPower = 0;
         }

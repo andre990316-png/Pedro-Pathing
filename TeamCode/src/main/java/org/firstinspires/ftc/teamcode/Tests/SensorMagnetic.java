@@ -27,9 +27,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Tests;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -47,15 +46,15 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
  */
-@TeleOp(name = "Sensor: REV touch sensor", group = "Sensor")
-public class SensorTouch extends LinearOpMode {
+@TeleOp(name = "Sensor: REV magnetic limit switch", group = "Sensor")
+public class SensorMagnetic extends LinearOpMode {
     TouchSensor touchSensor;  // Touch sensor Object
 
     @Override
     public void runOpMode() {
 
         // get a reference to our touchSensor object.
-        touchSensor = hardwareMap.get(TouchSensor.class, "sensor_touch");
+        touchSensor = hardwareMap.get(TouchSensor.class, "sensor_magnetic");
 
         // wait for the start button to be pressed.
         waitForStart();
@@ -66,9 +65,9 @@ public class SensorTouch extends LinearOpMode {
 
             // send the info back to driver station using telemetry function.
             if (touchSensor.isPressed()) {
-                telemetry.addData("Touch Sensor", "Is Pressed");
+                telemetry.addData("Magnetic Sensor", "Is Pressed");
             } else {
-                telemetry.addData("Touch Sensor", "Is Not Pressed");
+                telemetry.addData("Magnetic Sensor", "Is Not Pressed");
             }
 
             telemetry.update();

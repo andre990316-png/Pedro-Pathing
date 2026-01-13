@@ -1,5 +1,4 @@
-package org.firstinspires.ftc.teamcode.mechanisms;
-
+package org.firstinspires.ftc.teamcode.Mechanisms;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -7,7 +6,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.teamcode.Data.FlywheelAndHoodData;
+
 public class FlywheelLogic {
+
+
+    public static final double kp = 0.39;
+    public static final double kd = 0.00002;
 
     // --- Hardware ---
     private DcMotorEx ShooterM1; // right
@@ -24,24 +29,37 @@ public class FlywheelLogic {
     // Keep it consistent with your drivetrain code.
     private static final double TICKS_PER_REV = 28;
 
+    public boolean isAutoAiming() {
+        return autoAiming;
+    }
+
+    public void setAutoAiming(boolean autoAiming) {
+        this.autoAiming = autoAiming;
+    }
+
     // --- State machine ---
     private enum FlywheelState { IDLE, SPIN_UP, WAIT, LAUNCH, RESET_GATE }
     private FlywheelState flyWheelState = FlywheelState.IDLE;
 
     // --- Gate / shot settings ---
     private double gateCloseAngle = 0.2;
-    private double gateOpenAngle  = 0.7;
-    private double gateOpenTime   = 0.3;
-    private double gateCloseTime  = 0.3;
+    private double gateOpenAngle  = 0;
+    private double gateOpenTime   = 0.5;
+    private double gateCloseTime  = 0.5;
 
     private int shotsRemaining = 0;
 
     // --- Velocity targets (RPM) ---
-    private double flywheelRpm = 0.0;          // measured RPM
-    private double minFlywheelRpm = 800;     // RPM threshold to shoot
-    private double targetFlywheelRpm = 1000; // desired RPM
+    private double flywheelRpm = 0.0;
+    private double minFlywheelRpm = 800;
+    private double targetRPM = 0;
     private double flywheelMaxSpinupTime = 2.0;
+    private double lastShooterTime=System.nanoTime();
     private IntakeLogic intake = new IntakeLogic();
+    private double currentRPM=0;
+    private double lastError = 0;
+    private double error=0;
+    private boolean autoAiming=false;
 
     public void init(HardwareMap hardwareMap) {
         ShooterM1 = hardwareMap.get(DcMotorEx.class, "Shooter M1");
@@ -66,43 +84,51 @@ public class FlywheelLogic {
         intake.init(hardwareMap);
     }
 
-    // Convert RPM -> encoder ticks/second for setVelocity()
-    private double rpmToTicksPerSec(double rpm) {
-        return rpm * TICKS_PER_REV / 60.0;
-    }
-
-    // Update measured flywheel RPM using encoder deltas
-    private void updateFlywheelRpm() {
-        double dt = velTimer.seconds();
-        if (dt <= 0.0) return;
-        int p1 = ShooterM1.getCurrentPosition();
-        //int p2 = ShooterM2.getCurrentPosition();
-
-        int d1 = p1 - lastPos1;
-        //int d2 = p2 - lastPos2;
-
-        lastPos1 = p1;
-        //lastPos2 = p2;
-        velTimer.reset();
-
-        double tps1 = d1 / dt; // ticks per second
-        //double tps2 = d2 / dt;
-
-        double rpm1 = (tps1 / TICKS_PER_REV) * 60.0;
-        //double rpm2 = (tps2 / TICKS_PER_REV) * 60.0;
-
-        // take magnitude + average (since one motor is reversed)
-        flywheelRpm = (Math.abs(rpm1));
-    }
-
     public void update() {
-        updateFlywheelRpm(); // <-- keeps flywheelRpm fresh every loop
+
+        long Shooter_now = System.nanoTime();
+        double Shooter_dt = (Shooter_now - lastShooterTime) / 1e9;
+
+        if (Shooter_dt <= 0) Shooter_dt = 0.02;
+
+        int pos1 = ShooterM1.getCurrentPosition();
+
+        int dPos1 = pos1 - lastPos1;
+        dPos1 = -dPos1;
+
+        double rev1 = dPos1 / TICKS_PER_REV;
+
+        /// current RPM
+        currentRPM = (rev1 / Shooter_dt) * 60.0;
+
+        lastPos1 = pos1;
+        lastShooterTime = Shooter_now;
+
+        /// convert desired RPM to motor language or something idk
+        targetRPM = Range.clip(targetRPM, 0, 6000);
+
+        error = targetRPM - currentRPM;
+        double dError = (error - lastError) / Shooter_dt;
+
+        double pdPower = kp * error + kd * dError;
+
+        if (targetRPM <= 0) pdPower = 0;
+
+        double calcRPM = Range.clip(pdPower, 0.0, 1.0);
+
+        lastError = error;
+
+
+        /// set shooter motors
+        ShooterM1.setPower(calcRPM);
+        ShooterM2.setPower(-calcRPM);
+
         intake.update();
         switch (flyWheelState) {
             case IDLE:
                 break;
             case WAIT:
-                if (stateTimer.seconds() > 2) {
+                if (stateTimer.seconds() > 0) {
                     stateTimer.reset();
                     flyWheelState = FlywheelState.SPIN_UP;
                 }
@@ -142,9 +168,9 @@ public class FlywheelLogic {
         if (flyWheelState == FlywheelState.IDLE) {
             shotsRemaining = numberOfShots;
             if (shotsRemaining > 0) {
-                // Command target RPM (not power)
-                ShooterM1.setVelocity(rpmToTicksPerSec(targetFlywheelRpm));
-                ShooterM2.setVelocity(-rpmToTicksPerSec(targetFlywheelRpm));
+
+                ShooterM1.setPower(targetRPM);
+                ShooterM2.setPower(targetRPM);
                 intake.intakeReady(true);
                 stateTimer.reset();
                 flyWheelState = FlywheelState.WAIT;
@@ -163,8 +189,8 @@ public class FlywheelLogic {
         return intake;
     }
 
-    public void setTargetFlywheelRpm(double rpm) {
-        targetFlywheelRpm = Range.clip(rpm, 0, 6000);
+    public void setTargetRPM(double rpm) {
+        targetRPM = rpm;
     }
 
     public void setHoodPosition(double hood) {
@@ -181,5 +207,20 @@ public class FlywheelLogic {
         }
     }
 
+    public double getError(){
+        return error;
+    }
 
+    public double getTargetRPM(){
+        return targetRPM;
+    }
+
+    public void autoAim(double ta){
+        org.firstinspires.ftc.teamcode.Mechanisms.AutoShooting shot;
+
+        shot = (ta >= 0.7) ? FlywheelAndHoodData.lookupA(ta) : FlywheelAndHoodData.lookupB(ta);
+
+        setTargetRPM(shot.rpm);
+        setHoodPosition(shot.hood);
+    }
 }
