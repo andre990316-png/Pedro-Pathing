@@ -56,9 +56,9 @@ public class FlywheelLogic {
     private double flywheelMaxSpinupTime = 2.0;
     private double lastShooterTime=System.nanoTime();
     private IntakeLogic intake = new IntakeLogic();
-    private double currentRPM=0;
+    private double currentRPM = 0;
     private double lastError = 0;
-    private double error=0;
+    private double error = 0;
     private boolean autoAiming=false;
 
     public void init(HardwareMap hardwareMap) {
@@ -129,14 +129,14 @@ public class FlywheelLogic {
         switch (flyWheelState) {
             case IDLE:
                 break;
-            case WAIT:
-                if (stateTimer.seconds() > 0) {
-                    stateTimer.reset();
-                    flyWheelState = FlywheelState.SPIN_UP;
-                }
-                break;
+//            case WAIT:
+//                if (stateTimer.seconds() > 0) {
+//                    stateTimer.reset();
+//                    flyWheelState = FlywheelState.SPIN_UP;
+//                }
+//                break;
             case SPIN_UP:
-                if (flywheelRpm >= minFlywheelRpm || stateTimer.seconds() > flywheelMaxSpinupTime) {
+                if (flywheelRpm >= targetRPM - 100 || stateTimer.seconds() > flywheelMaxSpinupTime) {
                     ShooterS2.setPosition(gateOpenAngle);
                     stateTimer.reset();
                     flyWheelState = FlywheelState.LAUNCH;
@@ -175,7 +175,7 @@ public class FlywheelLogic {
                 ShooterM2.setPower(targetRPM);
                 intake.intakeReady(true);
                 stateTimer.reset();
-                flyWheelState = FlywheelState.WAIT;
+                flyWheelState = FlywheelState.SPIN_UP;
             }
 
         }
