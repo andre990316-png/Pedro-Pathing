@@ -226,6 +226,20 @@ public class Teleop extends OpMode {
         }
 
         // Telemetry
+        telemetry.addLine("In-Game");
+        telemetry.addData("Target RPM", shooter.getTargetRPM());
+        telemetry.addData("RPM", shooter.getFlywheelRpm());
+
+        telemetry.addData("Shooter Servo", ShooterS1.getPosition());
+        telemetry.addData("Shooter Servo2", ShooterS2.getPosition());
+
+        telemetry.addData("Sensitivity", Sensitivity);
+        telemetry.addData("Precision Mode Toggle", precisionModeToggleBtn.getState());
+        telemetry.addData("Precision Mode Hold", precisionModeHoldBtn.getState());
+
+
+
+        telemetry.addLine("Debug");
         telemetry.addData("Motor 1 Output", MotorFrontLeft.getPower());
         telemetry.addData("Motor 2 Output", MotorFrontRight.getPower());
         telemetry.addData("Motor 3 Output", MotorBackLeft.getPower());
