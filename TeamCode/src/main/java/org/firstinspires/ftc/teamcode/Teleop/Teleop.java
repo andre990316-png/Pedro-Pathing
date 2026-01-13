@@ -1,4 +1,6 @@
 package org.firstinspires.ftc.teamcode.Teleop;
+import android.widget.Button;
+
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -15,7 +17,7 @@ import org.firstinspires.ftc.teamcode.Data.FlywheelAndHoodData;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 
-@TeleOp(name = "Drivetrain2")
+@TeleOp(name = "Teleop")
 public class Teleop extends OpMode {
     public static final double TICKS_PER_REV = 28;
 
@@ -36,10 +38,11 @@ public class Teleop extends OpMode {
     private IMU imu;
     private LimelightAim autoAim = new LimelightAim();
     private boolean precisionMode;
-
-    private double pos;
     private double currentSensitivity;
     private double Sensitivity;
+
+
+    private double pos;
     private double XL, YL, XR, YR;
     private double TempMax1, TempMax2, MaxPower;
     private double shooterPower = 0.0;
@@ -59,6 +62,10 @@ public class Teleop extends OpMode {
     private ButtonLogic intakeToggleBtn    = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false); // gamepad1.left_bumper
     private ButtonLogic autoFlywheelAndHoodToggleBtn = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false); // gamepad2.right_bumper
 
+    private ButtonLogic precisionModeToggleBtn = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);//gamepad1.right_bumper
+    private ButtonLogic precisionModeHoldBtn = new ButtonLogic(ButtonLogic.Mode.HOLD, false);//gamepad1.right_trigger
+    private ButtonLogic sensitivityUpBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);//gamepad1.dpad_up
+    private ButtonLogic sensitivityDownBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);//gamepad1.dpad_down
 
     @Override
     public void init() {
@@ -96,6 +103,8 @@ public class Teleop extends OpMode {
 
         shooter.setTargetRPM(0);
 
+        Sensitivity = 1.0;
+
         shooter.init(hardwareMap);
 
         telemetry.addData("Initialize", "Completed");
@@ -108,6 +117,10 @@ public class Teleop extends OpMode {
         autoAim.resetHistory(getRuntime());
     }
 
+
+    //====================
+    //Main Loop
+    //====================
     @Override
     public void loop() {
         shooter.update();
@@ -124,6 +137,12 @@ public class Teleop extends OpMode {
         intakeToggleBtn.update(gamepad1.left_bumper);
         autoFlywheelAndHoodToggleBtn.update(gamepad2.right_bumper);
 
+        precisionModeHoldBtn.update(gamepad1.right_trigger > 0.03);
+        precisionModeToggleBtn.update(gamepad1.right_bumper);
+        sensitivityDownBtn.update(gamepad1.dpad_down);
+        sensitivityUpBtn.update(gamepad1.dpad_up);
+
+
         if (hoodUpBtn.getState()) pos += 0.02;
         if (hoodDownBtn.getState()) pos -= 0.02;
         pos = Range.clip(pos, 0.84, 1.0);
@@ -133,10 +152,26 @@ public class Teleop extends OpMode {
 
         IntakeMotor.setPower(intakeToggleBtn.getState() ? -1.0 : 0.0);
 
-        XL = gamepad1.left_stick_x;// * currentSensitivity;
-        YL = -gamepad1.left_stick_y;// * currentSensitivity;
-        XR = gamepad1.right_stick_x;// * currentSensitivity;
-        YR = -gamepad1.right_stick_y;// * currentSensitivity;
+        if (precisionModeToggleBtn.getState()) {
+            precisionMode = !precisionMode;
+        }
+
+        precisionMode = precisionModeHoldBtn.getState();
+
+        currentSensitivity = (precisionModeToggleBtn.getState() || precisionMode) ? 0.3 : Sensitivity;
+
+        if (sensitivityUpBtn.getState() && precisionMode) {
+            Sensitivity = Math.min(Math.max(Sensitivity + 0.1, 0.1), 1.0);
+        }
+
+        if (sensitivityDownBtn.getState() && !precisionMode) {
+            Sensitivity = Math.min(Math.max(Sensitivity - 0.1, 0.1), 1.0);
+        }
+
+        XL = gamepad1.left_stick_x * currentSensitivity;
+        YL = -gamepad1.left_stick_y * currentSensitivity;
+        XR = gamepad1.right_stick_x * currentSensitivity;
+        YR = -gamepad1.right_stick_y * currentSensitivity;
 
         TempMax1 = Math.max(Math.abs(YL + XL + XR), Math.abs((YL - XL) - XR));
         TempMax2 = Math.max(Math.abs((YL - XL) + XR), Math.abs((YL + XL) - XR));
@@ -191,6 +226,20 @@ public class Teleop extends OpMode {
         }
 
         // Telemetry
+        telemetry.addLine("In-Game");
+        telemetry.addData("Target RPM", shooter.getTargetRPM());
+        telemetry.addData("RPM", shooter.getFlywheelRpm());
+
+        telemetry.addData("Shooter Servo", ShooterS1.getPosition());
+        telemetry.addData("Shooter Servo2", ShooterS2.getPosition());
+
+        telemetry.addData("Sensitivity", Sensitivity);
+        telemetry.addData("Precision Mode Toggle", precisionModeToggleBtn.getState());
+        telemetry.addData("Precision Mode Hold", precisionModeHoldBtn.getState());
+
+
+
+        telemetry.addLine("Debug");
         telemetry.addData("Motor 1 Output", MotorFrontLeft.getPower());
         telemetry.addData("Motor 2 Output", MotorFrontRight.getPower());
         telemetry.addData("Motor 3 Output", MotorBackLeft.getPower());

@@ -68,7 +68,6 @@ public class FlywheelLogic {
         ShooterS2 = hardwareMap.get(Servo.class, "Shooter S2");
 
         ShooterM1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        ShooterM2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Needed for setVelocity() control
         ShooterM1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -79,7 +78,6 @@ public class FlywheelLogic {
         ShooterS2.setPosition(gateCloseAngle);
 
         lastPos1 = ShooterM1.getCurrentPosition();
-        lastPos2 = ShooterM2.getCurrentPosition();
         velTimer.reset();
         stateTimer.reset();
         flyWheelState = FlywheelState.IDLE;
