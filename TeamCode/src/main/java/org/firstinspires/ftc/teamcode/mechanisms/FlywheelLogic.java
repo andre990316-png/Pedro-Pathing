@@ -1,7 +1,4 @@
-package org.firstinspires.ftc.teamcode.mechanisms;
-
-import static org.firstinspires.ftc.teamcode.Drivetrain2.kD;
-
+package org.firstinspires.ftc.teamcode.Mechanisms;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -9,10 +6,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.teamcode.AutoShooting;
-import org.firstinspires.ftc.teamcode.Drivetrain2;
+import org.firstinspires.ftc.teamcode.Data.FlywheelAndHoodData;
 
 public class FlywheelLogic {
+
+
+    public static final double kp = 0.39;
+    public static final double kd = 0.00002;
 
     // --- Hardware ---
     private DcMotorEx ShooterM1; // right
@@ -50,16 +50,14 @@ public class FlywheelLogic {
     private int shotsRemaining = 0;
 
     // --- Velocity targets (RPM) ---
-    private double flywheelRpm = 0.0;          // measured RPM
-    private double minFlywheelRpm = 800;     // RPM threshold to shoot
-    private double targetRPM = 0; // desired RPM
+    private double flywheelRpm = 0.0;
+    private double minFlywheelRpm = 800;
+    private double targetRPM = 0;
     private double flywheelMaxSpinupTime = 2.0;
     private double lastShooterTime=System.nanoTime();
     private IntakeLogic intake = new IntakeLogic();
     private double currentRPM=0;
-
     private double lastError = 0;
-
     private double error=0;
     private boolean autoAiming=false;
 
@@ -108,15 +106,13 @@ public class FlywheelLogic {
         lastPos1 = pos1;
         lastShooterTime = Shooter_now;
 
-
-
         /// convert desired RPM to motor language or something idk
         targetRPM = Range.clip(targetRPM, 0, 6000);
 
         error = targetRPM - currentRPM;
         double dError = (error - lastError) / Shooter_dt;
 
-        double pdPower = Drivetrain2.kP * error + kD * dError;
+        double pdPower = kp * error + kd * dError;
 
         if (targetRPM <= 0) pdPower = 0;
 
@@ -128,9 +124,6 @@ public class FlywheelLogic {
         /// set shooter motors
         ShooterM1.setPower(calcRPM);
         ShooterM2.setPower(-calcRPM);
-
-
-
 
         intake.update();
         switch (flyWheelState) {
@@ -225,14 +218,11 @@ public class FlywheelLogic {
     }
 
     public void autoAim(double ta){
-        org.firstinspires.ftc.teamcode.AutoShooting shot;
+        org.firstinspires.ftc.teamcode.Mechanisms.AutoShooting shot;
 
-        shot = (ta >= 0.7) ? Drivetrain2.lookupA(ta) : Drivetrain2.lookupB(ta);
+        shot = (ta >= 0.7) ? FlywheelAndHoodData.lookupA(ta) : FlywheelAndHoodData.lookupB(ta);
 
         setTargetRPM(shot.rpm);
         setHoodPosition(shot.hood);
-
     }
-
-
 }
