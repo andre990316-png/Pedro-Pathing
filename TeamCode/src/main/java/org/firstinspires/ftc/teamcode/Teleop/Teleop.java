@@ -160,7 +160,7 @@ public class Teleop extends OpMode {
 
         currentSensitivity = (precisionModeToggleBtn.getState() || precisionMode) ? 0.3 : Sensitivity;
 
-        if (sensitivityUpBtn.getState() && precisionMode) {
+        if (sensitivityUpBtn.getState() && !precisionMode) {
             Sensitivity = Math.min(Math.max(Sensitivity + 0.1, 0.1), 1.0);
         }
 
