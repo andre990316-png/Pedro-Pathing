@@ -106,6 +106,11 @@ public class Auto_V2 extends OpMode {
     //loading zone intaking poses (blue)
     private final Pose blueLoadingZoneStart = new Pose(114,12,Math.toRadians(0));
     private final Pose blueLoadingZoneEnd = new Pose(134,12,Math.toRadians(0));
+
+    //gate and intake poses
+    private final Pose blueGateIntakePose = new Pose(10,62,Math.toRadians(120));
+    private final Pose redGateIntakePose = new Pose(10,62,Math.toRadians(120));
+
     private ElapsedTime stateTimer = new ElapsedTime();
     private boolean actionActioned=false;
 
