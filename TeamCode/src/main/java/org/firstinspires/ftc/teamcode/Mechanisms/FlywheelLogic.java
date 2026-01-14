@@ -11,8 +11,8 @@ import org.firstinspires.ftc.teamcode.Data.FlywheelAndHoodData;
 public class FlywheelLogic {
 
 
-    public static final double kp = 0.1;
-    public static final double kd = 0;
+    public static final double kp = 0.75;
+    public static final double kd = 0.01;
 
     // --- Hardware ---
     private DcMotorEx ShooterM1; // right
@@ -45,7 +45,7 @@ public class FlywheelLogic {
     private double gateCloseAngle = 0.2;
     private double gateOpenAngle  = 0;
     private double gateOpenTime   = 0.5;
-    private double gateCloseTime  = 0.5;
+    private double gateCloseTime  = 0;
 
     private int shotsRemaining = 0;
 
@@ -141,8 +141,8 @@ public class FlywheelLogic {
                 }
                 break;
             case LAUNCH:
-                if (stateTimer.seconds() > gateOpenTime) {
-                    shotsRemaining--;
+                if (stateTimer.seconds() > 3) {
+                    shotsRemaining -= 3;
                     ShooterS2.setPosition(gateCloseAngle);
                     stateTimer.reset();
                     flyWheelState = FlywheelState.RESET_GATE;
@@ -182,7 +182,7 @@ public class FlywheelLogic {
         return flyWheelState != FlywheelState.IDLE;
     }
     public double getFlywheelRpm() {
-        return flywheelRpm;
+        return currentRPM;
     }
 
     public IntakeLogic getIntake(){

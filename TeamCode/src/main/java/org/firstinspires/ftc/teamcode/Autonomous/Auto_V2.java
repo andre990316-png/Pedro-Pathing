@@ -14,7 +14,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import org.firstinspires.ftc.teamcode.Mechanisms.LimelightAim;
-import org.firstinspires.ftc.teamcode.Data.FlywheelAndHoodData;
 
 import org.firstinspires.ftc.teamcode.Mechanisms.FlywheelLogic;
 
@@ -58,6 +57,9 @@ public class Auto_V2 extends OpMode {
     private ArrayList<AutoStep> AUTOBOTTOMLEFT = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTOPRIGHT = new ArrayList<>();
     private ArrayList<AutoStep> AUTOBOTTOMRIGHT = new ArrayList<>();
+    private ArrayList<AutoStep> INTAKEBLUEBALLPOSITION1 = new ArrayList<>();
+    private ArrayList<AutoStep> INTAKEBLUEBALLPOSITION2 = new ArrayList<>();
+    private ArrayList<AutoStep> INTAKEBLUEBALLPOSITION3 = new ArrayList<>();
 
     private int currentIndex = 0;
     private long pauseEndTimeMs = 0;
@@ -72,8 +74,8 @@ public class Auto_V2 extends OpMode {
     private final Pose topRightStartPose = new Pose(124, 123, Math.toRadians(37));
 
     //close shoot poses (on big V)
-    private final Pose blueShootPoseClose = new Pose(47.32299012693935, 95.86459802538788, Math.toRadians(137));
-    private final Pose redShootPoseClose = new Pose(96.67700987306065, 95.86459802538788, Math.toRadians(137));
+    private final Pose blueShootPoseClose = new Pose(56.05641748942172, 86.9280677009873, Math.toRadians(137));
+    private final Pose redShootPoseClose = new Pose(87.9435825106, 86.9280677009873, Math.toRadians(137));
 
     //medium shoot poses (on big V)
     private final Pose blueShootPoseMed = new Pose(64,80,Math.toRadians(135));
@@ -121,6 +123,26 @@ public class Auto_V2 extends OpMode {
     private void buildSteps() {
         STEPS.clear();
         AUTOTEST.clear();
+        AUTOTOPLEFT.clear();
+        INTAKEBLUEBALLPOSITION1.clear();
+
+        INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1Start, AutoAction.INTAKE_ON, 0));
+        INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1End, AutoAction.NONE, 0));
+        INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1Start, AutoAction.INTAKE_OFF, 0));
+
+        INTAKEBLUEBALLPOSITION2.clear();
+
+        INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
+        INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2End, AutoAction.NONE, 0));
+        INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_OFF, 0));
+
+        INTAKEBLUEBALLPOSITION3.clear();
+
+        INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3Start, AutoAction.INTAKE_ON, 0));
+        INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3End, AutoAction.NONE, 0));
+        INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3Start, AutoAction.INTAKE_OFF, 0));
+
+
         // Start -> shoot
         AUTOTEST.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
         AUTOTEST.add(new AutoStep(blueShootPoseMed, AutoAction.NONE, 0));
@@ -129,13 +151,13 @@ public class Auto_V2 extends OpMode {
         AUTOTEST.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
         // Start moving to intake area: turn intake on at start of this segment
-        AUTOTEST.add(new AutoStep(blueShootPoseMed, AutoAction.INTAKE_ON, 0));
+        AUTOTEST.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_ON, 0));
         AUTOTEST.add(new AutoStep(blueBallPosition3Start, AutoAction.NONE, 0));
         AUTOTEST.add(new AutoStep(blueBallPosition3End, AutoAction.NONE, 0));
 
         // Start returning: turn intake off at start of this segment
         AUTOTEST.add(new AutoStep(blueBallPosition3Start, AutoAction.INTAKE_OFF, 0));
-        AUTOTEST.add(new AutoStep(blueShootPoseMed, AutoAction.SHOOT_3, 0));
+        AUTOTEST.add(new AutoStep(blueShootPoseClose, AutoAction.SHOOT_3, 0));
 
         // Optional: pause at shoot pose
         AUTOTEST.add(new AutoStep(null, AutoAction.PAUSE_MS, 500));
@@ -146,26 +168,16 @@ public class Auto_V2 extends OpMode {
 
         //shoots preload, gets row 2 and shoots
         AUTOTOPLEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
-        AUTOTOPLEFT.add(new AutoStep(blueShootPoseMed, AutoAction.NONE, 0));
+        AUTOTOPLEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
-        AUTOTOPLEFT.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
-        AUTOTOPLEFT.add(new AutoStep(blueBallPosition2End, AutoAction.NONE, 0));
-        AUTOTOPLEFT.add(new AutoStep(blueShootPoseMed, AutoAction.INTAKE_OFF, 0));
+        AUTOTOPLEFT.addAll(INTAKEBLUEBALLPOSITION3);
+        AUTOTOPLEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
-
-        //opens GATE and sucks GATE balls (great wording i know) and shoots
-        //does this thrice
-        for(int i=0; i<3; i++){
-            AUTOTOPLEFT.add(new AutoStep(blueGateIntakePose, AutoAction.NONE, 0));
-            AUTOTOPLEFT.add(new AutoStep(null, AutoAction.INTAKE_ON, 3000));
-            AUTOTOPLEFT.add(new AutoStep(blueShootPoseMed, AutoAction.INTAKE_OFF, 0));
-            AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
-        }
-
-        //gets row 3 and shoots
-        AUTOTOPLEFT.add(new AutoStep(blueBallPosition3Start, AutoAction.INTAKE_ON, 0));
-        AUTOTOPLEFT.add(new AutoStep(blueBallPosition3End, AutoAction.NONE, 0));
-        AUTOTOPLEFT.add(new AutoStep(blueShootPoseMed, AutoAction.INTAKE_OFF, 0));
+        AUTOTOPLEFT.addAll(INTAKEBLUEBALLPOSITION2);
+        AUTOTOPLEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        AUTOTOPLEFT.addAll(INTAKEBLUEBALLPOSITION1);
+        AUTOTOPLEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
         //the video has more stuff but they're way faster so i think this is about as far as we're gonna get
@@ -289,7 +301,7 @@ public class Auto_V2 extends OpMode {
     // Main auto sequencer
     // ------------------------------------------------------------
     private void updateAuto() {
-        if (currentIndex >= CHAINS.size()) return;
+        if (currentIndex >= STEPS.size()) return;
 
         // 1) 車子還在跑路徑，就不要進行下一步
         if (follower.isBusy()) return;

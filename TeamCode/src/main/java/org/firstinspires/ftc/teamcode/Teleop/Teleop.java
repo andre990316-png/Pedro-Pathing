@@ -204,10 +204,15 @@ public class Teleop extends OpMode {
         }
 
         if(autoFlywheelAndHoodToggleBtn.justPressed()) shooter.setTargetRPM(0);
-        if (autoFlywheelAndHoodToggleBtn.getState() && llValid) {
-            shot = (ta >= 0.7) ? FlywheelAndHoodData.lookupA(ta) : FlywheelAndHoodData.lookupB(ta);
-            shooter.setTargetRPM(shot.rpm);
-            shooter.setHoodPosition(shot.hood);
+        if (autoFlywheelAndHoodToggleBtn.getState()) {
+            if(llValid) {
+                shot = (ta >= 0.7) ? FlywheelAndHoodData.lookupA(ta) : FlywheelAndHoodData.lookupB(ta);
+                shooter.setTargetRPM(shot.rpm);
+                shooter.setHoodPosition(shot.hood);
+            } else {
+                shooter.setTargetRPM(shot.rpm);
+                shooter.setHoodPosition(shot.hood);
+            }
         } else {
             if (rpmUpBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() + 500);
             if (rpmDownBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() - 500);
