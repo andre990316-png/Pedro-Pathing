@@ -40,8 +40,7 @@ public class Teleop extends OpMode {
     private boolean precisionMode;
     private double currentSensitivity;
     private double Sensitivity;
-
-
+    private AutoShooting shot;
     private double pos;
     private double XL, YL, XR, YR;
     private double TempMax1, TempMax2, MaxPower;
@@ -103,7 +102,7 @@ public class Teleop extends OpMode {
 
         shooter.setTargetRPM(0);
 
-        Sensitivity = 1.0;
+        currentSensitivity = 1.0;
 
         shooter.init(hardwareMap);
 
@@ -138,34 +137,28 @@ public class Teleop extends OpMode {
         autoFlywheelAndHoodToggleBtn.update(gamepad2.right_bumper);
 
         precisionModeHoldBtn.update(gamepad1.right_trigger > 0.03);
-        precisionModeToggleBtn.update(gamepad1.right_bumper);
+        //precisionModeToggleBtn.update(gamepad1.right_bumper);
         sensitivityDownBtn.update(gamepad1.dpad_down);
         sensitivityUpBtn.update(gamepad1.dpad_up);
-
-
-        if (hoodUpBtn.getState()) pos += 0.02;
-        if (hoodDownBtn.getState()) pos -= 0.02;
-        pos = Range.clip(pos, 0.84, 1.0);
-        ShooterS1.setPosition(pos);
 
         ShooterS2.setPosition(gateHoldBtn.getState()? 0 : 0.2);
 
         IntakeMotor.setPower(intakeToggleBtn.getState() ? -1.0 : 0.0);
 
-        if (precisionModeToggleBtn.getState()) {
-            precisionMode = !precisionMode;
-        }
+//        if (precisionModeToggleBtn.getState()) {
+//            precisionMode = !precisionMode;
+//        }
 
         precisionMode = precisionModeHoldBtn.getState();
 
-        currentSensitivity = (precisionModeToggleBtn.getState() || precisionMode) ? 0.3 : Sensitivity;
+        //currentSensitivity = (precisionModeToggleBtn.getState() || precisionMode) ? 0.3 : Sensitivity;
 
         if (sensitivityUpBtn.getState() && precisionMode) {
-            Sensitivity = Math.min(Math.max(Sensitivity + 0.1, 0.1), 1.0);
+            currentSensitivity = Math.min(Math.max(Sensitivity + 0.1, 0.1), 1.0);
         }
 
-        if (sensitivityDownBtn.getState() && !precisionMode) {
-            Sensitivity = Math.min(Math.max(Sensitivity - 0.1, 0.1), 1.0);
+        if (sensitivityDownBtn.getState() && precisionMode) {
+            currentSensitivity = Math.min(Math.max(Sensitivity - 0.1, 0.1), 1.0);
         }
 
         XL = gamepad1.left_stick_x * currentSensitivity;
@@ -211,20 +204,18 @@ public class Teleop extends OpMode {
         }
 
         if(autoFlywheelAndHoodToggleBtn.justPressed()) shooter.setTargetRPM(0);
-
-        if (autoFlywheelAndHoodToggleBtn.getState()) {
-            if (llValid) {
-                AutoShooting shot = (ta >= 0.7) ? FlywheelAndHoodData.lookupA(ta) : FlywheelAndHoodData.lookupB(ta);
-                shooter.setTargetRPM(shot.rpm);
-                shooter.setHoodPosition(shot.hood);
-            } else {
-                shooter.setTargetRPM(0);
-            }
+        if (autoFlywheelAndHoodToggleBtn.getState() && llValid) {
+            shot = (ta >= 0.7) ? FlywheelAndHoodData.lookupA(ta) : FlywheelAndHoodData.lookupB(ta);
+            shooter.setTargetRPM(shot.rpm);
+            shooter.setHoodPosition(shot.hood);
         } else {
             if (rpmUpBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() + 500);
             if (rpmDownBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() - 500);
+            if (hoodUpBtn.getState()) pos += 0.02;
+            if (hoodDownBtn.getState()) pos -= 0.02;
+            pos = Range.clip(pos, 0.84, 1.0);
+            ShooterS1.setPosition(pos);
         }
-
         // Telemetry
         telemetry.addLine("In-Game");
         telemetry.addData("Target RPM", shooter.getTargetRPM());

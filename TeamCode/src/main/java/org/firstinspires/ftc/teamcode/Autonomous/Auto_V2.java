@@ -156,7 +156,7 @@ public class Auto_V2 extends OpMode {
         //opens GATE and sucks GATE balls (great wording i know) and shoots
         //does this thrice
         for(int i=0; i<3; i++){
-            AUTOTOPLEFT.add(new AutoStep(new Pose(10,62,Math.toRadians(120)), AutoAction.NONE, 0));
+            AUTOTOPLEFT.add(new AutoStep(blueGateIntakePose, AutoAction.NONE, 0));
             AUTOTOPLEFT.add(new AutoStep(null, AutoAction.INTAKE_ON, 3000));
             AUTOTOPLEFT.add(new AutoStep(blueShootPoseMed, AutoAction.INTAKE_OFF, 0));
             AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));

@@ -11,8 +11,8 @@ import org.firstinspires.ftc.teamcode.Data.FlywheelAndHoodData;
 public class FlywheelLogic {
 
 
-    public static final double kp = 0.39;
-    public static final double kd = 0.00002;
+    public static final double kp = 0.1;
+    public static final double kd = 0;
 
     // --- Hardware ---
     private DcMotorEx ShooterM1; // right
@@ -110,7 +110,7 @@ public class FlywheelLogic {
         error = targetRPM - currentRPM;
         double dError = (error - lastError) / Shooter_dt;
 
-        double pdPower = kp * error + kd * dError;
+        double pdPower = kp / 6000 * error + kd / 6000 * dError;
 
         if (targetRPM <= 0) pdPower = 0;
 

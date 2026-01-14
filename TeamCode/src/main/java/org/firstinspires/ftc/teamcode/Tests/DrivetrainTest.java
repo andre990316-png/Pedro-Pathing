@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 @TeleOp(name = "Drivetrain")
-public class Drivetrain extends LinearOpMode {
+public class DrivetrainTest extends LinearOpMode {
 
     // Drive + mechanisms
     private DcMotor MotorBackLeft;
