@@ -1,5 +1,4 @@
 package org.firstinspires.ftc.teamcode.Teleop;
-import android.widget.Button;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -8,6 +7,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
+
 
 import org.firstinspires.ftc.teamcode.Mechanisms.ButtonLogic;
 import org.firstinspires.ftc.teamcode.Mechanisms.FlywheelLogic;
@@ -46,6 +47,9 @@ public class Teleop extends OpMode {
     private double TempMax1, TempMax2, MaxPower;
     private double shooterPower = 0.0;
 
+    //Battery Voltage
+    private VoltageSensor battery;
+
     // Linear Flywheels
     double targetRPM = 0;
 
@@ -81,6 +85,7 @@ public class Teleop extends OpMode {
         ShooterS1 = hardwareMap.get(Servo.class, "Shooter S1");
         ShooterS2 = hardwareMap.get(Servo.class, "Shooter S2");
         ShooterRotateMotor = hardwareMap.get(DcMotor.class, "ShooterRotateMotor");
+        battery = hardwareMap.voltageSensor.iterator().next();
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
@@ -225,36 +230,42 @@ public class Teleop extends OpMode {
             pos = Range.clip(pos, 0.84, 1.0);
             ShooterS1.setPosition(pos);
         }
+
         // Telemetry
         telemetry.addLine("In-Game");
-        telemetry.addData("Target RPM", shooter.getTargetRPM());
-        telemetry.addData("RPM", shooter.getFlywheelRpm());
-
-        telemetry.addData("Shooter Servo", ShooterS1.getPosition());
-        telemetry.addData("Shooter Servo2", ShooterS2.getPosition());
-
+        telemetry.addLine("                                  ");
+        telemetry.addData("Target RPM ", shooter.getTargetRPM());
+        telemetry.addData("RPM ", shooter.getFlywheelRpm());
+        telemetry.addLine("                                  ");
+        telemetry.addData("Shooter Servo ", ShooterS1.getPosition());
+        telemetry.addData("Shooter Servo2 ", ShooterS2.getPosition());
+        telemetry.addLine("                                  ");
         telemetry.addData("Sensitivity", Sensitivity);
         telemetry.addData("Precision Mode Toggle", precisionModeToggleBtn.getState());
         telemetry.addData("Precision Mode Hold", precisionModeHoldBtn.getState());
 
-
+        telemetry.addLine("                                  ");
+        telemetry.addLine("                                  ");
+        telemetry.addLine("                                  ");
 
         telemetry.addLine("Debug");
-        telemetry.addData("Motor 1 Output", MotorFrontLeft.getPower());
-        telemetry.addData("Motor 2 Output", MotorFrontRight.getPower());
-        telemetry.addData("Motor 3 Output", MotorBackLeft.getPower());
-        telemetry.addData("Motor 4 Output", MotorBackRight.getPower());
-
+        telemetry.addLine("                                  ");
+        telemetry.addData("Motor 1 Power","%.3f",MotorFrontLeft.getPower());
+        telemetry.addData("Motor 2 Power","%.3f", MotorFrontRight.getPower());
+        telemetry.addData("Motor 3 Power","%.3f", MotorBackLeft.getPower());
+        telemetry.addData("Motor 4 Power","%.3f", MotorBackRight.getPower());
+        telemetry.addLine("                                  ");
         telemetry.addData("Shooter Servo", ShooterS1.getPosition());
         telemetry.addData("Shooter Servo2", ShooterS2.getPosition());
         telemetry.addData("Shooter M1 Input", ShooterM1.getPower());
         telemetry.addData("Shooter M2 Input", ShooterM2.getPower());
         telemetry.addData("Intake Power", IntakeMotor.getPower());
-
+        telemetry.addLine("                                  ");
         telemetry.addData("Target RPM", shooter.getTargetRPM());
         telemetry.addData("RPM", shooter.getFlywheelRpm());
         telemetry.addData("Flywheel Error", shooter.getError());
         telemetry.addData("Flywheel Power", shooterPower);
+        telemetry.addData("Battery Voltage", "%.2f V", battery.getVoltage());
 
         telemetry.update();
     }
