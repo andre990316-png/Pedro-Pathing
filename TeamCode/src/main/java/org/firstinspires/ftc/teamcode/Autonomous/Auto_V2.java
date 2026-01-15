@@ -60,6 +60,7 @@ public class Auto_V2 extends OpMode {
     private ArrayList<AutoStep> INTAKEBLUEBALLPOSITION1 = new ArrayList<>();
     private ArrayList<AutoStep> INTAKEBLUEBALLPOSITION2 = new ArrayList<>();
     private ArrayList<AutoStep> INTAKEBLUEBALLPOSITION3 = new ArrayList<>();
+    private ArrayList<AutoStep> INTAKEBLUEGATE = new ArrayList<>();
 
     private int currentIndex = 0;
     private long pauseEndTimeMs = 0;
@@ -142,6 +143,11 @@ public class Auto_V2 extends OpMode {
         INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3End, AutoAction.NONE, 0));
         INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3Start, AutoAction.INTAKE_OFF, 0));
 
+        INTAKEBLUEGATE.clear();
+
+        INTAKEBLUEGATE.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
+        INTAKEBLUEGATE.add(new AutoStep(blueGateIntakePose, AutoAction.NONE, 4000));
+        INTAKEBLUEGATE.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_OFF, 0));
 
         // Start -> shoot
         AUTOTEST.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
@@ -162,8 +168,6 @@ public class Auto_V2 extends OpMode {
         // Optional: pause at shoot pose
         AUTOTEST.add(new AutoStep(null, AutoAction.PAUSE_MS, 500));
 
-
-
         ///top left auto
 
         //shoots preload, gets row 2 and shoots
@@ -176,7 +180,13 @@ public class Auto_V2 extends OpMode {
         AUTOTOPLEFT.addAll(INTAKEBLUEBALLPOSITION2);
         AUTOTOPLEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        AUTOTOPLEFT.addAll(INTAKEBLUEGATE);
+        AUTOTOPLEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         AUTOTOPLEFT.addAll(INTAKEBLUEBALLPOSITION1);
+        AUTOTOPLEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        AUTOTOPLEFT.addAll(INTAKEBLUEGATE);
         AUTOTOPLEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
@@ -332,7 +342,7 @@ public class Auto_V2 extends OpMode {
         if (pauseEndTimeMs > 0 && System.currentTimeMillis() < pauseEndTimeMs) return;
 
         // 6) action 都做完了，才開始跑到下一個 pose
-        PathChain chain = CHAINS.get(currentIndex);
+        PathChain chain = (currentIndex < CHAINS.size()) ? CHAINS.get(currentIndex) : null;
         if (chain != null) {
             follower.followPath(chain, true);
         }
@@ -348,7 +358,13 @@ public class Auto_V2 extends OpMode {
         opModeTimer = new Timer();
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setPose(topLeftStartPose);
+
+        buildSteps();
+
+        Pose start = (!STEPS.isEmpty() && STEPS.get(0).pose != null) ? STEPS.get(0).pose : topLeftStartPose;
+        follower.setStartingPose(start);   // recommended for Pedro
+
+        buildChainsFromSteps();
 
         ShooterRotateMotor = hardwareMap.get(DcMotor.class, "ShooterRotateMotor");
 
@@ -363,9 +379,6 @@ public class Auto_V2 extends OpMode {
         limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
 
         shooter.init(hardwareMap);
-
-        buildSteps();
-        buildChainsFromSteps();
 
         telemetry.addData("Init", "OK");
         telemetry.update();
@@ -395,7 +408,7 @@ public class Auto_V2 extends OpMode {
 
         // turret auto-aim
         double turretPower = 0;
-
+        limelight.updateRobotOrientation(imu.getRobotYawPitchRollAngles().getYaw());
         if (autoAimEnabled) {
             LLResult ll = limelight.getLatestResult();
             turretPower = autoAim.update(getRuntime(), ll, telemetry);
@@ -404,7 +417,7 @@ public class Auto_V2 extends OpMode {
         }
         ShooterRotateMotor.setPower(turretPower);
 
-        telemetry.addData("Current State", STEPS.get(currentIndex).action.name());
+        telemetry.addData("Current State", (currentIndex < STEPS.size()) ? STEPS.get(currentIndex).action.name() : "DONE");
         telemetry.addData("Step", currentIndex + " / " + CHAINS.size());
         telemetry.addData("Busy", follower.isBusy());
         telemetry.addData("Shooter Busy", shooter.isBusy());
