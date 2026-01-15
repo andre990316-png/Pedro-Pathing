@@ -55,7 +55,8 @@ public class Teleop extends OpMode {
     private ButtonLogic rpmUpBtn       = new ButtonLogic(ButtonLogic.Mode.PULSE, false);  // dpad_up
     private ButtonLogic rpmDownBtn     = new ButtonLogic(ButtonLogic.Mode.PULSE, false);  // dpad_down
 
-    private ButtonLogic gateHoldBtn    = new ButtonLogic(ButtonLogic.Mode.HOLD, false);   // right_trigger
+    //private ButtonLogic gateHoldBtn    = new ButtonLogic(ButtonLogic.Mode.HOLD, false);   // right_trigger
+    private ButtonLogic shoot3Btn    = new ButtonLogic(ButtonLogic.Mode.HOLD, false);   // right_trigger
     private ButtonLogic autoAimHoldBtn = new ButtonLogic(ButtonLogic.Mode.HOLD, false);   // left_trigger
 
     private ButtonLogic intakeToggleBtn    = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false); // gamepad1.left_bumper
@@ -129,8 +130,8 @@ public class Teleop extends OpMode {
         hoodDownBtn.update(gamepad2.dpad_left);
         rpmUpBtn.update(gamepad2.dpad_up);
         rpmDownBtn.update(gamepad2.dpad_down);
-
-        gateHoldBtn.update(gamepad2.right_trigger > 0.03);
+        shoot3Btn.update(gamepad2.right_trigger > 0.3);
+        //gateHoldBtn.update(gamepad2.right_trigger > 0.03);
         autoAimHoldBtn.update(gamepad2.left_trigger > 0.3);
 
         intakeToggleBtn.update(gamepad1.left_bumper);
@@ -141,7 +142,10 @@ public class Teleop extends OpMode {
         sensitivityDownBtn.update(gamepad1.dpad_down);
         sensitivityUpBtn.update(gamepad1.dpad_up);
 
-        ShooterS2.setPosition(gateHoldBtn.getState()? 0 : 0.2);
+        //ShooterS2.setPosition(gateHoldBtn.getState()? 0 : 0.2);
+        if (shoot3Btn.getState() && !shooter.isBusy()) {
+            shooter.fireShots(1);
+        }
 
         IntakeMotor.setPower(intakeToggleBtn.getState() ? -1.0 : 0.0);
 

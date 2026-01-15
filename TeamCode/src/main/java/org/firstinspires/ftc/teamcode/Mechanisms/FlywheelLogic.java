@@ -11,8 +11,8 @@ import org.firstinspires.ftc.teamcode.Data.FlywheelAndHoodData;
 public class FlywheelLogic {
 
 
-    public static final double kp = 0.75;
-    public static final double kd = 0.01;
+    public static final double kp = 60;
+    public static final double kd = 0.00;
 
     // --- Hardware ---
     private DcMotorEx ShooterM1; // right
@@ -44,8 +44,8 @@ public class FlywheelLogic {
     // --- Gate / shot settings ---
     private double gateCloseAngle = 0.2;
     private double gateOpenAngle  = 0;
-    private double gateOpenTime   = 0.5;
-    private double gateCloseTime  = 0;
+    private double gateOpenTime   = 0.08;
+    private double gateCloseTime  = 0.08;
 
     private int shotsRemaining = 0;
 
@@ -53,7 +53,7 @@ public class FlywheelLogic {
     private double flywheelRpm = 0.0;
     private double minFlywheelRpm = 800;
     private double targetRPM = 0;
-    private double flywheelMaxSpinupTime = 2.0;
+    private double flywheelMaxSpinupTime = 0.7;
     private double lastShooterTime=System.nanoTime();
     private IntakeLogic intake = new IntakeLogic();
     private double currentRPM = 0;
@@ -134,15 +134,15 @@ public class FlywheelLogic {
 //                }
 //                break;
             case SPIN_UP:
-                if (flywheelRpm >= targetRPM - 100 || stateTimer.seconds() > flywheelMaxSpinupTime) {
+                if (flywheelRpm >= targetRPM - 1000 || stateTimer.seconds() > flywheelMaxSpinupTime) {
                     ShooterS2.setPosition(gateOpenAngle);
                     stateTimer.reset();
                     flyWheelState = FlywheelState.LAUNCH;
                 }
                 break;
             case LAUNCH:
-                if (stateTimer.seconds() > 3) {
-                    shotsRemaining -= 3;
+                if (stateTimer.seconds() > gateOpenTime) {
+                    shotsRemaining -= 1;
                     ShooterS2.setPosition(gateCloseAngle);
                     stateTimer.reset();
                     flyWheelState = FlywheelState.RESET_GATE;
