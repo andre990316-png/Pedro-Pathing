@@ -54,6 +54,7 @@ public class Auto_V2 extends OpMode {
     private ArrayList<PathChain> CHAINS = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTEST = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTOPLEFT = new ArrayList<>();
+    private ArrayList<AutoStep> AUTOTOPLEFT2 = new ArrayList<>();
     private ArrayList<AutoStep> AUTOBOTTOMLEFT = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTOPRIGHT = new ArrayList<>();
     private ArrayList<AutoStep> AUTOBOTTOMRIGHT = new ArrayList<>();
@@ -125,6 +126,7 @@ public class Auto_V2 extends OpMode {
         STEPS.clear();
         AUTOTEST.clear();
         AUTOTOPLEFT.clear();
+        AUTOTOPLEFT2.clear();
         INTAKEBLUEBALLPOSITION1.clear();
 
         INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1Start, AutoAction.INTAKE_ON, 0));
@@ -208,6 +210,26 @@ public class Auto_V2 extends OpMode {
             AUTOBOTTOMLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
         }
+
+        /// top left auto V2?
+
+        AUTOTOPLEFT2.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
+        AUTOTOPLEFT2.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        AUTOTOPLEFT2.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        AUTOTOPLEFT2.addAll(INTAKEBLUEBALLPOSITION3);
+        AUTOTOPLEFT2.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
+        AUTOTOPLEFT2.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        AUTOTOPLEFT2.addAll(INTAKEBLUEBALLPOSITION2);
+        AUTOTOPLEFT2.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
+        AUTOTOPLEFT2.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+
+        AUTOTOPLEFT2.addAll(INTAKEBLUEGATE);
+        AUTOTOPLEFT2.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
+        AUTOTOPLEFT2.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+
+        AUTOTOPLEFT2.addAll(INTAKEBLUEGATE);
+        AUTOTOPLEFT2.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
+        AUTOTOPLEFT2.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
 
         /// top right auto
