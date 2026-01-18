@@ -27,7 +27,6 @@ public class Auto_V2 extends OpMode {
 
     private Follower follower;
     private Timer pathTimer, opModeTimer;
-    private Pose goalPose;
 
     // Flywheel Logic
     private FlywheelLogic shooter = new FlywheelLogic();
@@ -40,7 +39,8 @@ public class Auto_V2 extends OpMode {
 
     // ====== STEP SYSTEM ======
     public enum AutoAction {
-        NONE,      // uses valueMs
+        NONE,
+        PAUSE_MS,        // uses valueMs
         INTAKE_ON,
         INTAKE_OFF,
         SHOOT_3,         // calls shooter.fireShots(3) and waits until shooter finishes
@@ -67,9 +67,6 @@ public class Auto_V2 extends OpMode {
     private long pauseEndTimeMs = 0;
     private boolean waitingForShooter = false;
     private boolean timerStart = true;
-    private double lastTa = 0;
-    private final Pose blueGoalPose = new Pose(0, 144, 0);
-    private final Pose redGoalPose  = new Pose(144, 144, 0);
 
     // ===== Poses you already had =====
     //start poses
@@ -131,12 +128,6 @@ public class Auto_V2 extends OpMode {
         AUTOTOPLEFT.clear();
         AUTOTOPLEFT2.clear();
         INTAKEBLUEBALLPOSITION1.clear();
-        AUTOBOTTOMLEFT.clear();
-        AUTOTOPRIGHT.clear();
-        AUTOBOTTOMRIGHT.clear();
-        INTAKEBLUEBALLPOSITION2.clear();
-        INTAKEBLUEBALLPOSITION3.clear();
-
 
         INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1Start, AutoAction.INTAKE_ON, 0));
         INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1End, AutoAction.NONE, 0));
@@ -177,7 +168,7 @@ public class Auto_V2 extends OpMode {
         AUTOTEST.add(new AutoStep(blueShootPoseClose, AutoAction.SHOOT_3, 0));
 
         // Optional: pause at shoot pose
-        AUTOTEST.add(new AutoStep(null, AutoAction.NONE, 500));
+        AUTOTEST.add(new AutoStep(null, AutoAction.PAUSE_MS, 500));
 
         ///top left auto
 
@@ -201,7 +192,26 @@ public class Auto_V2 extends OpMode {
         AUTOTOPLEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
-        // top left auto V2?
+        //the video has more stuff but they're way faster so i think this is about as far as we're gonna get
+
+        /// bottom left auto
+
+        //shoot preload
+        AUTOBOTTOMLEFT.add(new AutoStep(bottomLeftStartPose, AutoAction.NONE, 0));
+        AUTOBOTTOMLEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
+        AUTOBOTTOMLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+
+        //get loading zone balls and shoot
+        //does this thrice
+        for(int i=0; i<3; i++){
+            AUTOBOTTOMLEFT.add(new AutoStep(blueLoadingZoneStart, AutoAction.INTAKE_ON, 0));
+            AUTOBOTTOMLEFT.add(new AutoStep(blueLoadingZoneEnd, AutoAction.NONE, 0));
+            AUTOBOTTOMLEFT.add(new AutoStep(blueShootPoseFar, AutoAction.INTAKE_OFF, 0));
+            AUTOBOTTOMLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+
+        }
+
+        /// top left auto V2?
 
         AUTOTOPLEFT2.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
         AUTOTOPLEFT2.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
@@ -221,24 +231,6 @@ public class Auto_V2 extends OpMode {
         AUTOTOPLEFT2.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
         AUTOTOPLEFT2.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
-
-        //the video has more stuff but they're way faster so i think this is about as far as we're gonna get
-
-        /// bottom left auto
-
-        //shoot preload
-        AUTOBOTTOMLEFT.add(new AutoStep(bottomLeftStartPose, AutoAction.NONE, 0));
-        AUTOBOTTOMLEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
-        AUTOBOTTOMLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
-
-        //get loading zone balls and shoot
-        //does this thrice
-        for(int i=0; i<3; i++){
-            AUTOBOTTOMLEFT.add(new AutoStep(blueLoadingZoneStart, AutoAction.INTAKE_ON, 0));
-            AUTOBOTTOMLEFT.add(new AutoStep(blueLoadingZoneEnd, AutoAction.NONE, 0));
-            AUTOBOTTOMLEFT.add(new AutoStep(blueShootPoseFar, AutoAction.INTAKE_OFF, 0));
-            AUTOBOTTOMLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
-        }
 
         /// top right auto
 
@@ -283,11 +275,13 @@ public class Auto_V2 extends OpMode {
     // ------------------------------------------------------------
     private void executeAction(AutoStep step) {
         long now = System.currentTimeMillis();
-        if (step.valueMs > 0) {
-            pauseEndTimeMs = now + step.valueMs;
-        }
+
         switch (step.action) {
             case NONE:
+                break;
+
+            case PAUSE_MS:
+                pauseEndTimeMs = now + Math.max(0, step.valueMs);
                 break;
 
             case INTAKE_ON:
@@ -313,14 +307,15 @@ public class Auto_V2 extends OpMode {
 
                 if(llValid){
                     shooter.autoAim(ta);
-                    lastTa = ta;
-                } else {
-                    shooter.autoAim(lastTa);
+                }else{
+                    shot = new FlywheelLogic.AutoShooting(0, 0.84);
+                    shooter.setTargetRPM(shot.rpm);
+                    shooter.setHoodPosition(shot.hood);
                 }
 
+
                 shooter.fireShots(3);
-                waitingForShooter = shooter.isBusy();   // keep your existing blocking behavior
-                if (!waitingForShooter) actionActioned = false;  // retry SHOOT_3 next loop
+                waitingForShooter = true;   // keep your existing blocking behavior
                 break;
 
             case AIM_ON:
@@ -387,7 +382,7 @@ public class Auto_V2 extends OpMode {
         follower = Constants.createFollower(hardwareMap);
 
         buildSteps();
-        goalPose = blueGoalPose;
+
         Pose start = (!STEPS.isEmpty() && STEPS.get(0).pose != null) ? STEPS.get(0).pose : topLeftStartPose;
         follower.setStartingPose(start);   // recommended for Pedro
 
@@ -429,11 +424,6 @@ public class Auto_V2 extends OpMode {
         follower.update();
         shooter.update();
 
-        Pose robotPose = follower.getPose();
-        double dx = goalPose.getX() - robotPose.getX();
-        double dy = goalPose.getY() - robotPose.getY();
-        double distToGoal = Math.hypot(dx, dy);
-
         // run sequencer
 
         updateAuto();
@@ -450,7 +440,7 @@ public class Auto_V2 extends OpMode {
         ShooterRotateMotor.setPower(turretPower);
 
         telemetry.addData("Current State", (currentIndex < STEPS.size()) ? STEPS.get(currentIndex).action.name() : "DONE");
-        telemetry.addData("Step", currentIndex + " / " + STEPS.size());
+        telemetry.addData("Step", currentIndex + " / " + CHAINS.size());
         telemetry.addData("Busy", follower.isBusy());
         telemetry.addData("Shooter Busy", shooter.isBusy());
         telemetry.addData("WaitingShooter", waitingForShooter);
@@ -458,7 +448,6 @@ public class Auto_V2 extends OpMode {
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
-        telemetry.addData("DistanceToGoal", distToGoal);
         telemetry.update();
     }
 }
