@@ -56,11 +56,13 @@ public class Auto_V2 extends OpMode {
     private ArrayList<AutoStep> AUTOTOPLEFT = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTOPLEFT2 = new ArrayList<>();
     private ArrayList<AutoStep> AUTOBOTTOMLEFT = new ArrayList<>();
+    private ArrayList<AutoStep> AUTOBOTTOMLEFT2 = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTOPRIGHT = new ArrayList<>();
     private ArrayList<AutoStep> AUTOBOTTOMRIGHT = new ArrayList<>();
     private ArrayList<AutoStep> INTAKEBLUEBALLPOSITION1 = new ArrayList<>();
     private ArrayList<AutoStep> INTAKEBLUEBALLPOSITION2 = new ArrayList<>();
     private ArrayList<AutoStep> INTAKEBLUEBALLPOSITION3 = new ArrayList<>();
+    private ArrayList<AutoStep> INTAKEBLUELOADINGZONE = new ArrayList<>();
     private ArrayList<AutoStep> INTAKEBLUEGATE = new ArrayList<>();
 
     private int currentIndex = 0;
@@ -127,7 +129,9 @@ public class Auto_V2 extends OpMode {
         AUTOTEST.clear();
         AUTOTOPLEFT.clear();
         AUTOTOPLEFT2.clear();
+        AUTOBOTTOMLEFT2.clear();
         INTAKEBLUEBALLPOSITION1.clear();
+        INTAKEBLUELOADINGZONE.clear();
 
         INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1Start, AutoAction.INTAKE_ON, 0));
         INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1End, AutoAction.NONE, 0));
@@ -144,6 +148,12 @@ public class Auto_V2 extends OpMode {
         INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3Start, AutoAction.INTAKE_ON, 0));
         INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3End, AutoAction.NONE, 0));
         INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3Start, AutoAction.INTAKE_OFF, 0));
+
+        INTAKEBLUELOADINGZONE.clear();
+
+        INTAKEBLUELOADINGZONE.add(new AutoStep(blueLoadingZoneStart, AutoAction.INTAKE_ON, 0));
+        INTAKEBLUELOADINGZONE.add(new AutoStep(blueLoadingZoneEnd, AutoAction.NONE, 0));
+        INTAKEBLUELOADINGZONE.add(new AutoStep(blueLoadingZoneStart, AutoAction.INTAKE_OFF, 0));
 
         INTAKEBLUEGATE.clear();
 
@@ -230,6 +240,26 @@ public class Auto_V2 extends OpMode {
         AUTOTOPLEFT2.addAll(INTAKEBLUEGATE);
         AUTOTOPLEFT2.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
         AUTOTOPLEFT2.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+
+        /// bottom left auto V2
+
+        AUTOBOTTOMLEFT2.add(new AutoStep(bottomLeftStartPose, AutoAction.NONE, 0));
+        AUTOBOTTOMLEFT2.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
+        AUTOBOTTOMLEFT2.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+
+        AUTOBOTTOMLEFT2.addAll(INTAKEBLUEGATE);
+        AUTOBOTTOMLEFT2.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
+        AUTOBOTTOMLEFT2.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+
+        AUTOBOTTOMLEFT2.addAll(INTAKEBLUEGATE);
+        AUTOBOTTOMLEFT2.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
+        AUTOBOTTOMLEFT2.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+
+        AUTOBOTTOMLEFT2.addAll(INTAKEBLUEGATE);
+        AUTOBOTTOMLEFT2.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
+        AUTOBOTTOMLEFT2.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+
+
 
 
         /// top right auto
