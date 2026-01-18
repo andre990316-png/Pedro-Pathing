@@ -10,6 +10,8 @@ import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Autonomous.Constants;
 
 import org.firstinspires.ftc.teamcode.Mechanisms.ButtonLogic;
@@ -41,6 +43,7 @@ public class Teleop extends OpMode {
     private IMU imu;
     private LimelightAim autoAim = new LimelightAim();
     private boolean precisionMode;
+    private boolean poseSnapped = false;
     private double currentSensitivity;
     private double Sensitivity;
     private AutoShooting shot;
@@ -143,6 +146,22 @@ public class Teleop extends OpMode {
         shooter.update();
         follower.update();
         //teleopGate.update(shooter.getTargetRPM(), gamepad2.right_trigger > 0.3);
+        LLResult ll = limelight.getLatestResult();
+
+//        if (!poseSnapped && ll != null && ll.isValid()) {
+//            // Example: botpose_MT2 gives a Pose3D-like object in FTC SDK
+//            double x = (ll.getBotpose().getPosition().x - 1.83) * 39.3442622951;
+//            double y = (ll.getBotpose().getPosition().y + 1.83) * 39.3442622951;
+//            double yawDeg = ll.getBotpose().getOrientation().getYaw(AngleUnit.DEGREES);
+//
+//            // If Limelight is in meters and Pedro is in inches, convert:
+//            // x *= 39.3701; y *= 39.3701;
+//
+//
+//            Pose snapped = new Pose(x, y, Math.toRadians(yawDeg));
+//            follower.setPose(snapped);      // or follower.setStartingPose(snapped) depending on your Pedro version
+//            poseSnapped = true;
+//        }
         //Update Buttons
         hoodUpBtn.update(gamepad2.dpad_right);
         hoodDownBtn.update(gamepad2.dpad_left);
@@ -176,11 +195,11 @@ public class Teleop extends OpMode {
         //currentSensitivity = (precisionModeToggleBtn.getState() || precisionMode) ? 0.3 : Sensitivity;
 
         if (sensitivityUpBtn.getState() && precisionMode) {
-            currentSensitivity = Math.min(Math.max(Sensitivity + 0.1, 0.1), 1.0);
+            currentSensitivity = Math.min(Math.max(currentSensitivity + 0.1, 0.1), 1.0);
         }
 
         if (sensitivityDownBtn.getState() && precisionMode) {
-            currentSensitivity = Math.min(Math.max(Sensitivity - 0.1, 0.1), 1.0);
+            currentSensitivity = Math.min(Math.max(currentSensitivity - 0.1, 0.1), 1.0);
         }
 
         XL = gamepad1.left_stick_x * currentSensitivity;
@@ -208,7 +227,6 @@ public class Teleop extends OpMode {
         limelight.updateRobotOrientation(yaw);
 
         double turretPower;
-        LLResult ll = limelight.getLatestResult();
         if (autoAimHoldBtn.getState()) {
             turretPower = autoAim.update(getRuntime(), ll, telemetry);
         } else {
@@ -224,6 +242,11 @@ public class Teleop extends OpMode {
             llValid = true;
             ta = ll.getTa();
         }
+
+        Pose robotPose = follower.getPose();
+        double dx = goalPose.getX() - robotPose.getX();
+        double dy = goalPose.getY() - robotPose.getY();
+        double distToGoal = Math.hypot(dx, dy);
 
         if(autoFlywheelAndHoodToggleBtn.justPressed()) shooter.setTargetRPM(0);
         if (autoFlywheelAndHoodToggleBtn.getState()) {
@@ -244,11 +267,6 @@ public class Teleop extends OpMode {
             ShooterS1.setPosition(pos);
         }
 
-        Pose robotPose = follower.getPose();
-        double dx = goalPose.getX() - robotPose.getX();
-        double dy = goalPose.getY() - robotPose.getY();
-        double distToGoal = Math.hypot(dx, dy);
-
         // Telemetry
         telemetry.addLine("In-Game");
         telemetry.addLine("                                  ");
@@ -262,11 +280,7 @@ public class Teleop extends OpMode {
         telemetry.addData("Precision Mode Toggle", precisionModeToggleBtn.getState());
         telemetry.addData("Precision Mode Hold", precisionModeHoldBtn.getState());
 
-        telemetry.addLine("                                  ");
-        telemetry.addLine("                                  ");
-
         telemetry.addLine("Debug");
-        telemetry.addLine("                                  ");
         telemetry.addData("Motor 1 Power","%.3f",MotorFrontLeft.getPower());
         telemetry.addData("Motor 2 Power","%.3f", MotorFrontRight.getPower());
         telemetry.addData("Motor 3 Power","%.3f", MotorBackLeft.getPower());
@@ -287,6 +301,16 @@ public class Teleop extends OpMode {
         telemetry.addData("X", robotPose.getX());
         telemetry.addData("Y", robotPose.getY());
         telemetry.addData("Heading", Math.toDegrees(robotPose.getHeading()));
+        if (ll != null && ll.isValid()) {
+            telemetry.addData("MT2_LLX", ll.getBotpose_MT2().getPosition().x);
+            telemetry.addData("MT2_LLY", ll.getBotpose_MT2().getPosition().y);
+            telemetry.addData("MT2_LLHeading", ll.getBotpose_MT2().getOrientation().getYaw(AngleUnit.DEGREES));
+            telemetry.addData("MT_LLX", ll.getBotpose().getPosition().x);
+            telemetry.addData("MT_LLY", ll.getBotpose().getPosition().y);
+            telemetry.addData("MT_LLHeading", ll.getBotpose().getOrientation().getYaw(AngleUnit.DEGREES));
+        } else {
+            telemetry.addData("LLPose", "no valid tag");
+        }
         telemetry.addData("DistanceToGoal", distToGoal);
         telemetry.update();
     }
