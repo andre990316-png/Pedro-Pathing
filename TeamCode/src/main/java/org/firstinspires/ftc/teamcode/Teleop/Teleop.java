@@ -8,7 +8,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
-
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
+import org.firstinspires.ftc.teamcode.Autonomous.Constants;
 
 import org.firstinspires.ftc.teamcode.Mechanisms.ButtonLogic;
 import org.firstinspires.ftc.teamcode.Mechanisms.FlywheelLogic;
@@ -70,7 +72,13 @@ public class Teleop extends OpMode {
     private ButtonLogic precisionModeHoldBtn = new ButtonLogic(ButtonLogic.Mode.HOLD, false);//gamepad1.right_trigger
     private ButtonLogic sensitivityUpBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);//gamepad1.dpad_up
     private ButtonLogic sensitivityDownBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);//gamepad1.dpad_down
+    private Follower follower;
+    private Pose goalPose;
+    private final Pose blueGoalPose = new Pose(0, 144, 0);
+    private final Pose redGoalPose  = new Pose(144, 144, 0);
 
+    private final Pose topLeftStartPose = new Pose(20, 123, Math.toRadians(143));
+    private final Pose bottomLeftStartPose = new Pose(48, 10, Math.toRadians(90));
     @Override
     public void init() {
         // ===== Hardware map =====
@@ -112,6 +120,9 @@ public class Teleop extends OpMode {
         currentSensitivity = 1.0;
 
         shooter.init(hardwareMap);
+        follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(topLeftStartPose);
+        goalPose = blueGoalPose;
 
         telemetry.addData("Initialize", "Completed");
         telemetry.update();
@@ -130,7 +141,8 @@ public class Teleop extends OpMode {
     @Override
     public void loop() {
         shooter.update();
-        teleopGate.update(shooter.getTargetRPM(), gamepad2.right_trigger > 0.3);
+        follower.update();
+        //teleopGate.update(shooter.getTargetRPM(), gamepad2.right_trigger > 0.3);
         //Update Buttons
         hoodUpBtn.update(gamepad2.dpad_right);
         hoodDownBtn.update(gamepad2.dpad_left);
@@ -232,6 +244,11 @@ public class Teleop extends OpMode {
             ShooterS1.setPosition(pos);
         }
 
+        Pose robotPose = follower.getPose();
+        double dx = goalPose.getX() - robotPose.getX();
+        double dy = goalPose.getY() - robotPose.getY();
+        double distToGoal = Math.hypot(dx, dy);
+
         // Telemetry
         telemetry.addLine("In-Game");
         telemetry.addLine("                                  ");
@@ -266,7 +283,10 @@ public class Teleop extends OpMode {
         telemetry.addData("Flywheel Error", shooter.getError());
         telemetry.addData("Flywheel Power", shooterPower);
         telemetry.addData("Battery Voltage", "%.2f V", battery.getVoltage());
-
+        telemetry.addData("X", robotPose.getX());
+        telemetry.addData("Y", robotPose.getY());
+        telemetry.addData("Heading", Math.toDegrees(robotPose.getHeading()));
+        telemetry.addData("DistanceToGoal", distToGoal);
         telemetry.update();
     }
 }

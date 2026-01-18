@@ -46,9 +46,8 @@ public class TeleopGate {
                 gateServo.setPosition(gateOpen ? OPEN : CLOSED);
                 timer.reset();
             }
-        }
-        else {
-        gateServo.setPosition(CLOSED);
+        } else {
+            gateServo.setPosition(CLOSED);
         }
 
     }
