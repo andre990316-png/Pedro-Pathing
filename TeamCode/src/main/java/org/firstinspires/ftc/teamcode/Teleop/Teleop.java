@@ -281,7 +281,8 @@ public class Teleop extends OpMode {
         telemetry.addData("Target RPM", shooter.getTargetRPM());
         telemetry.addData("RPM", shooter.getFlywheelRpm());
         telemetry.addData("Flywheel Error", shooter.getError());
-        telemetry.addData("Flywheel Power", shooterPower);
+        telemetry.addData("Flywheel Power", shooter.getFlywheelPower());
+        telemetry.addData("Calculated RPM", shooter.getCalcRPM());
         telemetry.addData("Battery Voltage", "%.2f V", battery.getVoltage());
         telemetry.addData("X", robotPose.getX());
         telemetry.addData("Y", robotPose.getY());

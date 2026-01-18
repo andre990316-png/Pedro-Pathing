@@ -11,9 +11,9 @@ import org.firstinspires.ftc.teamcode.Data.FlywheelAndHoodData;
 public class FlywheelLogic {
 
 
-    public static final double kp = 30;
-    public static final double kd = 0.00;
-    public static final double kf = 0.00016666666;
+public static final double kp = 15;
+    public static final double kd = 2;
+    public static final double kf = 1.18;
 
 
     // --- Hardware ---
@@ -55,6 +55,7 @@ public class FlywheelLogic {
     private double flywheelRpm = 0.0;
     private double minFlywheelRpm = 800;
     private double targetRPM = 0;
+    private double calcRPM;
     private double flywheelMaxSpinupTime = 0.7;
     private double lastShooterTime=System.nanoTime();
     private IntakeLogic intake = new IntakeLogic();
@@ -72,8 +73,8 @@ public class FlywheelLogic {
         ShooterM1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Needed for setVelocity() control
-        ShooterM1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        ShooterM2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        ShooterM1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        ShooterM2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         ShooterM1.setPower(0);
         ShooterM2.setPower(0);
@@ -112,11 +113,10 @@ public class FlywheelLogic {
         error = targetRPM - currentRPM;
         double dError = (error - lastError) / Shooter_dt;
 
-        double pdPower = kf * 500;//  + kp / 6000 * error + kd / 6000 * dError;
-        //kf / 6000 * targetRPM +
+        double pdPower = kf / 6000 * targetRPM  + kp / 6000 * error + kd / 6000 * dError;
         if (targetRPM <= 0) pdPower = 0;
 
-        double calcRPM = Range.clip(pdPower, 0.0, 1.0);
+        calcRPM = Range.clip(pdPower, 0.0, 1.0);
 
         lastError = error;
 
@@ -136,7 +136,7 @@ public class FlywheelLogic {
 //                }
 //                break;
             case SPIN_UP:
-                if (currentRPM >= targetRPM - 1000 || stateTimer.seconds() > flywheelMaxSpinupTime) {
+                if (currentRPM >= targetRPM || stateTimer.seconds() > flywheelMaxSpinupTime) {
                     ShooterS2.setPosition(gateOpenAngle);
                     stateTimer.reset();
                     flyWheelState = FlywheelState.LAUNCH;
@@ -183,6 +183,7 @@ public class FlywheelLogic {
     public double getFlywheelRpm() {
         return currentRPM;
     }
+    public double getCalcRPM() {return calcRPM;}
 
     public IntakeLogic getIntake(){
         return intake;
@@ -212,6 +213,10 @@ public class FlywheelLogic {
 
     public double getTargetRPM(){
         return targetRPM;
+    }
+
+    public double getFlywheelPower(){
+        return ShooterM1.getPower();
     }
 
     public void autoAim(double ta){
