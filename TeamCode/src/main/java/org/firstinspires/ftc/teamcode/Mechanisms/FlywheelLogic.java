@@ -11,9 +11,9 @@ import org.firstinspires.ftc.teamcode.Data.FlywheelAndHoodData;
 public class FlywheelLogic {
 
 
-public static final double kp = 15;
-    public static final double kd = 2;
-    public static final double kf = 1.18;
+    public static final double kp = 1.88;
+    public static final double kd = 0.4;
+    public static final double kf = 1.087;
 
 
     // --- Hardware ---
@@ -88,6 +88,17 @@ public static final double kp = 15;
     }
 
     public void update() {
+        double ffPower;
+        if(targetRPM < 2000) {
+            ffPower = kf * (targetRPM / 6000) * 0.55;  // halve feedforward for very low RPM
+        } else if(targetRPM <= 4500) {
+            ffPower = kf * (targetRPM / 6000) * 0.8;  // slightly reduce for mid RPM
+        } else if (targetRPM < 5500) {
+            ffPower = kf * (targetRPM / 6000);        // full feedforward for high RPM
+        } else {
+            ffPower =kf * (targetRPM / 6000) * 1.2;
+        }
+
 
         long Shooter_now = System.nanoTime();
         double Shooter_dt = (Shooter_now - lastShooterTime) / 1e9;
@@ -107,13 +118,13 @@ public static final double kp = 15;
         lastPos1 = pos1;
         lastShooterTime = Shooter_now;
 
-        /// convert desired RPM to motor language or something idk
+        /// pdf cauculation
         targetRPM = Range.clip(targetRPM, 0, 6000);
 
         error = targetRPM - currentRPM;
         double dError = (error - lastError) / Shooter_dt;
 
-        double pdPower = kf / 6000 * targetRPM  + kp / 6000 * error + kd / 6000 * dError;
+        double pdPower = ffPower + kp * error / 6000.0 + kd * dError / 6000.0;
         if (targetRPM <= 0) pdPower = 0;
 
         calcRPM = Range.clip(pdPower, 0.0, 1.0);
@@ -136,7 +147,7 @@ public static final double kp = 15;
 //                }
 //                break;
             case SPIN_UP:
-                if (currentRPM >= targetRPM || stateTimer.seconds() > flywheelMaxSpinupTime) {
+                if (currentRPM + 500 >= targetRPM || stateTimer.seconds() > flywheelMaxSpinupTime) {
                     ShooterS2.setPosition(gateOpenAngle);
                     stateTimer.reset();
                     flyWheelState = FlywheelState.LAUNCH;
