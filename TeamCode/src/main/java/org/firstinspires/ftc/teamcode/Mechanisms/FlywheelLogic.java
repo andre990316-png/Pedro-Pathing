@@ -11,9 +11,9 @@ import org.firstinspires.ftc.teamcode.Data.FlywheelAndHoodData;
 public class FlywheelLogic {
 
 
-    public static final double kp = 1.88;
+    public static final double kp = 2.8;
     public static final double kd = 0.4;
-    public static final double kf = 1.087;
+    public static final double kf = 1.077;
 
 
     // --- Hardware ---
@@ -91,12 +91,16 @@ public class FlywheelLogic {
         double ffPower;
         if(targetRPM < 2000) {
             ffPower = kf * (targetRPM / 6000) * 0.55;  // halve feedforward for very low RPM
-        } else if(targetRPM <= 4500) {
-            ffPower = kf * (targetRPM / 6000) * 0.8;  // slightly reduce for mid RPM
-        } else if (targetRPM < 5500) {
+        }else if(targetRPM < 3500) {
+            ffPower = kf * (targetRPM / 6000) * 0.7;  // slightly reduce for mid RPM
+        } else if (targetRPM < 4500){
+            ffPower = kf * (targetRPM / 6000) * 0.75;
+        }else if(targetRPM == 4500) {
+            ffPower = kf * (targetRPM / 6000) * 0.85;
+        }else if (targetRPM < 5500) {
             ffPower = kf * (targetRPM / 6000);        // full feedforward for high RPM
         } else {
-            ffPower =kf * (targetRPM / 6000) * 1.2;
+            ffPower =kf * (targetRPM / 6000) * 1.16;
         }
 
 
@@ -206,7 +210,9 @@ public class FlywheelLogic {
 
     public void setHoodPosition(double hood) {
         // hood is a servo position in [0,1]
-        ShooterS1.setPosition(Range.clip(hood, 0.0, 1.0));
+        if (ShooterS1.getPosition() != hood) {
+            ShooterS1.setPosition(Range.clip(hood, 0.0, 1.0));
+        }
     }
 
     public static class AutoShooting {

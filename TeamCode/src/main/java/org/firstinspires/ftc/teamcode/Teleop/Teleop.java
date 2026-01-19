@@ -121,6 +121,7 @@ public class Teleop extends OpMode {
         shooter.setTargetRPM(0);
 
         currentSensitivity = 1.0;
+        Sensitivity = 1.0;
 
         shooter.init(hardwareMap);
         follower = Constants.createFollower(hardwareMap);
@@ -194,12 +195,14 @@ public class Teleop extends OpMode {
 
         //currentSensitivity = (precisionModeToggleBtn.getState() || precisionMode) ? 0.3 : Sensitivity;
 
-        if (sensitivityUpBtn.getState() && precisionMode) {
-            currentSensitivity = Math.min(Math.max(currentSensitivity + 0.1, 0.1), 1.0);
+        if (sensitivityUpBtn.getState()) {
+            Sensitivity = Range.clip(Sensitivity + 0.1, 0, 1);
+            currentSensitivity = Sensitivity;
         }
 
-        if (sensitivityDownBtn.getState() && precisionMode) {
-            currentSensitivity = Math.min(Math.max(currentSensitivity - 0.1, 0.1), 1.0);
+        if (sensitivityDownBtn.getState()) {
+            Sensitivity = Range.clip(Sensitivity - 0.1, 0, 1);
+            currentSensitivity = Sensitivity;
         }
 
         XL = gamepad1.left_stick_x * currentSensitivity;
@@ -276,6 +279,7 @@ public class Teleop extends OpMode {
         telemetry.addData("Shooter Servo ", ShooterS1.getPosition());
         telemetry.addData("Shooter Servo2 ", ShooterS2.getPosition());
         telemetry.addLine("                                  ");
+        telemetry.addData("Current Sensitivity", currentSensitivity);
         telemetry.addData("Sensitivity", Sensitivity);
         telemetry.addData("Precision Mode Toggle", precisionModeToggleBtn.getState());
         telemetry.addData("Precision Mode Hold", precisionModeHoldBtn.getState());
@@ -298,6 +302,7 @@ public class Teleop extends OpMode {
         telemetry.addData("Flywheel Power", shooter.getFlywheelPower());
         telemetry.addData("Calculated RPM", shooter.getCalcRPM());
         telemetry.addData("Battery Voltage", "%.2f V", battery.getVoltage());
+        telemetry.addLine(                                  );
         telemetry.addData("X", robotPose.getX());
         telemetry.addData("Y", robotPose.getY());
         telemetry.addData("Heading", Math.toDegrees(robotPose.getHeading()));
