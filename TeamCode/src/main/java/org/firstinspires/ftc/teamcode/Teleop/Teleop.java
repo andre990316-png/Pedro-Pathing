@@ -84,7 +84,7 @@ public class Teleop extends OpMode {
     private ButtonLogic sensitivityDownBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);//gamepad1.dpad_down
     private Follower follower;
 
-    private final Pose topLeftStartPose = new Pose(20, 123, Math.toRadians(143));
+    private final Pose topLeftStartPose = new Pose(20, 118.5, Math.toRadians(144));
     private final Pose bottomLeftStartPose = new Pose(48, 10, Math.toRadians(90));
     @Override
     public void init() {
@@ -150,7 +150,6 @@ public class Teleop extends OpMode {
         else if (gamepad1.dpad_right) {
             AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
         }
-
         telemetry.addLine("=== ALLIANCE SELECT ===");
         telemetry.addData("Alliance", AllianceData.selectedAlliance);
         telemetry.addLine("D-pad LEFT = RED");
