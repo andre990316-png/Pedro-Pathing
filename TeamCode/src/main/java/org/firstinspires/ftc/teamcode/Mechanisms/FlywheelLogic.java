@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-
 import org.firstinspires.ftc.teamcode.Data.FlywheelAndHoodData;
 
 public class FlywheelLogic {
@@ -237,7 +236,7 @@ public class FlywheelLogic {
     }
 
     public void autoAim(double ta){
-        org.firstinspires.ftc.teamcode.Mechanisms.AutoShooting shot;
+        org.firstinspires.ftc.teamcode.Tests.AutoShooting shot;
 
         shot = (ta >= 0.7) ? FlywheelAndHoodData.lookupA(ta) : FlywheelAndHoodData.lookupB(ta);
 

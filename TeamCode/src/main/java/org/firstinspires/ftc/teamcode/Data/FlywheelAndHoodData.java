@@ -1,5 +1,5 @@
 package org.firstinspires.ftc.teamcode.Data;
-import org.firstinspires.ftc.teamcode.Mechanisms.AutoShooting;
+import org.firstinspires.ftc.teamcode.Tests.AutoShooting;
 
 public class FlywheelAndHoodData {
     public static AutoShooting lookupA(double ta) {
