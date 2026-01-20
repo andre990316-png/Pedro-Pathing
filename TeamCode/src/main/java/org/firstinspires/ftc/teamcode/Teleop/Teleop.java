@@ -311,10 +311,10 @@ public class Teleop extends OpMode {
                 shooter.setHoodPosition(shot.hood);
             }
         } else {
-            if (rpmUpBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() + 500);
-            if (rpmDownBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() - 500);
-            if (hoodUpBtn.getState()) pos += 0.02;
-            if (hoodDownBtn.getState()) pos -= 0.02;
+            if (rpmUpBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() + 50);
+            if (rpmDownBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() - 50);
+            if (hoodUpBtn.getState()) pos += 0.01;
+            if (hoodDownBtn.getState()) pos -= 0.01;
             pos = Range.clip(pos, 0.84, 1.0);
             ShooterS1.setPosition(pos);
         }
