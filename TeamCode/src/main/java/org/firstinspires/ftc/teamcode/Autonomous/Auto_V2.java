@@ -13,6 +13,8 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+
+import org.firstinspires.ftc.teamcode.Data.AllianceData;
 import org.firstinspires.ftc.teamcode.Data.Auto_lastPose;
 import org.firstinspires.ftc.teamcode.Mechanisms.LimelightAim;
 import org.firstinspires.ftc.teamcode.Mechanisms.FlywheelLogic;
@@ -338,7 +340,6 @@ public class Auto_V2 extends OpMode {
     // ------------------------------------------------------------
     private void updateAuto() {
         if (currentIndex >= STEPS.size()){
-            Auto_lastPose.currentPose = follower.getPose();
             return;
         }
 
@@ -389,7 +390,8 @@ public class Auto_V2 extends OpMode {
         follower = Constants.createFollower(hardwareMap);
 
         buildSteps();
-        goalPose = blueGoalPose;
+        Pose goalPose = AllianceData.getGoalPose();
+
 
         Pose start = (!STEPS.isEmpty() && STEPS.get(0).pose != null) ? STEPS.get(0).pose : topLeftStartPose;
         follower.setStartingPose(start);   // recommended for Pedro
@@ -432,10 +434,13 @@ public class Auto_V2 extends OpMode {
         follower.update();
         shooter.update();
 
+        Auto_lastPose.currentPose = follower.getPose();
+
         Pose robotPose = follower.getPose();
+        Pose goalPose = AllianceData.getGoalPose();  // dynamically get current alliance
         double dx = goalPose.getX() - robotPose.getX();
         double dy = goalPose.getY() - robotPose.getY();
-        double distToGoal = Math.hypot(dx, dy);
+
         // run sequencer
 
         updateAuto();
@@ -460,7 +465,6 @@ public class Auto_V2 extends OpMode {
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
-        telemetry.addData("DistanceToGoal", distToGoal);
         telemetry.update();
     }
 }
