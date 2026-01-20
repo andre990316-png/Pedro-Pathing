@@ -48,8 +48,6 @@ public class Auto_V2 extends OpMode {
         AIM_OFF
     }
 
-
-
     private ArrayList<AutoStep> STEPS = new ArrayList<>();
     private ArrayList<PathChain> CHAINS = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTEST = new ArrayList<>();

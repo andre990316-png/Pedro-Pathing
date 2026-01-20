@@ -11,6 +11,7 @@ public class LimelightAim {
     public double Kd = 0.002;
     public double deadband = 0.6;
     public double maxTurretPower = 1.0;
+    public static String currentPipeline;
 
     // ===== history =====
     public double lastTx = 0;
@@ -19,6 +20,7 @@ public class LimelightAim {
 
     /** Convert your pipeline name -> number (so opmodes can call pipelineSwitch(int)). */
     public static int pipelineFromName(String name) {
+        currentPipeline = name;
         if (name == null) return 3;
         switch (name) {
             case "GPP": return 0;
@@ -28,6 +30,18 @@ public class LimelightAim {
             case "Red": return 4;
             default: return 3;
         }
+    }
+    public static String getCurrentPipeline(String name) {
+        return currentPipeline;
+    }
+    public static int getAprilTagId(LLResult llResult) {
+        int id = 0;
+        if (llResult != null && llResult.isValid()) {
+            java.util.List<com.qualcomm.hardware.limelightvision.LLResultTypes.FiducialResult> fiducials = llResult.getFiducialResults();
+            if (fiducials != null && !fiducials.isEmpty())
+                id = fiducials.get(0).getFiducialId();
+        }
+        return id;
     }
 
     public void resetHistory(double runtimeSeconds) {
@@ -69,6 +83,7 @@ public class LimelightAim {
                 telemetry.addData("AutoAim", "ON");
                 telemetry.addData("tx", tx);
                 telemetry.addData("ta", llResult.getTa());
+                telemetry.addData("ta", llResult.getTa());
                 telemetry.addData("dTx", dTx);
                 telemetry.addData("Turret PD", turretPower);
                 telemetry.addData("Motor Power", -turretPower);
@@ -83,7 +98,7 @@ public class LimelightAim {
                 telemetry.addData("Motor Power", -turretPower);
             }
         }
-
+        telemetry.addData("Current Pipeline", currentPipeline);
         // motor sign matches your test: ShooterRotateMotor.setPower(-turretPower)
         return -turretPower;
     }
