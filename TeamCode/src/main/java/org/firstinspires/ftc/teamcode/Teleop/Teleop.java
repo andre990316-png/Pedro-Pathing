@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.pedropathing.follower.Follower;
@@ -13,8 +14,8 @@ import com.pedropathing.geometry.Pose;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Autonomous.Constants;
-
-import org.firstinspires.ftc.teamcode.Mechanisms.Auto_lastPose;
+import org.firstinspires.ftc.teamcode.Data.AllianceData;
+import org.firstinspires.ftc.teamcode.Data.Auto_lastPose;
 import org.firstinspires.ftc.teamcode.Mechanisms.ButtonLogic;
 import org.firstinspires.ftc.teamcode.Mechanisms.FlywheelLogic;
 import org.firstinspires.ftc.teamcode.Mechanisms.LimelightAim;
@@ -58,6 +59,10 @@ public class Teleop extends OpMode {
 
     // Linear Flywheels
     double targetRPM = 0;
+    //elapsed time
+    private ElapsedTime allianceBannerTimer = new ElapsedTime();
+    private boolean showAllianceBanner = true;
+
 
     private FlywheelLogic shooter = new FlywheelLogic();
     private ButtonLogic hoodUpBtn      = new ButtonLogic(ButtonLogic.Mode.PULSE, false);  // dpad_right
@@ -77,9 +82,6 @@ public class Teleop extends OpMode {
     private ButtonLogic sensitivityUpBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);//gamepad1.dpad_up
     private ButtonLogic sensitivityDownBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);//gamepad1.dpad_down
     private Follower follower;
-    private Pose goalPose;
-    private final Pose blueGoalPose = new Pose(0, 144, 0);
-    private final Pose redGoalPose  = new Pose(144, 144, 0);
 
     private final Pose topLeftStartPose = new Pose(20, 123, Math.toRadians(143));
     private final Pose bottomLeftStartPose = new Pose(48, 10, Math.toRadians(90));
@@ -126,10 +128,34 @@ public class Teleop extends OpMode {
 
         shooter.init(hardwareMap);
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(topLeftStartPose);
-        goalPose = blueGoalPose;
+
+        if (Auto_lastPose.currentPose != null){
+            follower.setStartingPose(Auto_lastPose.currentPose);
+            telemetry.addLine("Starting Position = Auto_lastPose");
+        }else {
+            follower.setStartingPose(topLeftStartPose);
+            telemetry.addLine("Starting Position = topLeftStartingPose");
+        }
+
 
         telemetry.addData("Initialize", "Completed");
+        telemetry.update();
+    }
+
+    @Override
+    public void init_loop() {
+
+        if (gamepad1.dpad_left) {
+            AllianceData.selectedAlliance = AllianceData.Alliance.RED;
+        }
+        else if (gamepad1.dpad_right) {
+            AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
+        }
+
+        telemetry.addLine("=== ALLIANCE SELECT ===");
+        telemetry.addData("Alliance", AllianceData.selectedAlliance);
+        telemetry.addLine("D-pad LEFT = RED");
+        telemetry.addLine("D-pad RIGHT = BLUE");
         telemetry.update();
     }
 
@@ -137,7 +163,19 @@ public class Teleop extends OpMode {
     public void start() {
         limelight.start();
         autoAim.resetHistory(getRuntime());
+
+        if (AllianceData.isRed()) {
+            limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
+        } else {
+            limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
+        }
+        allianceBannerTimer.reset();
+        showAllianceBanner = true;
+
+        limelight.start();
+        autoAim.resetHistory(getRuntime());
     }
+
 
 
     //====================
@@ -184,6 +222,17 @@ public class Teleop extends OpMode {
         //ShooterS2.setPosition(gateHoldBtn.getState()? 0 : 0.2);
         if (shoot3Btn.getState() && !shooter.isBusy()) {
             shooter.fireShots(1);
+        }
+
+        if (showAllianceBanner) {
+            if (allianceBannerTimer.seconds() < 2.0) {
+                telemetry.addLine("=== ALLIANCE LOCKED ===");
+                telemetry.addData("Alliance", AllianceData.selectedAlliance);
+                telemetry.update();
+                return; // optional — remove if you want normal telemetry underneath
+            } else {
+                showAllianceBanner = false;
+            }
         }
 
         IntakeMotor.setPower(intakeToggleBtn.getState() ? -1.0 : 0.0);
@@ -248,8 +297,8 @@ public class Teleop extends OpMode {
         }
 
         Pose robotPose = follower.getPose();
-        double dx = goalPose.getX() - robotPose.getX();
-        double dy = goalPose.getY() - robotPose.getY();
+        double dx = AllianceData.getGoalPose().getX() - robotPose.getX();
+        double dy = AllianceData.getGoalPose().getY() - robotPose.getY();
         double distToGoal = Math.hypot(dx, dy);
 
         if(autoFlywheelAndHoodToggleBtn.justPressed()) shooter.setTargetRPM(0);
