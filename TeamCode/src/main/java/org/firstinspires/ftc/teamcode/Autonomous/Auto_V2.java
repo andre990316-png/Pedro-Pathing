@@ -71,10 +71,10 @@ public class Auto_V2 extends OpMode {
 
     // ===== Poses you already had =====
     //start poses
-    private final Pose topLeftStartPose = new Pose(20, 123, Math.toRadians(143));
+    private final Pose topLeftStartPose = new Pose(20, 118.5, Math.toRadians(143));
     private final Pose bottomLeftStartPose = new Pose(48, 10, Math.toRadians(90));
     private final Pose bottomRightStartPose = new Pose(96, 10, Math.toRadians(90));
-    private final Pose topRightStartPose = new Pose(124, 123, Math.toRadians(37));
+    private final Pose topRightStartPose = new Pose(124, 118.5, Math.toRadians(37));
 
     //close shoot poses (on big V)
     private final Pose blueShootPoseClose = new Pose(56.05641748942172, 86.9280677009873, Math.toRadians(137));
