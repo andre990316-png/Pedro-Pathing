@@ -354,8 +354,8 @@ public class Teleop extends OpMode {
         telemetry.addLine(                                  );
         if (Auto_lastPose.currentPose != null){
         telemetry.addData("Autonomous", Auto_lastPose.currentPose);}
-        telemetry.addData("X", robotPose.getX());
-        telemetry.addData("Y", robotPose.getY());
+        telemetry.addData("X", follower.getPose().getX());
+        telemetry.addData("Y", follower.getPose().getY());
         telemetry.addData("Heading", Math.toDegrees(robotPose.getHeading()));
         if (ll != null && ll.isValid()) {
             telemetry.addData("MT2_LLX", ll.getBotpose_MT2().getPosition().x);
