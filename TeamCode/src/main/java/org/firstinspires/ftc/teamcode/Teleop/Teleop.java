@@ -76,7 +76,7 @@ public class Teleop extends OpMode {
 
     private ButtonLogic intakeToggleBtn    = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false); // gamepad1.left_bumper
     private ButtonLogic autoFlywheelAndHoodToggleBtn = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false); // gamepad2.right_bumper
-
+    private ButtonLogic autoSort = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);
     private ButtonLogic precisionModeToggleBtn = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);//gamepad1.right_bumper
     private ButtonLogic precisionModeHoldBtn = new ButtonLogic(ButtonLogic.Mode.HOLD, false);//gamepad1.right_trigger
     private ButtonLogic sensitivityUpBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);//gamepad1.dpad_up
@@ -109,7 +109,6 @@ public class Teleop extends OpMode {
         imu.initialize(new IMU.Parameters(revHubOrientationOnRobot));
         limelight = hardwareMap.get(Limelight3A.class, "Limelight");
         limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
-
         // Motor setup
         MotorBackLeft.setDirection(DcMotor.Direction.REVERSE);
         MotorFrontLeft.setDirection(DcMotor.Direction.REVERSE);
@@ -210,7 +209,7 @@ public class Teleop extends OpMode {
         shoot3Btn.update(gamepad2.right_trigger > 0.3);
         //gateHoldBtn.update(gamepad2.right_trigger > 0.03);
         autoAimHoldBtn.update(gamepad2.left_trigger > 0.3);
-
+        autoSort.update(gamepad2.left_bumper);
         intakeToggleBtn.update(gamepad1.left_bumper);
         autoFlywheelAndHoodToggleBtn.update(gamepad2.right_bumper);
 
@@ -369,5 +368,6 @@ public class Teleop extends OpMode {
         }
         telemetry.addData("DistanceToGoal", distToGoal);
         telemetry.update();
+
     }
 }
