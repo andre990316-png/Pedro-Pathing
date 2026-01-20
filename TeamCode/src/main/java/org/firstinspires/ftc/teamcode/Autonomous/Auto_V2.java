@@ -13,8 +13,8 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import org.firstinspires.ftc.teamcode.Mechanisms.Auto_lastPose;
 import org.firstinspires.ftc.teamcode.Mechanisms.LimelightAim;
-
 import org.firstinspires.ftc.teamcode.Mechanisms.FlywheelLogic;
 
 import java.util.ArrayList;
@@ -331,7 +331,10 @@ public class Auto_V2 extends OpMode {
     // Main auto sequencer
     // ------------------------------------------------------------
     private void updateAuto() {
-        if (currentIndex >= STEPS.size()) return;
+        if (currentIndex >= STEPS.size()){
+            Auto_lastPose.currentPose = follower.getPose();
+            return;
+        }
 
         // 1) 車子還在跑路徑，就不要進行下一步
         if (follower.isBusy()) return;

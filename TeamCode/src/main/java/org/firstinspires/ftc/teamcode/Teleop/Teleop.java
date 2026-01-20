@@ -14,6 +14,7 @@ import com.pedropathing.geometry.Pose;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Autonomous.Constants;
 
+import org.firstinspires.ftc.teamcode.Mechanisms.Auto_lastPose;
 import org.firstinspires.ftc.teamcode.Mechanisms.ButtonLogic;
 import org.firstinspires.ftc.teamcode.Mechanisms.FlywheelLogic;
 import org.firstinspires.ftc.teamcode.Mechanisms.LimelightAim;
@@ -302,6 +303,7 @@ public class Teleop extends OpMode {
         telemetry.addData("Calculated RPM", shooter.getCalcRPM());
         telemetry.addData("Battery Voltage", "%.2f V", battery.getVoltage());
         telemetry.addLine(                                  );
+        telemetry.addData("Autonomous", Auto_lastPose.currentPose);
         telemetry.addData("X", robotPose.getX());
         telemetry.addData("Y", robotPose.getY());
         telemetry.addData("Heading", Math.toDegrees(robotPose.getHeading()));
