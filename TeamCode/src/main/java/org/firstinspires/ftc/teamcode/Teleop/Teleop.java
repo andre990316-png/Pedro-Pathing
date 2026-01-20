@@ -137,7 +137,7 @@ public class Teleop extends OpMode {
             telemetry.addLine("Starting Position = topLeftStartingPose");
         }
 
-
+        follower.setStartingPose(AllianceData.getGoalPose());
         telemetry.addData("Initialize", "Completed");
         telemetry.update();
     }
@@ -151,6 +151,7 @@ public class Teleop extends OpMode {
         else if (gamepad1.dpad_right) {
             AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
         }
+        follower.setStartingPose(AllianceData.getGoalPose());
 
         telemetry.addLine("=== ALLIANCE SELECT ===");
         telemetry.addData("Alliance", AllianceData.selectedAlliance);
@@ -225,7 +226,7 @@ public class Teleop extends OpMode {
         }
 
         if (showAllianceBanner) {
-            if (allianceBannerTimer.seconds() < 2.0) {
+            if (allianceBannerTimer.seconds() < .67) {
                 telemetry.addLine("=== ALLIANCE LOCKED ===");
                 telemetry.addData("Alliance", AllianceData.selectedAlliance);
                 telemetry.update();
