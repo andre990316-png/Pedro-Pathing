@@ -128,6 +128,20 @@ public class Teleop extends OpMode {
         shooter.init(hardwareMap);
         follower = Constants.createFollower(hardwareMap);
 
+        telemetry.addData("Initialize", "Completed");
+        telemetry.update();
+    }
+
+    @Override
+    public void init_loop() {
+
+        if (gamepad1.dpad_right) {
+            AllianceData.selectedAlliance = AllianceData.Alliance.RED;
+        }
+        else if (gamepad1.dpad_left) {
+            AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
+        }
+
         if (Auto_lastPose.currentPose != null){
             follower.setStartingPose(Auto_lastPose.currentPose);
             telemetry.addLine("Starting Position = Auto_lastPose");
@@ -136,25 +150,10 @@ public class Teleop extends OpMode {
             telemetry.addLine("Starting Position = topLeftStartingPose");
         }
 
-
-        telemetry.addData("Initialize", "Completed");
-        telemetry.update();
-    }
-
-    @Override
-    public void init_loop() {
-
-        if (gamepad1.dpad_left) {
-            AllianceData.selectedAlliance = AllianceData.Alliance.RED;
-        }
-        else if (gamepad1.dpad_right) {
-            AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
-        }
-
         telemetry.addLine("=== ALLIANCE SELECT ===");
         telemetry.addData("Alliance", AllianceData.selectedAlliance);
-        telemetry.addLine("D-pad LEFT = RED");
-        telemetry.addLine("D-pad RIGHT = BLUE");
+        telemetry.addLine("D-pad LEFT = BLUE");
+        telemetry.addLine("D-pad RIGHT = RED");
         telemetry.update();
     }
 
