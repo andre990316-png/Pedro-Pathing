@@ -339,7 +339,6 @@ public class Auto_V2 extends OpMode {
     // ------------------------------------------------------------
     private void updateAuto() {
         if (currentIndex >= STEPS.size()){
-            Auto_lastPose.currentPose = follower.getPose();
             return;
         }
 
@@ -433,6 +432,8 @@ public class Auto_V2 extends OpMode {
     public void loop() {
         follower.update();
         shooter.update();
+
+        Auto_lastPose.currentPose = follower.getPose();
 
         Pose robotPose = follower.getPose();
         Pose goalPose = AllianceData.getGoalPose();  // dynamically get current alliance
