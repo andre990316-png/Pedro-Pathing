@@ -14,13 +14,12 @@ import com.pedropathing.geometry.Pose;
 import org.firstinspires.ftc.teamcode.Autonomous.Constants;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.Autonomous.Constants;
 import org.firstinspires.ftc.teamcode.Data.AllianceData;
 import org.firstinspires.ftc.teamcode.Data.Auto_lastPose;
 import org.firstinspires.ftc.teamcode.Mechanisms.ButtonLogic;
 import org.firstinspires.ftc.teamcode.Mechanisms.FlywheelLogic;
 import org.firstinspires.ftc.teamcode.Mechanisms.LimelightAim;
-import org.firstinspires.ftc.teamcode.Mechanisms.AutoShooting;
+import org.firstinspires.ftc.teamcode.Tests.AutoShooting;
 import org.firstinspires.ftc.teamcode.Data.FlywheelAndHoodData;
 import org.firstinspires.ftc.teamcode.Mechanisms.TeleopGate;
 
@@ -304,9 +303,6 @@ public class Teleop extends OpMode {
         if (autoFlywheelAndHoodToggleBtn.getState()) {
             if(llValid) {
                 shot = (ta >= 0.7) ? FlywheelAndHoodData.lookupA(ta) : FlywheelAndHoodData.lookupB(ta);
-                shooter.setTargetRPM(shot.rpm);
-                shooter.setHoodPosition(shot.hood);
-            } else {
                 shooter.setTargetRPM(shot.rpm);
                 shooter.setHoodPosition(shot.hood);
             }
