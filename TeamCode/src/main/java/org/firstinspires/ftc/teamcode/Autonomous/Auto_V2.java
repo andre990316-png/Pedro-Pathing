@@ -126,6 +126,7 @@ public class Auto_V2 extends OpMode {
     // Action runs when the segment STARTS (before followPath).
     // ------------------------------------------------------------
     private void buildSteps() {
+
         STEPS.clear();
         AUTOTEST.clear();
         AUTOTOPLEFT.clear();
