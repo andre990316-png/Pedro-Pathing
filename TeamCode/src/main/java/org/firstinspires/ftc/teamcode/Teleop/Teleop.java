@@ -354,7 +354,8 @@ public class Teleop extends OpMode {
         telemetry.addData("Calculated RPM", shooter.getCalcRPM());
         telemetry.addData("Battery Voltage", "%.2f V", battery.getVoltage());
         telemetry.addLine(                                  );
-        telemetry.addData("Autonomous", Auto_lastPose.currentPose);
+        if (Auto_lastPose.currentPose != null){
+        telemetry.addData("Autonomous", Auto_lastPose.currentPose);}
         telemetry.addData("X", robotPose.getX());
         telemetry.addData("Y", robotPose.getY());
         telemetry.addData("Heading", Math.toDegrees(robotPose.getHeading()));
