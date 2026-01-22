@@ -75,6 +75,7 @@ public class Teleop extends OpMode {
     private ButtonLogic autoAimHoldBtn = new ButtonLogic(ButtonLogic.Mode.HOLD, false);   // left_trigger
 
     private ButtonLogic intakeHoldBtn    = new ButtonLogic(ButtonLogic.Mode.HOLD, false); // gamepad1.left_bumper
+    private ButtonLogic intakeReverseHoldBtn = new ButtonLogic(ButtonLogic.Mode.HOLD,false);
     private ButtonLogic autoFlywheelAndHoodToggleBtn = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false); // gamepad2.right_bumper
     private ButtonLogic autoSort = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);
     private ButtonLogic precisionModeToggleBtn = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);//gamepad1.right_bumper
@@ -192,20 +193,22 @@ public class Teleop extends OpMode {
         //teleopGate.update(shooter.getTargetRPM(), gamepad2.right_trigger > 0.3);
         LLResult ll = limelight.getLatestResult();
 
-//        if (!poseSnapped && ll != null && ll.isValid()) {
-//            // Example: botpose_MT2 gives a Pose3D-like object in FTC SDK
-//            double x = (ll.getBotpose().getPosition().x - 1.83) * 39.3442622951;
-//            double y = (ll.getBotpose().getPosition().y + 1.83) * 39.3442622951;
-//            double yawDeg = ll.getBotpose().getOrientation().getYaw(AngleUnit.DEGREES);
-//
-//            // If Limelight is in meters and Pedro is in inches, convert:
-//            // x *= 39.3701; y *= 39.3701;
-//
-//
-//            Pose snapped = new Pose(x, y, Math.toRadians(yawDeg));
-//            follower.setPose(snapped);      // or follower.setStartingPose(snapped) depending on your Pedro version
-//            poseSnapped = true;
-//        }
+/*        if (!poseSnapped && ll != null && ll.isValid()) {
+            // Example: botpose_MT2 gives a Pose3D-like object in FTC SDK
+            double x = (ll.getBotpose().getPosition().x - 1.83) * 39.3442622951;
+            double y = (ll.getBotpose().getPosition().y + 1.83) * 39.3442622951;
+            double yawDeg = ll.getBotpose().getOrientation().getYaw(AngleUnit.DEGREES);
+
+            // If Limelight is in meters and Pedro is in inches, convert:
+            // x *= 39.3701; y *= 39.3701;
+
+
+            Pose snapped = new Pose(x, y, Math.toRadians(yawDeg));
+            follower.setPose(snapped);      // or follower.setStartingPose(snapped) depending on your Pedro version
+            poseSnapped = true;
+       }
+        */
+
         //Update Buttons
         hoodUpBtn.update(gamepad2.dpad_right);
         hoodDownBtn.update(gamepad2.dpad_left);
@@ -216,9 +219,10 @@ public class Teleop extends OpMode {
         autoAimHoldBtn.update(gamepad2.left_trigger > 0.3);
         autoSort.update(gamepad2.left_bumper);
         intakeHoldBtn.update(gamepad1.left_bumper);
+        intakeReverseHoldBtn.update(gamepad1.left_trigger > 0.3);
         autoFlywheelAndHoodToggleBtn.update(gamepad2.right_bumper);
 
-        precisionModeHoldBtn.update(gamepad1.right_trigger > 0.03);
+        precisionModeHoldBtn.update(gamepad1.right_trigger > 0.3);
         //precisionModeToggleBtn.update(gamepad1.right_bumper);
         sensitivityDownBtn.update(gamepad1.dpad_down);
         sensitivityUpBtn.update(gamepad1.dpad_up);
@@ -239,7 +243,10 @@ public class Teleop extends OpMode {
             }
         }
 
-        IntakeMotor.setPower(intakeHoldBtn.getState() ? -1.0 : 0.0);
+        if (intakeHoldBtn.getState()) {
+            IntakeMotor.setPower(intakeHoldBtn.getState() ? -1.0 : 0.0);
+        }else {
+        IntakeMotor.setPower(intakeReverseHoldBtn.getState()? 0.5 : 0.0);}
 
 //        if (precisionModeToggleBtn.getState()) {
 //            precisionMode = !precisionMode;
@@ -247,7 +254,7 @@ public class Teleop extends OpMode {
 
         precisionMode = precisionModeHoldBtn.getState();
 
-        //currentSensitivity = (precisionModeToggleBtn.getState() || precisionMode) ? 0.3 : Sensitivity;
+        currentSensitivity = (precisionModeToggleBtn.getState() || precisionMode) ? 0.3 : Sensitivity;
 
         if (sensitivityUpBtn.getState()) {
             Sensitivity = Range.clip(Sensitivity + 0.1, 0, 1);
@@ -305,21 +312,23 @@ public class Teleop extends OpMode {
         double dy = AllianceData.getGoalPose().getY() - robotPose.getY();
         double distToGoal = Math.hypot(dx, dy);
 
-//        if(autoFlywheelAndHoodToggleBtn.justPressed()) shooter.setTargetRPM(0);
-//        if (autoFlywheelAndHoodToggleBtn.getState()) {
-//            if(llValid) {
-//                shot = (ta >= 0.7) ? FlywheelAndHoodData.lookupA(ta) : FlywheelAndHoodData.lookupB(ta);
-//                shooter.setTargetRPM(shot.rpm);
-//                shooter.setHoodPosition(shot.hood);
-//            }
-//        } else {
-//            if (rpmUpBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() + 50);
-//            if (rpmDownBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() - 50);
-//            if (hoodUpBtn.getState()) pos += 0.01;
-//            if (hoodDownBtn.getState()) pos -= 0.01;
-//            pos = Range.clip(pos, 0.84, 1.0);
-//            ShooterS1.setPosition(pos);
-//        }
+/*        if(autoFlywheelAndHoodToggleBtn.justPressed()) shooter.setTargetRPM(0);
+        if (autoFlywheelAndHoodToggleBtn.getState()) {
+            if(llValid) {
+                shot = (ta >= 0.7) ? FlywheelAndHoodData.lookupA(ta) : FlywheelAndHoodData.lookupB(ta);
+                shooter.setTargetRPM(shot.rpm);
+                shooter.setHoodPosition(shot.hood);
+            }
+        } else {
+            if (rpmUpBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() + 50);
+            if (rpmDownBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() - 50);
+            if (hoodUpBtn.getState()) pos += 0.01;
+            if (hoodDownBtn.getState()) pos -= 0.01;
+            pos = Range.clip(pos, 0.84, 1.0);
+            ShooterS1.setPosition(pos);
+        }
+        */
+
         if(autoFlywheelAndHoodToggleBtn.justPressed()) shooter.setTargetRPM(0);
         if (autoFlywheelAndHoodToggleBtn.getState()) {
                 shot = (distToGoal < 125) ? FlywheelAndHoodData.lookupA(distToGoal) : FlywheelAndHoodData.lookupB(distToGoal);
