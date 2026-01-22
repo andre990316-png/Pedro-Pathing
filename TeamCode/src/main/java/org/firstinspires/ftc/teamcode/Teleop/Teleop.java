@@ -246,9 +246,8 @@ public class Teleop extends OpMode {
         if (intakeHoldBtn.getState() && IntakeMotor.getPower() != -1.0) {
             IntakeMotor.setPower(-1.0);
         }else if (intakeReverseHoldBtn.getState() && IntakeMotor.getPower() != 0.5){
-        IntakeMotor.setPower(0.5);
+            IntakeMotor.setPower(0.5);
         }else if (IntakeMotor.getPower() != 0.0) IntakeMotor.setPower(0.0);
-
 
 //        if (precisionModeToggleBtn.getState()) {
 //            precisionMode = !precisionMode;
