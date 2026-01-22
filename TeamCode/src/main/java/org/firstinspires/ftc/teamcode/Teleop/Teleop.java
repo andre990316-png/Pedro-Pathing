@@ -144,15 +144,22 @@ public class Teleop extends OpMode {
     public void init_loop() {
 
         if (gamepad1.dpad_left) {
-            AllianceData.selectedAlliance = AllianceData.Alliance.RED;
-        }
-        else if (gamepad1.dpad_right) {
             AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
         }
+        else if (gamepad1.dpad_right) {
+            AllianceData.selectedAlliance = AllianceData.Alliance.RED;
+        }
+
+        if (Auto_lastPose.currentPose != null){
+            telemetry.addLine("Starting Position = Auto_lastPose");
+        }else {
+            telemetry.addLine("Starting Position = topLeftStartingPose");
+        }
+
         telemetry.addLine("=== ALLIANCE SELECT ===");
         telemetry.addData("Alliance", AllianceData.selectedAlliance);
-        telemetry.addLine("D-pad LEFT = RED");
-        telemetry.addLine("D-pad RIGHT = BLUE");
+        telemetry.addLine("D-pad LEFT = BLUE");
+        telemetry.addLine("D-pad RIGHT = RED");
         telemetry.update();
     }
 
