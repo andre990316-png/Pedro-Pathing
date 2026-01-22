@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Mechanisms;
+package org.firstinspires.ftc.teamcode.Tests;
 
 public class CalcShooterYaw {
     public static double calcYaw(double x, double y, double tx, double ty, double currheading){
