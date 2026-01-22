@@ -74,7 +74,7 @@ public class Teleop extends OpMode {
     private ButtonLogic shoot3Btn    = new ButtonLogic(ButtonLogic.Mode.HOLD, false);   // right_trigger
     private ButtonLogic autoAimHoldBtn = new ButtonLogic(ButtonLogic.Mode.HOLD, false);   // left_trigger
 
-    private ButtonLogic intakeToggleBtn    = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false); // gamepad1.left_bumper
+    private ButtonLogic intakeHoldBtn    = new ButtonLogic(ButtonLogic.Mode.HOLD, false); // gamepad1.left_bumper
     private ButtonLogic autoFlywheelAndHoodToggleBtn = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false); // gamepad2.right_bumper
     private ButtonLogic autoSort = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);
     private ButtonLogic precisionModeToggleBtn = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);//gamepad1.right_bumper
@@ -208,7 +208,7 @@ public class Teleop extends OpMode {
         //gateHoldBtn.update(gamepad2.right_trigger > 0.03);
         autoAimHoldBtn.update(gamepad2.left_trigger > 0.3);
         autoSort.update(gamepad2.left_bumper);
-        intakeToggleBtn.update(gamepad1.left_bumper);
+        intakeHoldBtn.update(gamepad1.left_bumper);
         autoFlywheelAndHoodToggleBtn.update(gamepad2.right_bumper);
 
         precisionModeHoldBtn.update(gamepad1.right_trigger > 0.03);
@@ -232,7 +232,7 @@ public class Teleop extends OpMode {
             }
         }
 
-        IntakeMotor.setPower(intakeToggleBtn.getState() ? -1.0 : 0.0);
+        IntakeMotor.setPower(intakeHoldBtn.getState() ? -1.0 : 0.0);
 
 //        if (precisionModeToggleBtn.getState()) {
 //            precisionMode = !precisionMode;
@@ -298,13 +298,26 @@ public class Teleop extends OpMode {
         double dy = AllianceData.getGoalPose().getY() - robotPose.getY();
         double distToGoal = Math.hypot(dx, dy);
 
+//        if(autoFlywheelAndHoodToggleBtn.justPressed()) shooter.setTargetRPM(0);
+//        if (autoFlywheelAndHoodToggleBtn.getState()) {
+//            if(llValid) {
+//                shot = (ta >= 0.7) ? FlywheelAndHoodData.lookupA(ta) : FlywheelAndHoodData.lookupB(ta);
+//                shooter.setTargetRPM(shot.rpm);
+//                shooter.setHoodPosition(shot.hood);
+//            }
+//        } else {
+//            if (rpmUpBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() + 50);
+//            if (rpmDownBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() - 50);
+//            if (hoodUpBtn.getState()) pos += 0.01;
+//            if (hoodDownBtn.getState()) pos -= 0.01;
+//            pos = Range.clip(pos, 0.84, 1.0);
+//            ShooterS1.setPosition(pos);
+//        }
         if(autoFlywheelAndHoodToggleBtn.justPressed()) shooter.setTargetRPM(0);
         if (autoFlywheelAndHoodToggleBtn.getState()) {
-            if(llValid) {
-                shot = (ta >= 0.7) ? FlywheelAndHoodData.lookupA(ta) : FlywheelAndHoodData.lookupB(ta);
+                shot = (distToGoal < 125) ? FlywheelAndHoodData.lookupA(distToGoal) : FlywheelAndHoodData.lookupB(distToGoal);
                 shooter.setTargetRPM(shot.rpm);
                 shooter.setHoodPosition(shot.hood);
-            }
         } else {
             if (rpmUpBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() + 50);
             if (rpmDownBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() - 50);
@@ -313,7 +326,6 @@ public class Teleop extends OpMode {
             pos = Range.clip(pos, 0.84, 1.0);
             ShooterS1.setPosition(pos);
         }
-
         // Telemetry
         telemetry.addLine("In-Game");
         telemetry.addLine("                                  ");
