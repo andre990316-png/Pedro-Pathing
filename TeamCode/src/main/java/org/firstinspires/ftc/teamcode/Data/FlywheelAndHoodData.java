@@ -1,19 +1,26 @@
 package org.firstinspires.ftc.teamcode.Data;
+import org.firstinspires.ftc.teamcode.Tests.Auto;
 import org.firstinspires.ftc.teamcode.Tests.AutoShooting;
 import java.lang.Math;
 
 public class FlywheelAndHoodData {
     public static AutoShooting lookupA(double distance) {
-        if(distance < 70) {
-            double flywheelRPM = 0.00606061*Math.pow(distance, 4)
+        double flywheelRPM, hoodAngle;
+        if(distance < 40) {
+            flywheelRPM = 3300;
+            hoodAngle = 0.84;
+        } else if(distance < 70) {
+            flywheelRPM = 0.00606061*Math.pow(distance, 4)
                     - 1.41958*Math.pow(distance, 3)
                     + 122.1789*Math.pow(distance, 2)
                     - 4534.42682*distance
                     + 64544.4805;
-            return new AutoShooting(flywheelRPM, logisticModel(distance));
+            hoodAngle = logisticModel(distance);
         } else {
-            return new AutoShooting(4400, 1.00);
+            flywheelRPM = 4400;
+            hoodAngle = 1.00;
         }
+        return new AutoShooting(flywheelRPM, hoodAngle);
     }
 //    public static AutoShooting lookupA(double ta) {
 //        if (ta >= 2.37) return new AutoShooting(3500, 0.90);
