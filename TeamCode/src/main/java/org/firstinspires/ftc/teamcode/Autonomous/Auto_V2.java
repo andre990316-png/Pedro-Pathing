@@ -55,6 +55,7 @@ public class Auto_V2 extends OpMode {
     private ArrayList<AutoStep> AUTOTEST = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTOPLEFT = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTOPLEFT2 = new ArrayList<>();
+    private ArrayList<AutoStep> AUTOTOPRIGHT2 = new ArrayList<>();
     private ArrayList<AutoStep> AUTOBOTTOMLEFT = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTOPRIGHT = new ArrayList<>();
     private ArrayList<AutoStep> AUTOBOTTOMRIGHT = new ArrayList<>();
@@ -120,6 +121,12 @@ public class Auto_V2 extends OpMode {
 
     private ElapsedTime stateTimer = new ElapsedTime();
     private boolean actionActioned=false;
+
+    public int PATHNUM=0;
+    public boolean[] inputs=new boolean[]{gamepad1.dpad_up, gamepad1.dpad_down, gamepad1.a};
+    public boolean[] lastinputs;
+    public boolean[] inputpressed;
+    public boolean selectedAuto=false;
 
     // ------------------------------------------------------------
     // Build Steps (pose + action) ONCE
@@ -247,6 +254,8 @@ public class Auto_V2 extends OpMode {
         /// bottom right auto
 
         AUTOBOTTOMRIGHT = AutoStep.flipped(AUTOBOTTOMLEFT);
+
+        AUTOTOPRIGHT2 = AutoStep.flipped(AUTOTOPLEFT2);
 
         STEPS.addAll(AUTOTOPLEFT);//change path here
     }
@@ -414,6 +423,56 @@ public class Auto_V2 extends OpMode {
 
         telemetry.addData("Init", "OK");
         telemetry.update();
+    }
+
+    @Override
+    public void init_loop(){
+        if(selectedAuto){
+            telemetry.addLine("auto selected.");
+            telemetry.update();
+        }else{
+            String[] names = {"top left","top right","bottom left","bottom right"};
+            ArrayList<ArrayList<AutoStep>> paths = new ArrayList<>();
+            paths.add(AUTOTOPLEFT2);
+            paths.add(AUTOTOPRIGHT2);
+            paths.add(AUTOBOTTOMLEFT);
+            paths.add(AUTOBOTTOMRIGHT);
+
+            lastinputs = new boolean[inputs.length-1];
+            for(int i=0; i<inputs.length; i++){
+                lastinputs[i]=inputs[i];
+            }
+            inputs = new boolean[]{gamepad1.dpad_up, gamepad1.dpad_down, gamepad1.a};
+            inputpressed = new boolean[inputs.length-1];
+            for(int i=0; i<inputs.length; i++){
+                inputpressed[i] = inputs[i]&&!lastinputs[i];
+            }
+            if(inputpressed[0]){
+                PATHNUM=(PATHNUM+1)%(names.length);
+            }
+            if(inputpressed[1]){
+                PATHNUM=(PATHNUM-1)%(names.length);
+            }
+            if(inputpressed[2]){
+                STEPS.clear();
+                STEPS.addAll(paths.get(PATHNUM));
+                buildChainsFromSteps();
+                Pose start = (!STEPS.isEmpty() && STEPS.get(0).pose != null) ? STEPS.get(0).pose : topLeftStartPose;
+                follower.setStartingPose(start);
+                selectedAuto=true;
+
+            }
+
+            telemetry.addLine("select auto plz");
+            for(int i=0; i<names.length; i++){
+                telemetry.addLine(names[i]+(PATHNUM==i?" <":""));
+            }
+            telemetry.update();
+        }
+
+
+
+
     }
 
     @Override
