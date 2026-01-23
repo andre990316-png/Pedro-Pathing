@@ -245,7 +245,7 @@ public class Teleop extends OpMode {
 
         if (intakeHoldBtn.getState() && IntakeMotor.getPower() != -1.0) {
             IntakeMotor.setPower(-1.0);
-        }else if (intakeReverseHoldBtn.getState() && IntakeMotor.getPower() != 0.5){
+        }else if (intakeReverseHoldBtn.getState() && IntakeMotor.getPower() != 0.5 && !intakeHoldBtn.getState()){
             IntakeMotor.setPower(0.5);
         }else if (IntakeMotor.getPower() != 0.0) IntakeMotor.setPower(0.0);
 
@@ -393,6 +393,5 @@ public class Teleop extends OpMode {
         }
         telemetry.addData("DistanceToGoal", distToGoal);
         telemetry.update();
-
     }
 }
