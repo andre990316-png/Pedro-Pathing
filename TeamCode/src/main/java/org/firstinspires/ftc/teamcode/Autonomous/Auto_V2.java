@@ -459,9 +459,9 @@ public class Auto_V2 extends OpMode {
             if(inputpressed[2]){
                 STEPS.clear();
                 STEPS.addAll(paths.get(PATHNUM));
-                buildChainsFromSteps();
                 Pose start = (!STEPS.isEmpty() && STEPS.get(0).pose != null) ? STEPS.get(0).pose : topLeftStartPose;
                 follower.setStartingPose(start);
+                buildChainsFromSteps();
                 selectedAuto=true;
 
             }
