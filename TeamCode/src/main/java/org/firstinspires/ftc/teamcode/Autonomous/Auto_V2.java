@@ -7,6 +7,7 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -438,7 +439,7 @@ public class Auto_V2 extends OpMode {
             for(int i=0; i<inputs.length; i++){
                 lastinputs[i]=inputs[i];
             }
-            inputs = new boolean[]{gamepad1.dpad_up, gamepad1.dpad_down, gamepad1.a};
+            inputs = new boolean[]{gamepad2.dpad_up, gamepad2.dpad_down, gamepad2.a};
             inputpressed = new boolean[inputs.length];
             for(int i=0; i<inputs.length; i++){
                 inputpressed[i] = inputs[i]&&!lastinputs[i];
