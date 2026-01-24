@@ -434,12 +434,12 @@ public class Auto_V2 extends OpMode {
             paths.add(AUTOBOTTOMLEFT);
             paths.add(AUTOBOTTOMRIGHT);
 
-            lastinputs = new boolean[inputs.length-1];
+            lastinputs = new boolean[inputs.length];
             for(int i=0; i<inputs.length; i++){
                 lastinputs[i]=inputs[i];
             }
             inputs = new boolean[]{gamepad1.dpad_up, gamepad1.dpad_down, gamepad1.a};
-            inputpressed = new boolean[inputs.length-1];
+            inputpressed = new boolean[inputs.length];
             for(int i=0; i<inputs.length; i++){
                 inputpressed[i] = inputs[i]&&!lastinputs[i];
             }
