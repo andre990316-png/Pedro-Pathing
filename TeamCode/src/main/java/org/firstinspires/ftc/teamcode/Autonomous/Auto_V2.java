@@ -231,19 +231,15 @@ public class Auto_V2 extends OpMode {
         AUTOTOPLEFT2.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         AUTOTOPLEFT2.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         AUTOTOPLEFT2.addAll(INTAKEBLUEBALLPOSITION3);
-        AUTOTOPLEFT2.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
+        AUTOTOPLEFT2.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         AUTOTOPLEFT2.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         AUTOTOPLEFT2.addAll(INTAKEBLUEBALLPOSITION2);
-        AUTOTOPLEFT2.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
+        AUTOTOPLEFT2.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        AUTOTOPLEFT2.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        AUTOTOPLEFT2.addAll(INTAKEBLUEBALLPOSITION1);
+        AUTOTOPLEFT2.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         AUTOTOPLEFT2.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
-        AUTOTOPLEFT2.addAll(INTAKEBLUEGATE);
-        AUTOTOPLEFT2.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
-        AUTOTOPLEFT2.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
-
-        AUTOTOPLEFT2.addAll(INTAKEBLUEGATE);
-        AUTOTOPLEFT2.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
-        AUTOTOPLEFT2.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
 
         /// top right auto
