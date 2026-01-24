@@ -242,11 +242,10 @@ public class FlywheelLogic {
         return ShooterM1.getPower();
     }
 
-    public void autoAim(double ta){
+    public void autoAim(double distToGoal){
         org.firstinspires.ftc.teamcode.Tests.AutoShooting shot;
 
-        shot = (ta >= 0.7) ? FlywheelAndHoodData.lookupA(ta) : FlywheelAndHoodData.lookupB(ta);
-
+        shot = (distToGoal < 125) ? FlywheelAndHoodData.lookupA(distToGoal) : FlywheelAndHoodData.lookupB(distToGoal);
         setTargetRPM(shot.rpm);
         setHoodPosition(shot.hood);
     }
