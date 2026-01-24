@@ -11,9 +11,9 @@ import org.firstinspires.ftc.teamcode.Tests.AutoShooting;
 public class FlywheelLogic {
 
 
-    public static final double kp = 2.8;
-    public static final double kd = 0.4;
-    public static final double kf = 1.077;
+    public static final double kp = 2.82;
+    public static final double kd = 0.33;
+    public static final double kf = 1.666767;
 
 
     // --- Hardware ---
@@ -92,20 +92,20 @@ public class FlywheelLogic {
         double pPower = kp;
         if(targetRPM < 2000) {
             ffPower = kf * (targetRPM / 6000) * 0.55;  // halve feedforward for very low RPM
-        }else if(targetRPM < 3500) {
-            ffPower = kf * (targetRPM / 6000) * 0.678;// slightly reduce for mid RPM
+        }else if(targetRPM < 3450) {
+            ffPower = kf * (targetRPM / 6000) * 0.666;// slightly reduce for mid RPM
             pPower = kp * 0.77;
         } else if (targetRPM < 4500){
-            ffPower = kf * (targetRPM / 6000) * 0.75;
+            ffPower = kf * (targetRPM / 6000) * 0.7;
             pPower = kp;
-        }else if(targetRPM > 4500) {
-            ffPower = kf * (targetRPM / 6000) * 0.92892293407;
-            pPower = kp * 1.03571428571;
+        }else if(targetRPM < 5000) {
+            ffPower = kf * (targetRPM / 6000) * 0.7;
+            pPower = kp;
         }else if (targetRPM < 5500) {
-            ffPower = kf * (targetRPM / 6000);        // full feedforward for high RPM
+            ffPower = kf * (targetRPM / 6000) * 0.7967;        // full feedforward for high RPM
             pPower = kp;
         } else {
-            ffPower = kf * (targetRPM / 6000) * 1.16;
+            ffPower = kf * (targetRPM / 6000) * 1.2;
             pPower = kp;
         }
 
