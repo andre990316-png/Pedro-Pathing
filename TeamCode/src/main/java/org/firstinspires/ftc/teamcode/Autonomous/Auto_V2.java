@@ -68,6 +68,8 @@ public class Auto_V2 extends OpMode {
     private int currentIndex = 0;
     private long pauseEndTimeMs = 0;
     private boolean waitingForShooter = false;
+
+    private double distToGoal = 0;
     private boolean timerStart = true;
     private double lastTa = 0;
     private final Pose blueGoalPose = new Pose(0, 144, 0);
@@ -301,24 +303,6 @@ public class Auto_V2 extends OpMode {
                 break;
 
             case SHOOT_3:
-                double ta = 0;
-                boolean llValid = false;
-
-                LLResult ll = limelight.getLatestResult();
-                if (ll != null && ll.isValid()) {
-                    llValid = true;
-                    ta = ll.getTa();
-                }
-
-                FlywheelLogic.AutoShooting shot;
-
-                if(llValid){
-                    shooter.autoAim(ta);
-                    lastTa = ta;
-                } else {
-                    shooter.autoAim(lastTa);
-                }
-
                 shooter.fireShots(3);
                 waitingForShooter = shooter.isBusy();   // keep your existing blocking behavior
                 if (!waitingForShooter) actionActioned = false;  // retry SHOOT_3 next loop
@@ -499,7 +483,8 @@ public class Auto_V2 extends OpMode {
         Pose goalPose = AllianceData.getGoalPose();  // dynamically get current alliance
         double dx = goalPose.getX() - robotPose.getX();
         double dy = goalPose.getY() - robotPose.getY();
-
+        distToGoal = Math.hypot(dx, dy);
+        shooter.autoAim(distToGoal);
         // run sequencer
 
         updateAuto();
