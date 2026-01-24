@@ -124,7 +124,7 @@ public class Auto_V2 extends OpMode {
     private boolean actionActioned=false;
 
     public int PATHNUM=0;
-    public boolean[] inputs=new boolean[]{gamepad1.dpad_up, gamepad1.dpad_down, gamepad1.a};
+    public boolean[] inputs=new boolean[]{false, false, false};
     public boolean[] lastinputs;
     public boolean[] inputpressed;
     public boolean selectedAuto=false;
@@ -439,7 +439,7 @@ public class Auto_V2 extends OpMode {
             for(int i=0; i<inputs.length; i++){
                 lastinputs[i]=inputs[i];
             }
-            inputs = new boolean[]{gamepad2.dpad_up, gamepad2.dpad_down, gamepad2.a};
+            inputs = new boolean[]{gamepad1.dpad_up, gamepad1.dpad_down, gamepad1.a};
             inputpressed = new boolean[inputs.length];
             for(int i=0; i<inputs.length; i++){
                 inputpressed[i] = inputs[i]&&!lastinputs[i];
