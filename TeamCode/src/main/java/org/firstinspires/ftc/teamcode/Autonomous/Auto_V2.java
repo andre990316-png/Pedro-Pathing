@@ -64,6 +64,7 @@ public class Auto_V2 extends OpMode {
     private ArrayList<AutoStep> INTAKEBLUEBALLPOSITION2 = new ArrayList<>();
     private ArrayList<AutoStep> INTAKEBLUEBALLPOSITION3 = new ArrayList<>();
     private ArrayList<AutoStep> INTAKEBLUEGATE = new ArrayList<>();
+    private ArrayList<AutoStep> INTAKEBLUELOADINGZONE = new ArrayList<>();
 
     private int currentIndex = 0;
     private long pauseEndTimeMs = 0;
@@ -111,16 +112,17 @@ public class Auto_V2 extends OpMode {
     private final Pose redBallPosition3End = new Pose(126, 84, Math.toRadians(0));
 
     //loading zone intaking poses (red)
-    private final Pose redLoadingZoneStart = new Pose(30,12,Math.toRadians(180));
-    private final Pose redLoadingZoneEnd = new Pose(10,12,Math.toRadians(180));
+    private final Pose blueLoadingZoneStart = new Pose(34,9, Math.toRadians(180));
+    private final Pose blueLoadingZoneEnd = new Pose(10.2, 9, Math.toRadians(180));
 
     //loading zone intaking poses (blue)
-    private final Pose blueLoadingZoneStart = new Pose(114,12,Math.toRadians(0));
-    private final Pose blueLoadingZoneEnd = new Pose(134,12,Math.toRadians(0));
+    private final Pose redLoadingZoneStart = new Pose(110,9, Math.toRadians(0));
+    private final Pose redLoadingZoneEnd = new Pose(133.8,9, Math.toRadians(0));
 
     //gate and intake poses
-    private final Pose blueGateIntakePose = new Pose(10,62,Math.toRadians(120));
-    private final Pose redGateIntakePose = new Pose(10,62,Math.toRadians(120));
+    private final Pose blueGateIntakePose = new Pose(10,62, Math.toRadians(120));
+    private final Pose redGateIntakePose = new Pose(10,62, Math.toRadians(120));
+
 
     private ElapsedTime stateTimer = new ElapsedTime();
     private boolean actionActioned=false;
@@ -170,6 +172,12 @@ public class Auto_V2 extends OpMode {
         INTAKEBLUEGATE.add(new AutoStep(blueGateIntakePose, AutoAction.NONE, 4000));
         INTAKEBLUEGATE.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_OFF, 0));
 
+        INTAKEBLUELOADINGZONE.clear();
+
+        INTAKEBLUELOADINGZONE.add(new AutoStep(blueLoadingZoneStart, AutoAction.INTAKE_ON, 0));
+        INTAKEBLUELOADINGZONE.add(new AutoStep(blueLoadingZoneEnd, AutoAction.NONE, 0));
+        INTAKEBLUELOADINGZONE.add(new AutoStep(blueLoadingZoneStart, AutoAction.INTAKE_OFF, 0));
+
         // Start -> shoot
         AUTOTEST.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
         AUTOTEST.add(new AutoStep(blueShootPoseMed, AutoAction.NONE, 0));
@@ -202,6 +210,9 @@ public class Auto_V2 extends OpMode {
         AUTOTOPLEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         AUTOTOPLEFT.addAll(INTAKEBLUEBALLPOSITION1);
+        AUTOTOPLEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        AUTOTOPLEFT.addAll(INTAKEBLUELOADINGZONE);
         AUTOTOPLEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
