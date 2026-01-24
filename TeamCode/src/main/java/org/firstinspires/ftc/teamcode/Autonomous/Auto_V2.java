@@ -445,10 +445,16 @@ public class Auto_V2 extends OpMode {
                 inputpressed[i] = inputs[i]&&!lastinputs[i];
             }
             if(inputpressed[0]){
-                PATHNUM=(PATHNUM+1)%(names.length);
+                PATHNUM--;
+                if(PATHNUM<0){
+                    PATHNUM=names.length-1;
+                }
             }
             if(inputpressed[1]){
-                PATHNUM=(PATHNUM-1)%(names.length);
+                PATHNUM++;
+                if(PATHNUM>names.length-1){
+                    PATHNUM=0;
+                }
             }
             if(inputpressed[2]){
                 STEPS.clear();
