@@ -93,19 +93,19 @@ public class Auto_V2 extends OpMode {
     private final Pose redShootPoseFar = new Pose(80,20,Math.toRadians(64));
 
     //artifact intaking poses (blue)
-    private final Pose blueBallPosition1Start = new Pose(41, 35.5, Math.toRadians(180));
+    private final Pose blueBallPosition1Start = new Pose(50, 35.5, Math.toRadians(180));
     private final Pose blueBallPosition1End = new Pose(10, 35.5, Math.toRadians(180));
-    private final Pose blueBallPosition2Start = new Pose(41, 58, Math.toRadians(180));
+    private final Pose blueBallPosition2Start = new Pose(50, 58, Math.toRadians(180));
     private final Pose blueBallPosition2End = new Pose(10, 58, Math.toRadians(180));
-    private final Pose blueBallPosition3Start = new Pose(41, 84, Math.toRadians(180));
+    private final Pose blueBallPosition3Start = new Pose(50, 84, Math.toRadians(180));
     private final Pose blueBallPosition3End = new Pose(17, 84, Math.toRadians(180));
 
     //artifact intaking poses (red)
-    private final Pose redBallPosition1Start = new Pose(102, 35.5, Math.toRadians(0));
+    private final Pose redBallPosition1Start = new Pose(93, 35.5, Math.toRadians(0));
     private final Pose redBallPosition1End = new Pose(133, 35.5, Math.toRadians(0));
-    private final Pose redBallPosition2Start = new Pose(102, 58, Math.toRadians(0));
+    private final Pose redBallPosition2Start = new Pose(93, 58, Math.toRadians(0));
     private final Pose redBallPosition2End = new Pose(133, 58, Math.toRadians(0));
-    private final Pose redBallPosition3Start = new Pose(102, 84, Math.toRadians(0));
+    private final Pose redBallPosition3Start = new Pose(93, 84, Math.toRadians(0));
     private final Pose redBallPosition3End = new Pose(126, 84, Math.toRadians(0));
 
     //loading zone intaking poses (red)

@@ -98,14 +98,14 @@ public class FlywheelLogic {
         } else if (targetRPM < 4500){
             ffPower = kf * (targetRPM / 6000) * 0.75;
             pPower = kp;
-        }else if(targetRPM == 4500) {
-            ffPower = kf * (targetRPM / 6000) * 0.85;
-            pPower = kp;
+        }else if(targetRPM > 4500) {
+            ffPower = kf * (targetRPM / 6000) * 0.92892293407;
+            pPower = kp * 1.03571428571;
         }else if (targetRPM < 5500) {
             ffPower = kf * (targetRPM / 6000);        // full feedforward for high RPM
             pPower = kp;
         } else {
-            ffPower =kf * (targetRPM / 6000) * 1.16;
+            ffPower = kf * (targetRPM / 6000) * 1.16;
             pPower = kp;
         }
 
