@@ -229,7 +229,12 @@ public class Teleop extends OpMode {
 
         //ShooterS2.setPosition(gateHoldBtn.getState()? 0 : 0.2);
         if (shoot3Btn.getState() && !shooter.isBusy()) {
+            if (IntakeMotor.getPower() != -1) {
+                IntakeMotor.setPower(-1);
+            }
             shooter.fireShots(1);
+        } else if (!intakeReverseHoldBtn.getState() && !intakeHoldBtn.getState()) {
+            IntakeMotor.setPower(0);
         }
 
         if (showAllianceBanner) {
