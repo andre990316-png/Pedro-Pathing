@@ -216,6 +216,10 @@ public class Teleop extends OpMode {
         LED1.setGreenLED(true);
         LED2.setGreenLED(true);
         LED3.setGreenLED(true);
+        LED1.setRedLED(false);
+        LED2.setRedLED(false);
+        LED3.setRedLED(false);
+        RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.277);
         //teleopGate.update(shooter.getTargetRPM(), gamepad2.right_trigger > 0.3);
         LLResult ll = limelight.getLatestResult();
 

@@ -119,12 +119,12 @@ public class Auto_V2 extends OpMode {
     private final Pose redBallPosition3End = new Pose(126, 84, Math.toRadians(0));
 
     //loading zone intaking poses (red)
-    private final Pose blueLoadingZoneStart = new Pose(34,9, Math.toRadians(180));
-    private final Pose blueLoadingZoneEnd = new Pose(10.2, 9, Math.toRadians(180));
+    private final Pose blueLoadingZoneStart = new Pose(34,10, Math.toRadians(180));
+    private final Pose blueLoadingZoneEnd = new Pose(10.2, 10, Math.toRadians(180));
 
     //loading zone intaking poses (blue)
-    private final Pose redLoadingZoneStart = new Pose(110,9, Math.toRadians(0));
-    private final Pose redLoadingZoneEnd = new Pose(133.8,9, Math.toRadians(0));
+    private final Pose redLoadingZoneStart = new Pose(110,10, Math.toRadians(0));
+    private final Pose redLoadingZoneEnd = new Pose(133.8,10, Math.toRadians(0));
 
     //gate and intake poses
     private final Pose blueGateIntakePose = new Pose(10,62, Math.toRadians(120));

@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.teamcode.Data.FlywheelAndHoodData;
-import org.firstinspires.ftc.teamcode.Tests.AutoShooting;
 
 public class FlywheelLogic {
 
@@ -40,12 +39,12 @@ public class FlywheelLogic {
     }
 
     // --- State machine ---
-    private enum FlywheelState { IDLE, SPIN_UP, WAIT, LAUNCH, RESET_GATE }
+    private enum FlywheelState { IDLE, SPIN_UP, LAUNCH, RESET_GATE }
     private FlywheelState flyWheelState = FlywheelState.IDLE;
 
     // --- Gate / shot settings ---
-    private double gateCloseAngle = 0.2;
-    private double gateOpenAngle  = 0;
+    private double gateCloseAngle = 1;
+    private double gateOpenAngle  = 0.8;
     private double gateOpenTime   = 0.05;
     private double gateCloseTime  = 0.05;
 
@@ -216,6 +215,9 @@ public class FlywheelLogic {
         return currentRPM;
     }
     public double getCalcRPM() {return calcRPM;}
+    public boolean isFlywheelReady() {
+        return (currentRPM < targetRPM && currentRPM + 100 >= targetRPM) || (currentRPM > targetRPM && currentRPM - 100 <= targetRPM);
+    }
 
     public IntakeLogic getIntake(){
         return intake;
