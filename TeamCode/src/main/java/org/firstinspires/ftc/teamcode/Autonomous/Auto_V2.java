@@ -464,10 +464,6 @@ public class Auto_V2 extends OpMode {
 //            }
 //            telemetry.update();
 //        }
-//
-//
-//
-//
 //    }
 
     @Override
