@@ -15,10 +15,10 @@ public class ColorThing {
     ///  order: colors[0] is the closest artifact to intake, and colors[2] is the one about to be shot
     public static ArrayList<Integer> lastcolors;
     public static int lastcolor=0;
-    NormalizedColorSensor colorSensor;
+    public static NormalizedColorSensor colorSensor;
 
 
-    public void update(){
+    public static void update(){
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
 
         int color = getColor(colors);
@@ -34,12 +34,12 @@ public class ColorThing {
         telemetry.update();
 
     }
-    public void init(){
+    public static void init(){
         colorSensor = hardwareMap.get(NormalizedColorSensor.class, "sensor_color"); /// <-- CHANGE THE NAME TO THE CORRECT ONE
 
     }
 
-    public int getColor(NormalizedRGBA color){
+    public static int getColor(NormalizedRGBA color){
         float[] hsv = new float[3];
         Color.colorToHSV(color.toColor(), hsv);
         if(hsv[1]<0.2){//if saturation too low, probably nothing
