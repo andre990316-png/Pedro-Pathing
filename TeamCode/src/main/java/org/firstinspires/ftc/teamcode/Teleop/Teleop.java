@@ -22,6 +22,8 @@ import org.firstinspires.ftc.teamcode.Mechanisms.LimelightAim;
 import org.firstinspires.ftc.teamcode.Tests.AutoShooting;
 import org.firstinspires.ftc.teamcode.Data.FlywheelAndHoodData;
 import org.firstinspires.ftc.teamcode.Mechanisms.TeleopGate;
+import org.firstinspires.ftc.teamcode.Mechanisms.PatternLogic;
+
 
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -62,7 +64,10 @@ public class Teleop extends OpMode {
     //elapsed time
     private ElapsedTime allianceBannerTimer = new ElapsedTime();
     private boolean showAllianceBanner = true;
-
+    //Pattern
+    private boolean patternLocked = false;
+    private PatternLogic patternLogic = new PatternLogic();
+    private int detectedTag = -1;
 
     private FlywheelLogic shooter = new FlywheelLogic();
     private ButtonLogic hoodUpBtn      = new ButtonLogic(ButtonLogic.Mode.PULSE, false);  // dpad_right
@@ -78,6 +83,10 @@ public class Teleop extends OpMode {
     private ButtonLogic intakeReverseHoldBtn = new ButtonLogic(ButtonLogic.Mode.HOLD,false);
     private ButtonLogic autoFlywheelAndHoodToggleBtn = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false); // gamepad2.right_bumper
     private ButtonLogic autoSort = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);
+    private ButtonLogic greenBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);  //gamepad1.a
+    private ButtonLogic purpleBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false); //gamepad1.x
+    private ButtonLogic patternResetBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false); //gamepad1.start
+    private ButtonLogic patternConfirmBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false); //gamepad1.right_bumper
     private ButtonLogic precisionModeToggleBtn = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);//gamepad1.right_bumper
     private ButtonLogic precisionModeHoldBtn = new ButtonLogic(ButtonLogic.Mode.HOLD, false);//gamepad1.right_trigger
     private ButtonLogic sensitivityUpBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);//gamepad1.dpad_up
@@ -86,6 +95,8 @@ public class Teleop extends OpMode {
 
     private final Pose topLeftStartPose = new Pose(20, 118.5, Math.toRadians(144));
     private final Pose bottomLeftStartPose = new Pose(48, 10, Math.toRadians(90));
+    private final java.util.ArrayList<PatternLogic.Color> driverPatternEntry = new java.util.ArrayList<>(3);
+
     @Override
     public void init() {
         // ===== Hardware map =====
@@ -218,6 +229,10 @@ public class Teleop extends OpMode {
         //gateHoldBtn.update(gamepad2.right_trigger > 0.03);
         autoAimHoldBtn.update(gamepad2.left_trigger > 0.3);
         autoSort.update(gamepad2.left_bumper);
+        greenBtn.update(gamepad1.a);
+        purpleBtn.update(gamepad1.x);
+        patternResetBtn.update(gamepad1.start);
+        patternConfirmBtn.update(gamepad1.right_bumper);
         intakeHoldBtn.update(gamepad1.left_bumper);
         intakeReverseHoldBtn.update(gamepad1.left_trigger > 0.3);
         autoFlywheelAndHoodToggleBtn.update(gamepad2.right_bumper);
@@ -348,8 +363,36 @@ public class Teleop extends OpMode {
             pos = Range.clip(pos, 0.84, 1.0);
             ShooterS1.setPosition(pos);
         }
+
+        if (!patternLocked) {
+
+            if (greenBtn.justPressed() && driverPatternEntry.size() < 3)
+                driverPatternEntry.add(PatternLogic.Color.G);
+
+            if (purpleBtn.justPressed() && driverPatternEntry.size() < 3)
+                driverPatternEntry.add(PatternLogic.Color.P);
+            /// TODO: add LED lights to confirm selection
+
+            if (patternResetBtn.justPressed()) {
+                driverPatternEntry.clear();
+                patternLogic.clearAll();
+                patternLocked = false;
+            }
+
+            if (patternConfirmBtn.justPressed() && driverPatternEntry.size() == 3) {
+                patternLogic.setDesiredPatternFromEntry(driverPatternEntry);
+                patternLocked = true;
+                driverPatternEntry.clear();
+            }
+        }
+
         // Telemetry
         telemetry.addLine("In-Game");
+        telemetry.addLine("                                  ");
+        telemetry.addData("Driver Entry", driverPatternEntry);
+        telemetry.addData("Desired Pattern (brain)", patternLogic.getPatternSnapshot());
+        telemetry.addData("Pattern Locked", patternLocked);
+;
         telemetry.addLine("                                  ");
         telemetry.addData("Target RPM ", shooter.getTargetRPM());
         telemetry.addData("RPM ", shooter.getFlywheelRpm());
