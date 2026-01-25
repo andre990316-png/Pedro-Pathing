@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.LED;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -39,6 +40,9 @@ public class Auto_V2 extends OpMode {
     private boolean autoAimEnabled = true;
     private Limelight3A limelight;
     private IMU imu;
+    private LED LED1;
+    private LED LED2;
+    private LED LED3;
     private LimelightAim autoAim = new LimelightAim();
 
     // ====== STEP SYSTEM ======

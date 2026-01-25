@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.LED;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -45,6 +46,9 @@ public class Teleop extends OpMode {
     // Vision + turret
     private Limelight3A limelight;
     private IMU imu;
+    private LED LED1;
+    private LED LED2;
+    private LED LED3;
     private LimelightAim autoAim = new LimelightAim();
     private boolean precisionMode;
     private boolean poseSnapped = false;
