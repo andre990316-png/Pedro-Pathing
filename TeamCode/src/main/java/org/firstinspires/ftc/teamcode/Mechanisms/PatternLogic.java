@@ -15,6 +15,7 @@ public class PatternLogic {
 
     private final ArrayList<Color> box = new ArrayList<>(3);     // current balls, front = next
     private final ArrayList<Color> pattern = new ArrayList<>(3); // desired pattern of 3
+    public List<Color> getPatternSnapshot() { return new ArrayList<>(pattern); }
     private int patternIndex = 0; // 0..2, which pattern slot you’re currently trying to shoot next
 
     public void initPattern(int id) {
@@ -28,6 +29,22 @@ public class PatternLogic {
         patternIndex = 0;
         box.clear();
     }
+
+    public void clearAll() {
+        box.clear();
+        pattern.clear();
+        patternIndex = 0;
+    }
+
+    public void setDesiredPatternFromEntry(List<Color> entry) {
+        if (entry.size() != 3) return;
+
+        pattern.clear();
+        pattern.addAll(entry);
+        patternIndex = 0;
+        box.clear();
+    }
+
 
     public void addArtifact(Color c) {
         if (box.size() >= 3) return;
