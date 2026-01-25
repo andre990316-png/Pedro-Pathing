@@ -62,7 +62,10 @@ public class FlywheelLogic {
     private double currentRPM = 0;
     private double lastError = 0;
     private double error = 0;
-    private boolean autoAiming=false;
+    private boolean autoAiming = false;
+    private boolean swapNextTwoBalls = false;
+    private boolean switchAngle = false;
+    private Integer swaped = 0;
 
     public void init(HardwareMap hardwareMap) {
         ShooterM1 = hardwareMap.get(DcMotorEx.class, "Shooter M1");
@@ -166,6 +169,8 @@ public class FlywheelLogic {
             case LAUNCH:
                 if (stateTimer.seconds() > gateOpenTime) {
                     shotsRemaining -= 1;
+                    if (swapNextTwoBalls)
+                        swaped++;
                     ShooterS2.setPosition(gateCloseAngle);
                     stateTimer.reset();
                     flyWheelState = FlywheelState.RESET_GATE;
@@ -175,6 +180,12 @@ public class FlywheelLogic {
             case RESET_GATE:
                 if (stateTimer.seconds() > gateCloseTime) {
                     if (shotsRemaining > 0) {
+                        if (swapNextTwoBalls && swaped == 1)
+                            switchAngle = false;
+                        else if (swapNextTwoBalls && swaped == 2) {
+                            swapNextTwoBalls = false;
+                            swaped = 0;
+                        }
                         stateTimer.reset();
                         flyWheelState = FlywheelState.SPIN_UP;
                     } else {
@@ -216,7 +227,9 @@ public class FlywheelLogic {
 
     public void setHoodPosition(double hood) {
         // hood is a servo position in [0,1]
-        if (ShooterS1.getPosition() != hood) {
+        if(swapNextTwoBalls && switchAngle) {
+            ShooterS1.setPosition(0);
+        } else if (ShooterS1.getPosition() != hood) {
             ShooterS1.setPosition(Range.clip(hood, 0.0, 1.0));
         }
     }
@@ -240,6 +253,13 @@ public class FlywheelLogic {
 
     public double getFlywheelPower(){
         return ShooterM1.getPower();
+    }
+    public void setSwapNextTwoBalls() {
+        if(shotsRemaining >= 2) {
+            switchAngle = true;
+            swaped = 0;
+            swapNextTwoBalls = true;
+        }
     }
 
     public void autoAim(double distToGoal){

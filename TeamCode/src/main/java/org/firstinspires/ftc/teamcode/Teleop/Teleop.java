@@ -337,9 +337,7 @@ public class Teleop extends OpMode {
 
         if(autoFlywheelAndHoodToggleBtn.justPressed()) shooter.setTargetRPM(0);
         if (autoFlywheelAndHoodToggleBtn.getState()) {
-                shot = (distToGoal < 125) ? FlywheelAndHoodData.lookupA(distToGoal) : FlywheelAndHoodData.lookupB(distToGoal);
-                shooter.setTargetRPM(shot.rpm);
-                shooter.setHoodPosition(shot.hood);
+            shooter.autoAim(distToGoal);
         } else {
             if (rpmUpBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() + 50);
             if (rpmDownBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() - 50);
