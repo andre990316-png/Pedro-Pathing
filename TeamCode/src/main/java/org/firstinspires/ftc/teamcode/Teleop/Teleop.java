@@ -124,9 +124,6 @@ public class Teleop extends OpMode {
         LED2.init(hardwareMap, 2);
         LED3.init(hardwareMap, 3);
         RGB = hardwareMap.get(Servo.class, "RGB");
-        LED1.setGreenLED(true);
-        LED2.setGreenLED(true);
-        LED3.setGreenLED(true);
         RGB.setPosition(0.48);
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(
@@ -216,6 +213,9 @@ public class Teleop extends OpMode {
     public void loop() {
         shooter.update();
         follower.update();
+        LED1.setGreenLED(true);
+        LED2.setGreenLED(true);
+        LED3.setGreenLED(true);
         //teleopGate.update(shooter.getTargetRPM(), gamepad2.right_trigger > 0.3);
         LLResult ll = limelight.getLatestResult();
 

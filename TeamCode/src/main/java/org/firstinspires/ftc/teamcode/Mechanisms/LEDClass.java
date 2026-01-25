@@ -4,8 +4,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.LED;
 
 public class LEDClass {
-    private LED redLED;
     private LED greenLED;
+    private LED redLED;
 
     public void init(HardwareMap hardwareMap, int i) {
         String num = String.valueOf(i);
