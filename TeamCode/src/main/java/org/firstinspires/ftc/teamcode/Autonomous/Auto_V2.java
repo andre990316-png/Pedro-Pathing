@@ -12,12 +12,14 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.LED;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 
 import org.firstinspires.ftc.teamcode.Data.AllianceData;
 import org.firstinspires.ftc.teamcode.Data.Auto_lastPose;
+import org.firstinspires.ftc.teamcode.Mechanisms.LEDClass;
 import org.firstinspires.ftc.teamcode.Mechanisms.LimelightAim;
 import org.firstinspires.ftc.teamcode.Mechanisms.FlywheelLogic;
 
@@ -29,6 +31,10 @@ public class Auto_V2 extends OpMode {
     // Motors / hardware you already had
     private DcMotor ShooterRotateMotor;
 
+    private LEDClass LED1 = new LEDClass();
+    private LEDClass LED2 = new LEDClass();
+    private LEDClass LED3 = new LEDClass();
+    private Servo RGB = null;
     private Follower follower;
     private Timer pathTimer, opModeTimer;
     private Pose goalPose;
@@ -40,9 +46,6 @@ public class Auto_V2 extends OpMode {
     private boolean autoAimEnabled = true;
     private Limelight3A limelight;
     private IMU imu;
-    private LED LED1;
-    private LED LED2;
-    private LED LED3;
     private LimelightAim autoAim = new LimelightAim();
 
     // ====== STEP SYSTEM ======
@@ -399,7 +402,14 @@ public class Auto_V2 extends OpMode {
         buildChainsFromSteps();
 
         ShooterRotateMotor = hardwareMap.get(DcMotor.class, "ShooterRotateMotor");
-
+        LED1.init(hardwareMap, 1);
+        LED2.init(hardwareMap, 2);
+        LED3.init(hardwareMap, 3);
+        RGB = hardwareMap.get(Servo.class, "RGB");
+        LED1.setGreenLED(true);
+        LED2.setGreenLED(true);
+        LED3.setGreenLED(true);
+        RGB.setPosition(0.48);
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT,

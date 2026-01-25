@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Teleop;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.LED;
@@ -19,6 +20,7 @@ import org.firstinspires.ftc.teamcode.Data.AllianceData;
 import org.firstinspires.ftc.teamcode.Data.Auto_lastPose;
 import org.firstinspires.ftc.teamcode.Mechanisms.ButtonLogic;
 import org.firstinspires.ftc.teamcode.Mechanisms.FlywheelLogic;
+import org.firstinspires.ftc.teamcode.Mechanisms.LEDClass;
 import org.firstinspires.ftc.teamcode.Mechanisms.LimelightAim;
 import org.firstinspires.ftc.teamcode.Tests.AutoShooting;
 import org.firstinspires.ftc.teamcode.Data.FlywheelAndHoodData;
@@ -46,9 +48,10 @@ public class Teleop extends OpMode {
     // Vision + turret
     private Limelight3A limelight;
     private IMU imu;
-    private LED LED1;
-    private LED LED2;
-    private LED LED3;
+    private LEDClass LED1 = new LEDClass();
+    private LEDClass LED2 = new LEDClass();
+    private LEDClass LED3 = new LEDClass();
+    private Servo RGB = null;
     private LimelightAim autoAim = new LimelightAim();
     private boolean precisionMode;
     private boolean poseSnapped = false;
@@ -74,16 +77,16 @@ public class Teleop extends OpMode {
     private int detectedTag = -1;
 
     private FlywheelLogic shooter = new FlywheelLogic();
-    private ButtonLogic hoodUpBtn      = new ButtonLogic(ButtonLogic.Mode.PULSE, false);  // dpad_right
-    private ButtonLogic hoodDownBtn    = new ButtonLogic(ButtonLogic.Mode.PULSE, false);  // dpad_left
-    private ButtonLogic rpmUpBtn       = new ButtonLogic(ButtonLogic.Mode.PULSE, false);  // dpad_up
-    private ButtonLogic rpmDownBtn     = new ButtonLogic(ButtonLogic.Mode.PULSE, false);  // dpad_down
+    private ButtonLogic hoodUpBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);  // dpad_right
+    private ButtonLogic hoodDownBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);  // dpad_left
+    private ButtonLogic rpmUpBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);  // dpad_up
+    private ButtonLogic rpmDownBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);  // dpad_down
 
     //private ButtonLogic gateHoldBtn    = new ButtonLogic(ButtonLogic.Mode.HOLD, false);   // right_trigger
-    private ButtonLogic shoot3Btn    = new ButtonLogic(ButtonLogic.Mode.HOLD, false);   // right_trigger
+    private ButtonLogic shoot3Btn = new ButtonLogic(ButtonLogic.Mode.HOLD, false);   // right_trigger
     private ButtonLogic autoAimHoldBtn = new ButtonLogic(ButtonLogic.Mode.HOLD, false);   // left_trigger
 
-    private ButtonLogic intakeHoldBtn    = new ButtonLogic(ButtonLogic.Mode.HOLD, false); // gamepad1.left_bumper
+    private ButtonLogic intakeHoldBtn = new ButtonLogic(ButtonLogic.Mode.HOLD, false); // gamepad1.left_bumper
     private ButtonLogic intakeReverseHoldBtn = new ButtonLogic(ButtonLogic.Mode.HOLD,false);
     private ButtonLogic autoFlywheelAndHoodToggleBtn = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false); // gamepad2.right_bumper
     private ButtonLogic autoSort = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);
@@ -117,6 +120,14 @@ public class Teleop extends OpMode {
         ShooterRotateMotor = hardwareMap.get(DcMotor.class, "ShooterRotateMotor");
         teleopGate = new TeleopGate(ShooterS2);
         battery = hardwareMap.voltageSensor.iterator().next();
+        LED1.init(hardwareMap, 1);
+        LED2.init(hardwareMap, 2);
+        LED3.init(hardwareMap, 3);
+        RGB = hardwareMap.get(Servo.class, "RGB");
+        LED1.setGreenLED(true);
+        LED2.setGreenLED(true);
+        LED3.setGreenLED(true);
+        RGB.setPosition(0.48);
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
@@ -387,7 +398,6 @@ public class Teleop extends OpMode {
                 driverPatternEntry.clear();
             }
         }
-
         // Telemetry
         telemetry.addLine("In-Game");
         telemetry.addLine("                                  ");
