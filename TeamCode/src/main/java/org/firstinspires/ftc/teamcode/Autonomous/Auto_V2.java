@@ -420,7 +420,7 @@ public class Auto_V2 extends OpMode {
         }else{
             String[] names = {"top left","top right","bottom left","bottom right"};
             ArrayList<ArrayList<AutoStep>> paths = new ArrayList<>();
-            buildSteps();
+            //buildSteps();
             paths.add(AUTOTOPLEFT);
             paths.add(AUTOTOPRIGHT2);
             paths.add(AUTOBOTTOMLEFT);
