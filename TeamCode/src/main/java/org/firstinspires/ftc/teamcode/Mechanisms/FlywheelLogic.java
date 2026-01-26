@@ -159,7 +159,7 @@ public class FlywheelLogic {
 //                }
 //                break;
             case SPIN_UP:
-                if ((currentRPM < targetRPM && currentRPM + 100 >= targetRPM) || (currentRPM > targetRPM && currentRPM - 100 <= targetRPM) || stateTimer.seconds() > flywheelMaxSpinupTime) {
+                if ((Math.abs(error) <= 100) || stateTimer.seconds() > flywheelMaxSpinupTime) {
                     ShooterS2.setPosition(gateOpenAngle);
                     stateTimer.reset();
                     flyWheelState = FlywheelState.LAUNCH;
@@ -216,7 +216,7 @@ public class FlywheelLogic {
     }
     public double getCalcRPM() {return calcRPM;}
     public boolean isFlywheelReady() {
-        return (currentRPM < targetRPM && currentRPM + 100 >= targetRPM) || (currentRPM > targetRPM && currentRPM - 100 <= targetRPM);
+        return (Math.abs(error) <= 100);
     }
 
     public IntakeLogic getIntake(){
