@@ -159,7 +159,7 @@ public class FlywheelLogic {
 //                }
 //                break;
             case SPIN_UP:
-                if ((currentRPM < targetRPM && currentRPM + 100 >= targetRPM) || (currentRPM > targetRPM && currentRPM - 100 <= targetRPM) || stateTimer.seconds() > flywheelMaxSpinupTime) {
+                if ((Math.abs(error) <= 100) || stateTimer.seconds() > flywheelMaxSpinupTime) {
                     intake.intakeReady(true);
                     ShooterS2.setPosition(gateOpenAngle);
                     stateTimer.reset();
