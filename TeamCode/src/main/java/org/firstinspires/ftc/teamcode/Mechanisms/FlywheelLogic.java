@@ -160,6 +160,7 @@ public class FlywheelLogic {
 //                break;
             case SPIN_UP:
                 if ((Math.abs(error) <= 100) || stateTimer.seconds() > flywheelMaxSpinupTime) {
+                    intake.setIntakeOnVelocity(-0.7);
                     intake.intakeReady(true);
                     ShooterS2.setPosition(gateOpenAngle);
                     stateTimer.reset();
@@ -170,6 +171,7 @@ public class FlywheelLogic {
                 if (stateTimer.seconds() > gateOpenTime) {
                     shotsRemaining -= 1;
                     intake.intakeReady(false);
+                    intake.setIntakeOnVelocity(-1);
                     if (swapNextTwoBalls)
                         swaped++;
                     ShooterS2.setPosition(gateCloseAngle);

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Mechanisms;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 public class IntakeLogic {
     private DcMotor IntakeMotor;
@@ -40,6 +41,12 @@ public class IntakeLogic {
     }
     public void intakeReady(boolean start) {
         startIntake = start;
+    }
+    public void setIntakeOnVelocity(double p) {
+        intakeOnVelocity = Range.clip(p, 0.0, 1.0);
+    }
+    public void setIntakeOffVelocity(double p) {
+        intakeOffVelocity = Range.clip(p, 0.0, 1.0);
     }
     public boolean isBusy() {
         return intakeState != IntakeState.IDLE;
