@@ -63,6 +63,7 @@ public class Auto_V2 extends OpMode {
     private ArrayList<AutoStep> AUTOTEST = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTOPLEFT = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTOPLEFT2 = new ArrayList<>();
+    private ArrayList<AutoStep> AUTOTOPLEFT3 = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTOPRIGHT2 = new ArrayList<>();
     private ArrayList<AutoStep> AUTOBOTTOMLEFT = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTOPRIGHT = new ArrayList<>();
@@ -72,6 +73,7 @@ public class Auto_V2 extends OpMode {
     private ArrayList<AutoStep> INTAKEBLUEBALLPOSITION3 = new ArrayList<>();
     private ArrayList<AutoStep> INTAKEBLUEGATE = new ArrayList<>();
     private ArrayList<AutoStep> INTAKEBLUELOADINGZONE = new ArrayList<>();
+    private ArrayList<AutoStep> BLUESHOOT3NEAR = new ArrayList<>();
 
     private int currentIndex = 0;
     private long pauseEndTimeMs = 0;
@@ -150,12 +152,14 @@ public class Auto_V2 extends OpMode {
         AUTOTEST.clear();
         AUTOTOPLEFT.clear();
         AUTOTOPLEFT2.clear();
+        AUTOTOPLEFT3.clear();
         INTAKEBLUEBALLPOSITION1.clear();
         AUTOBOTTOMLEFT.clear();
         AUTOTOPRIGHT.clear();
         AUTOBOTTOMRIGHT.clear();
         INTAKEBLUEBALLPOSITION2.clear();
         INTAKEBLUEBALLPOSITION3.clear();
+        BLUESHOOT3NEAR.clear();
 
         INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1Start, AutoAction.INTAKE_ON, 0));
         INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1End, AutoAction.NONE, 0));
@@ -185,6 +189,11 @@ public class Auto_V2 extends OpMode {
         INTAKEBLUELOADINGZONE.add(new AutoStep(blueLoadingZoneEnd, AutoAction.NONE, 0));
         INTAKEBLUELOADINGZONE.add(new AutoStep(blueLoadingZoneStart, AutoAction.INTAKE_OFF, 0));
 
+        BLUESHOOT3NEAR.clear();
+
+        BLUESHOOT3NEAR.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        BLUESHOOT3NEAR.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+
         // Start -> shoot
         AUTOTEST.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
         AUTOTEST.add(new AutoStep(blueShootPoseMed, AutoAction.NONE, 0));
@@ -208,20 +217,25 @@ public class Auto_V2 extends OpMode {
 
         //shoots preload, gets row 2 and shoots
         AUTOTOPLEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
-        AUTOTOPLEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
-        AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        AUTOTOPLEFT.addAll(BLUESHOOT3NEAR);
         AUTOTOPLEFT.addAll(INTAKEBLUEBALLPOSITION3);
-        AUTOTOPLEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
-        AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        AUTOTOPLEFT.addAll(BLUESHOOT3NEAR);
         AUTOTOPLEFT.addAll(INTAKEBLUEBALLPOSITION2);
-        AUTOTOPLEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
-        AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        AUTOTOPLEFT.addAll(BLUESHOOT3NEAR);
         AUTOTOPLEFT.addAll(INTAKEBLUEBALLPOSITION1);
-        AUTOTOPLEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
-        AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        AUTOTOPLEFT.addAll(BLUESHOOT3NEAR);
         AUTOTOPLEFT.addAll(INTAKEBLUELOADINGZONE);
-        AUTOTOPLEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
-        AUTOTOPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        AUTOTOPLEFT.addAll(BLUESHOOT3NEAR);
+
+        AUTOTOPLEFT3.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
+        AUTOTOPLEFT.addAll(BLUESHOOT3NEAR);
+        AUTOTOPLEFT.addAll(INTAKEBLUEBALLPOSITION3);
+        AUTOTOPLEFT.addAll(BLUESHOOT3NEAR);
+        AUTOTOPLEFT.addAll(INTAKEBLUEBALLPOSITION2);
+        AUTOTOPLEFT.addAll(BLUESHOOT3NEAR);
+        AUTOTOPLEFT.addAll(INTAKEBLUEGATE);
+        AUTOTOPLEFT.addAll(BLUESHOOT3NEAR);
+
 
         //the video has more stuff but they're way faster so i think this is about as far as we're gonna get
 
