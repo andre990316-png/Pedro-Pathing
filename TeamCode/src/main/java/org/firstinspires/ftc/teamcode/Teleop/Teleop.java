@@ -263,13 +263,15 @@ public class Teleop extends OpMode {
 
         //ShooterS2.setPosition(gateHoldBtn.getState()? 0 : 0.2);
         if (shoot3Btn.getState() && !shooter.isBusy()) {
-            if (IntakeMotor.getPower() != -1) {
-                IntakeMotor.setPower(-1);
-            }
             shooter.fireShots(1);
-        } else if (!intakeReverseHoldBtn.getState() && !intakeHoldBtn.getState()) {
-            IntakeMotor.setPower(0);
         }
+
+        if (intakeHoldBtn.getState()) {
+            IntakeMotor.setPower(-1.0);
+        } else if (intakeReverseHoldBtn.getState()) {
+            IntakeMotor.setPower(0.5);
+        } else if (!shooter.isBusy())
+            IntakeMotor.setPower(0.0);
 
         if (showAllianceBanner) {
             if (allianceBannerTimer.seconds() < .67) {
@@ -281,12 +283,6 @@ public class Teleop extends OpMode {
                 showAllianceBanner = false;
             }
         }
-
-        if (intakeHoldBtn.getState() && IntakeMotor.getPower() != -1.0) {
-            IntakeMotor.setPower(-1.0);
-        }else if (intakeReverseHoldBtn.getState() && IntakeMotor.getPower() != 0.5 && !intakeHoldBtn.getState()){
-            IntakeMotor.setPower(0.5);
-        }else if (IntakeMotor.getPower() != 0.0) IntakeMotor.setPower(0.0);
 
 //        if (precisionModeToggleBtn.getState()) {
 //            precisionMode = !precisionMode;

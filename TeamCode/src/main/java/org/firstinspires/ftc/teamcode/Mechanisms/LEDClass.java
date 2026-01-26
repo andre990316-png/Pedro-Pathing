@@ -20,4 +20,7 @@ public class LEDClass {
         if(isON) greenLED.on();
         else greenLED.off();
     }
+    public void displayCurrentBalls() {
+
+    }
 }

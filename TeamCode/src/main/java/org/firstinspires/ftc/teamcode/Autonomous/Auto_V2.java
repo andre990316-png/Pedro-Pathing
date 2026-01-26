@@ -104,11 +104,11 @@ public class Auto_V2 extends OpMode {
 
     //artifact intaking poses (blue)
     private final Pose blueBallPosition1Start = new Pose(50, 35.5, Math.toRadians(180));
-    private final Pose blueBallPosition1End = new Pose(10, 35.5, Math.toRadians(180));
+    private final Pose blueBallPosition1End = new Pose(11, 35.5, Math.toRadians(180));
     private final Pose blueBallPosition2Start = new Pose(50, 58, Math.toRadians(180));
-    private final Pose blueBallPosition2End = new Pose(10, 58, Math.toRadians(180));
+    private final Pose blueBallPosition2End = new Pose(11, 58, Math.toRadians(180));
     private final Pose blueBallPosition3Start = new Pose(50, 84, Math.toRadians(180));
-    private final Pose blueBallPosition3End = new Pose(17, 84, Math.toRadians(180));
+    private final Pose blueBallPosition3End = new Pose(18, 84, Math.toRadians(180));
 
     //artifact intaking poses (red)
     private final Pose redBallPosition1Start = new Pose(93, 35.5, Math.toRadians(0));
@@ -120,15 +120,15 @@ public class Auto_V2 extends OpMode {
 
     //loading zone intaking poses (red)
     private final Pose blueLoadingZoneStart = new Pose(34,10, Math.toRadians(180));
-    private final Pose blueLoadingZoneEnd = new Pose(10.2, 10, Math.toRadians(180));
+    private final Pose blueLoadingZoneEnd = new Pose(11, 10, Math.toRadians(180));
 
     //loading zone intaking poses (blue)
     private final Pose redLoadingZoneStart = new Pose(110,10, Math.toRadians(0));
     private final Pose redLoadingZoneEnd = new Pose(133.8,10, Math.toRadians(0));
 
     //gate and intake poses
-    private final Pose blueGateIntakePose = new Pose(10,62, Math.toRadians(120));
-    private final Pose redGateIntakePose = new Pose(10,62, Math.toRadians(120));
+    private final Pose blueGateIntakePose = new Pose(11,62, Math.toRadians(120));
+    private final Pose redGateIntakePose = new Pose(11,62, Math.toRadians(120));
 
 
     private ElapsedTime stateTimer = new ElapsedTime();
@@ -515,15 +515,19 @@ public class Auto_V2 extends OpMode {
         updateAuto();
 
         // turret auto-aim
-        double turretPower = 0;
-        limelight.updateRobotOrientation(imu.getRobotYawPitchRollAngles().getYaw());
-        if (autoAimEnabled) {
-            LLResult ll = limelight.getLatestResult();
-            turretPower = autoAim.update(getRuntime(), ll, telemetry);
+        if (STEPS.get(currentIndex).action == AutoAction.SHOOT_3) {
+            double turretPower = 0;
+            limelight.updateRobotOrientation(imu.getRobotYawPitchRollAngles().getYaw());
+            if (autoAimEnabled) {
+                LLResult ll = limelight.getLatestResult();
+                turretPower = autoAim.update(getRuntime(), ll, telemetry);
+            } else {
+                turretPower = 0;
+            }
+            ShooterRotateMotor.setPower(turretPower);
         } else {
-            turretPower = 0;
+            ShooterRotateMotor.setPower(0);
         }
-        ShooterRotateMotor.setPower(turretPower);
 
         telemetry.addData("Current State", (currentIndex < STEPS.size()) ? STEPS.get(currentIndex).action.name() : "DONE");
         telemetry.addData("Step", currentIndex + " / " + STEPS.size());

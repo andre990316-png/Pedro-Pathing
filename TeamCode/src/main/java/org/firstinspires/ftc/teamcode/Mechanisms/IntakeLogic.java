@@ -39,9 +39,7 @@ public class IntakeLogic {
         }
     }
     public void intakeReady(boolean start) {
-        if(intakeState == IntakeState.IDLE) {
-            startIntake = start;
-        }
+        startIntake = start;
     }
     public boolean isBusy() {
         return intakeState != IntakeState.IDLE;

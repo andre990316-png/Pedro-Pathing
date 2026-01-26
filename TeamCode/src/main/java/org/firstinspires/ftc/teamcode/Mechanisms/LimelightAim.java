@@ -7,10 +7,11 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class LimelightAim {
 
     // ===== tunables =====
-    public double Kp = 0.014;
-    public double Kd = 0.002;
-    public double deadband = 0.2;
+    public double Kp = 0.017;
+    public double Kd = 0.001;
+    public double deadband = 0.5;
     public double maxTurretPower = 1.0;
+    public double minTurretPower = 0.2;
     public static String currentPipeline;
 
     // ===== history =====
@@ -63,7 +64,7 @@ public class LimelightAim {
             double error = -tx; // same as your working test
 
             double Aim_dt = runtimeSeconds - lastAimTime;
-            if (Aim_dt <= 0) Aim_dt = 0.02;
+            if (Aim_dt <= 0.02) Aim_dt = 0.02;
 
             double dTx = (tx - lastTx) / Aim_dt;
 
@@ -75,14 +76,17 @@ public class LimelightAim {
 
             turretPower = Range.clip(turretPower, -maxTurretPower, maxTurretPower);
 
+            if (Math.abs(tx) > deadband && Math.abs(turretPower) < minTurretPower) {
+                turretPower = Math.copySign(minTurretPower, turretPower);
+            }
+
             lastTx = tx;
             lastAimTime = runtimeSeconds;
             lastTurretPower = turretPower;
 
             if (telemetry != null) {
                 telemetry.addData("AutoAim", "ON");
-                telemetry.addData("tx", tx);
-                telemetry.addData("ta", llResult.getTa());
+                telemetry.addData("tx", llResult.getTx());
                 telemetry.addData("ta", llResult.getTa());
                 telemetry.addData("dTx", dTx);
                 telemetry.addData("Turret PD", turretPower);
