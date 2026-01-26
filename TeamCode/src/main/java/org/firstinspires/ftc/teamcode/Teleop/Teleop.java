@@ -55,6 +55,9 @@ public class Teleop extends OpMode {
     private LimelightAim autoAim = new LimelightAim();
     private boolean precisionMode;
     private boolean poseSnapped = false;
+    private boolean AutoPoseAvailable = false;
+    private boolean AutoPoseOn = false;
+
     private double currentSensitivity;
     private double Sensitivity;
     private AutoShooting shot;
@@ -154,10 +157,12 @@ public class Teleop extends OpMode {
 
         if (Auto_lastPose.currentPose != null){
             follower.setStartingPose(Auto_lastPose.currentPose);
-            telemetry.addLine("Starting Position = Auto_lastPose");
+            AutoPoseAvailable = true;
+            AutoPoseOn = true;
         }else {
             follower.setStartingPose(topLeftStartPose);
-            telemetry.addLine("Starting Position = topLeftStartingPose");
+            AutoPoseAvailable = false;
+            AutoPoseOn = false;
         }
 
         telemetry.addData("Initialize", "Completed");
@@ -174,16 +179,23 @@ public class Teleop extends OpMode {
             AllianceData.selectedAlliance = AllianceData.Alliance.RED;
         }
 
-        if (Auto_lastPose.currentPose != null){
-            telemetry.addLine("Starting Position = Auto_lastPose");
-        }else {
+        if(gamepad1.dpad_up) {
+            follower.setStartingPose(topLeftStartPose);
             telemetry.addLine("Starting Position = topLeftStartingPose");
+            AutoPoseOn = false;
+        }else if(gamepad1.dpad_down && AutoPoseAvailable) {
+            follower.setStartingPose(Auto_lastPose.currentPose);
+            telemetry.addLine("Starting Position = Auto_lastPose");
+            AutoPoseOn = true;
         }
 
         telemetry.addLine("=== ALLIANCE SELECT ===");
         telemetry.addData("Alliance", AllianceData.selectedAlliance);
         telemetry.addLine("D-pad LEFT = BLUE");
         telemetry.addLine("D-pad RIGHT = RED");
+        telemetry.addLine("D-pad UP = Top Left");
+        telemetry.addLine(AutoPoseAvailable ? "D-pad DOWN = Auto" : "D-pad DOWN = Auto (NOT AVAILABLE)");
+
         telemetry.update();
     }
 
@@ -274,9 +286,10 @@ public class Teleop extends OpMode {
             IntakeMotor.setPower(0.0);
 
         if (showAllianceBanner) {
-            if (allianceBannerTimer.seconds() < .67) {
+            if (allianceBannerTimer.seconds() < .6767) {
                 telemetry.addLine("=== ALLIANCE LOCKED ===");
                 telemetry.addData("Alliance", AllianceData.selectedAlliance);
+                telemetry.addData("Start Pose", AutoPoseOn ? "AUTO" : "TOP LEFT");
                 telemetry.update();
                 return; // optional — remove if you want normal telemetry underneath
             } else {
@@ -404,7 +417,6 @@ public class Teleop extends OpMode {
         telemetry.addData("Driver Entry", driverPatternEntry);
         telemetry.addData("Desired Pattern (brain)", patternLogic.getPatternSnapshot());
         telemetry.addData("Pattern Locked", patternLocked);
-;
         telemetry.addLine("                                  ");
         telemetry.addData("Target RPM ", shooter.getTargetRPM());
         telemetry.addData("RPM ", shooter.getFlywheelRpm());
@@ -414,7 +426,6 @@ public class Teleop extends OpMode {
         telemetry.addLine("                                  ");
         telemetry.addData("Current Sensitivity", currentSensitivity);
         telemetry.addData("Sensitivity", Sensitivity);
-        telemetry.addData("Precision Mode Toggle", precisionModeToggleBtn.getState());
         telemetry.addData("Precision Mode Hold", precisionModeHoldBtn.getState());
 
         telemetry.addLine("Debug");
@@ -435,8 +446,9 @@ public class Teleop extends OpMode {
         telemetry.addData("Flywheel Power", shooter.getFlywheelPower());
         telemetry.addData("Calculated RPM", shooter.getCalcRPM());
         telemetry.addData("Battery Voltage", "%.2f V", battery.getVoltage());
-        telemetry.addLine(                                  );
-        if (Auto_lastPose.currentPose != null){
+        telemetry.addLine(""                       );
+        telemetry.addData("Start Pose", AutoPoseOn ? "AUTO" : "TOP LEFT");
+        if (AutoPoseOn){
         telemetry.addData("Autonomous", Auto_lastPose.currentPose);}
         telemetry.addData("X", follower.getPose().getX());
         telemetry.addData("Y", follower.getPose().getY());

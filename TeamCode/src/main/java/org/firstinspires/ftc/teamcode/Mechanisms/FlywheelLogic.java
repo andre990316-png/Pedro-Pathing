@@ -218,7 +218,7 @@ public class FlywheelLogic {
     }
     public double getCalcRPM() {return calcRPM;}
     public boolean isFlywheelReady() {
-        return (currentRPM < targetRPM && currentRPM + 100 >= targetRPM) || (currentRPM > targetRPM && currentRPM - 100 <= targetRPM);
+        return (Math.abs(error) <= 100);
     }
 
     public IntakeLogic getIntake(){
