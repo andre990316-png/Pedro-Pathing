@@ -20,6 +20,7 @@ import org.firstinspires.ftc.teamcode.Data.AllianceData;
 import org.firstinspires.ftc.teamcode.Data.Auto_lastPose;
 import org.firstinspires.ftc.teamcode.Mechanisms.ButtonLogic;
 import org.firstinspires.ftc.teamcode.Mechanisms.FlywheelLogic;
+import org.firstinspires.ftc.teamcode.Mechanisms.IntakeLogic;
 import org.firstinspires.ftc.teamcode.Mechanisms.LEDClass;
 import org.firstinspires.ftc.teamcode.Mechanisms.LimelightAim;
 import org.firstinspires.ftc.teamcode.Tests.AutoShooting;
@@ -77,6 +78,7 @@ public class Teleop extends OpMode {
     private PatternLogic patternLogic = new PatternLogic();
     private int detectedTag = -1;
 
+    private IntakeLogic intake = new IntakeLogic();
     private FlywheelLogic shooter = new FlywheelLogic();
     private ButtonLogic hoodUpBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);  // dpad_right
     private ButtonLogic hoodDownBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);  // dpad_left
@@ -302,10 +304,12 @@ public class Teleop extends OpMode {
 
         if (intakeHoldBtn.getState()) {
             shooter.getIntake().setIntakeOnVelocity(-1.0);
+            intake.intakeReady(true);
         } else if (intakeReverseHoldBtn.getState()) {
             shooter.getIntake().setIntakeOnVelocity(0.5);
+            intake.intakeReady(true);
         } else if (!shoot3Btn.getState() && !intakeHoldBtn.getState() && !intakeReverseHoldBtn.getState()){
-            shooter.getIntake().setIntakeOnVelocity(0.0);
+            intake.intakeReady(false);
         }
 
         if (showAllianceBanner) {
