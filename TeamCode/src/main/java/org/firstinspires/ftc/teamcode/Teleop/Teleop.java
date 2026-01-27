@@ -305,7 +305,7 @@ public class Teleop extends OpMode {
         if (intakeHoldBtn.getState()) {
             shooter.getIntake().setIntakeOnVelocity(-1.0);
             intake.intakeReady(true);
-        } else if (intakeReverseHoldBtn.getState()) {
+        } else if (intakeReverseHoldBtn.getState() && !shoot3Btn.getState() && !intakeHoldBtn.getState()) {
             shooter.getIntake().setIntakeOnVelocity(0.5);
             intake.intakeReady(true);
         } else if (!shoot3Btn.getState() && !intakeHoldBtn.getState() && !intakeReverseHoldBtn.getState()){
