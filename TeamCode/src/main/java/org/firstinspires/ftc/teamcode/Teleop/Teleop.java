@@ -66,7 +66,7 @@ public class Teleop extends OpMode {
     private double shooterPower = 0.0;
 
     //Battery Voltage
-    public static VoltageSensor battery;
+    private VoltageSensor battery;
 
     // Linear Flywheels
     double targetRPM = 0;

@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.teamcode.Data.FlywheelAndHoodData;
-import org.firstinspires.ftc.teamcode.Teleop.Teleop;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
@@ -25,6 +25,7 @@ public class FlywheelLogic {
     private Servo ShooterS2;
 
     // --- Timing / velocity measurement ---
+    private VoltageSensor battery;
     private final ElapsedTime stateTimer = new ElapsedTime();
     private final ElapsedTime velTimer = new ElapsedTime();
     private int lastPos1 = 0, lastPos2 = 0;
@@ -72,6 +73,8 @@ public class FlywheelLogic {
         ShooterS1 = hardwareMap.get(Servo.class, "Shooter S1");
         ShooterS2 = hardwareMap.get(Servo.class, "Shooter S2");
 
+        battery = hardwareMap.voltageSensor.iterator().next();
+
         ShooterM1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Needed for setVelocity() control
@@ -90,7 +93,8 @@ public class FlywheelLogic {
     }
 
     public void update() {
-        double voltageCamp = (13 / Teleop.battery.getVoltage());
+        double voltage = battery.getVoltage();
+        double voltageCamp = (13 / voltage);
         double ffPower;
         double pPower = kp;
         if(targetRPM < 2000) {
