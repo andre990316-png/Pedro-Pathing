@@ -210,8 +210,6 @@ public class Teleop extends OpMode {
         allianceBannerTimer.reset();
         showAllianceBanner = true;
 
-        limelight.start();
-        autoAim.resetHistory(getRuntime());
     }
 
 
@@ -280,8 +278,9 @@ public class Teleop extends OpMode {
             shooter.getIntake().setIntakeOnVelocity(-1.0);
         } else if (intakeReverseHoldBtn.getState()) {
             shooter.getIntake().setIntakeOnVelocity(0.5);
-        } else if (!shooter.isBusy())
+        } else if (!shoot3Btn.getState() && !intakeHoldBtn.getState() && !intakeReverseHoldBtn.getState()){
             shooter.getIntake().setIntakeOnVelocity(0.0);
+        }
 
         if (showAllianceBanner) {
             if (allianceBannerTimer.seconds() < .6767) {
