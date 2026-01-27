@@ -249,8 +249,7 @@ public class Auto_V2 extends OpMode {
         //get loading zone balls and shoot
         //does this thrice
         for(int i=0; i<3; i++){
-            AUTOBOTTOMLEFT.add(new AutoStep(blueLoadingZoneStart, AutoAction.INTAKE_ON, 0));
-            AUTOBOTTOMLEFT.add(new AutoStep(blueLoadingZoneEnd, AutoAction.NONE, 0));
+            AUTOBOTTOMLEFT.addAll(INTAKEBLUELOADINGZONE);
             AUTOBOTTOMLEFT.add(new AutoStep(blueShootPoseFar, AutoAction.INTAKE_OFF, 0));
             AUTOBOTTOMLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         }
@@ -450,7 +449,7 @@ public class Auto_V2 extends OpMode {
             ArrayList<ArrayList<AutoStep>> paths = new ArrayList<>();
 
             paths.add(AUTOTOPLEFT);
-            paths.add(AUTOTOPRIGHT2);
+            paths.add(AUTOTOPRIGHT);
             paths.add(AUTOBOTTOMLEFT);
             paths.add(AUTOBOTTOMRIGHT);
 
