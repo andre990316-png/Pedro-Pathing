@@ -6,6 +6,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.teamcode.Data.FlywheelAndHoodData;
+import org.firstinspires.ftc.teamcode.Teleop.Teleop;
+
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 public class FlywheelLogic {
 
@@ -25,7 +28,6 @@ public class FlywheelLogic {
     private final ElapsedTime stateTimer = new ElapsedTime();
     private final ElapsedTime velTimer = new ElapsedTime();
     private int lastPos1 = 0, lastPos2 = 0;
-
     // IMPORTANT: for Yellow Jacket 6000RPM w/ encoder (common 4x), you used 112 before.
     // Keep it consistent with your drivetrain code.
     private static final double TICKS_PER_REV = 28;
@@ -88,6 +90,7 @@ public class FlywheelLogic {
     }
 
     public void update() {
+        double voltageCamp = (12 / Teleop.battery.getVoltage());
         double ffPower;
         double pPower = kp;
         if(targetRPM < 2000) {
@@ -134,7 +137,7 @@ public class FlywheelLogic {
         error = targetRPM - currentRPM;
         double dError = (error - lastError) / Shooter_dt;
 
-        double pdPower = ffPower + pPower * error / 6000.0 + kd * dError / 6000.0;
+        double pdPower = (ffPower * voltageCamp) + pPower * error / 6000.0 + kd * dError / 6000.0;
         if (targetRPM <= 0) pdPower = 0;
 
         calcRPM = Range.clip(pdPower, 0.0, 1.0);
