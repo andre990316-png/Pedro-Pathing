@@ -51,8 +51,6 @@ public class FlywheelLogic {
     private int shotsRemaining = 0;
 
     // --- Velocity targets (RPM) ---
-    private double flywheelRpm = 0.0;
-    private double minFlywheelRpm = 800;
     private double targetRPM = 0;
     private double calcRPM;
     private double flywheelMaxSpinupTime = 0.7;
@@ -147,8 +145,8 @@ public class FlywheelLogic {
         /// set shooter motors
         ShooterM1.setPower(calcRPM);
         ShooterM2.setPower(-calcRPM);
-
         intake.update();
+
         switch (flyWheelState) {
             case IDLE:
                 break;

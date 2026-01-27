@@ -16,40 +16,43 @@ public class ColorSensorLogic {
     public static ArrayList<Integer> lastcolors;
     public static int lastColor = 0;
     public static NormalizedColorSensor colorSensor;
+    public int[] returnCurrentColors() {
+        return colors;
+    }
 
+    public void update(Telemetry telemetry){
+        NormalizedRGBA newColors = colorSensor.getNormalizedColors();
 
-    public static void update(Telemetry telemetry){
-        NormalizedRGBA colors = colorSensor.getNormalizedColors();
-
-        int color = getColor(colors);
+        int color = getColor(newColors);
         if(color != lastColor){
             push(color);
         }
         lastColor = color;
 
         telemetry.addLine()
-                .addData("Red", "%.3f", colors.red)
-                .addData("Green", "%.3f", colors.green)
-                .addData("Blue", "%.3f", colors.blue);
-        telemetry.update();
-
+                .addData("Red", "%.3f", newColors.red)
+                .addData("Green", "%.3f", newColors.green)
+                .addData("Blue", "%.3f", newColors.blue);
+        telemetry.addData("Current color", "%d", lastColor);
+        telemetry.addData("First color", "%d", colors[0]);
+        telemetry.addData("Second color", "%d", colors[1]);
+        telemetry.addData("Third color", "%d", colors[2]);
     }
-    public static void init(HardwareMap hardwareMap){
+    public void init(HardwareMap hardwareMap){
         colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorSensor"); /// <-- CHANGE THE NAME TO THE CORRECT ONE
     }
-
-    public static int getColor(NormalizedRGBA color){
+    public int getColor(NormalizedRGBA color){
         float[] hsv = new float[3];
         Color.colorToHSV(color.toColor(), hsv);
         if(hsv[1] < 0.2){//if saturation too low, probably nothing
             return 0;
         }
-        if(color.green < 120){//main defining factor between green and purple is the G value
+        if(color.blue < 0.035){//main defining factor between green and purple is the G value
             return 1;
         }
         return 2;
     }
-    public static void push(int c){
+    public void push(int c){
         colors[2] = colors[1];
         colors[1] = colors[0];
         colors[0] = c;

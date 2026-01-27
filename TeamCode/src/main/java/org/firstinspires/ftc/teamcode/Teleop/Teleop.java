@@ -26,7 +26,7 @@ import org.firstinspires.ftc.teamcode.Tests.AutoShooting;
 import org.firstinspires.ftc.teamcode.Data.FlywheelAndHoodData;
 import org.firstinspires.ftc.teamcode.Mechanisms.TeleopGate;
 import org.firstinspires.ftc.teamcode.Mechanisms.PatternLogic;
-
+import org.firstinspires.ftc.teamcode.Mechanisms.ColorSensorLogic;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -44,7 +44,6 @@ public class Teleop extends OpMode {
     private DcMotor ShooterRotateMotor;
     private Servo ShooterS1;
     private Servo ShooterS2;
-    private TeleopGate teleopGate;
     // Vision + turret
     private Limelight3A limelight;
     private IMU imu;
@@ -106,6 +105,7 @@ public class Teleop extends OpMode {
     private final Pose topLeftStartPose = new Pose(20, 118.5, Math.toRadians(144));
     private final Pose bottomLeftStartPose = new Pose(48, 10, Math.toRadians(90));
     private final java.util.ArrayList<PatternLogic.Color> driverPatternEntry = new java.util.ArrayList<>(3);
+    private ColorSensorLogic colorSensorLogic = new ColorSensorLogic();
 
     @Override
     public void init() {
@@ -121,13 +121,13 @@ public class Teleop extends OpMode {
         ShooterS1 = hardwareMap.get(Servo.class, "Shooter S1");
         ShooterS2 = hardwareMap.get(Servo.class, "Shooter S2");
         ShooterRotateMotor = hardwareMap.get(DcMotor.class, "ShooterRotateMotor");
-        teleopGate = new TeleopGate(ShooterS2);
         battery = hardwareMap.voltageSensor.iterator().next();
         LED1.init(hardwareMap, 1);
         LED2.init(hardwareMap, 2);
         LED3.init(hardwareMap, 3);
         RGB = hardwareMap.get(Servo.class, "RGB");
         RGB.setPosition(0.48);
+        colorSensorLogic.init(hardwareMap);
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
@@ -225,12 +225,38 @@ public class Teleop extends OpMode {
     public void loop() {
         shooter.update();
         follower.update();
+        colorSensorLogic.update(telemetry);
+        int[] colors = colorSensorLogic.returnCurrentColors();
+        for (int i=0; i<3; i++) {
+            if (colors[i] == 0) {
+                patternLogic.addArtifact(PatternLogic.Color.U);
+                LED1.setGreenLED(false);
+                LED2.setGreenLED(false);
+                LED3.setGreenLED(false);
+                LED1.setRedLED(false);
+                LED2.setRedLED(false);
+                LED3.setRedLED(false);
+            }
+            else if (colors[i] == 1) {
+                patternLogic.addArtifact(PatternLogic.Color.P);
+                LED1.setGreenLED(false);
+                LED2.setGreenLED(false);
+                LED3.setGreenLED(false);
+                LED1.setRedLED(true);
+                LED2.setRedLED(true);
+                LED3.setRedLED(true);
+            }
+            else {
+                patternLogic.addArtifact(PatternLogic.Color.G);
+                LED1.setGreenLED(true);
+                LED2.setGreenLED(true);
+                LED3.setGreenLED(true);
+                LED1.setRedLED(false);
+                LED2.setRedLED(false);
+                LED3.setRedLED(false);
+            }
+        }
         LED1.setGreenLED(true);
-        LED2.setGreenLED(true);
-        LED3.setGreenLED(true);
-        LED1.setRedLED(false);
-        LED2.setRedLED(false);
-        LED3.setRedLED(false);
         RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.277);
         //teleopGate.update(shooter.getTargetRPM(), gamepad2.right_trigger > 0.3);
         LLResult ll = limelight.getLatestResult();

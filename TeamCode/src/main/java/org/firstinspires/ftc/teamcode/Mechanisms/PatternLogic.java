@@ -20,6 +20,7 @@ public class PatternLogic {
 
     public void initPattern(int id) {
         pattern.clear();
+        box.clear();
         switch (id) {
             case 21: pattern.add(Color.G); pattern.add(Color.P); pattern.add(Color.P); break;
             case 22: pattern.add(Color.P); pattern.add(Color.G); pattern.add(Color.P); break;
@@ -27,7 +28,7 @@ public class PatternLogic {
             default: throw new IllegalArgumentException("Unknown pattern id: " + id);
         }
         patternIndex = 0;
-        box.clear();
+        box.add(Color.U); box.add(Color.U); box.add(Color.U);
     }
 
     public void clearAll() {
