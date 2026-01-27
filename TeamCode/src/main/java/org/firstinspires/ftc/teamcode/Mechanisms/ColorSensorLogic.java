@@ -23,7 +23,7 @@ public class ColorSensorLogic {
         return colors;
     }
 
-    public static void update(){
+    public static void update(Telemetry telemetry){
         NormalizedRGBA newColors = colorSensor.getNormalizedColors();
 
         int color = getColor(newColors);

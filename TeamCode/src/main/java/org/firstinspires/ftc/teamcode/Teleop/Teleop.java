@@ -222,7 +222,7 @@ public class Teleop extends OpMode {
     public void loop() {
         shooter.update();
         follower.update();
-        ColorSensorLogic.update();
+        ColorSensorLogic.update(telemetry);
         int[] colors = colorSensorLogic.returnCurrentColors();
         for (int i=0; i<3; i++) {
             if (colors[i] == 0) {
