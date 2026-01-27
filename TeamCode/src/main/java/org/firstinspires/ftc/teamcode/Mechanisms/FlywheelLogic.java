@@ -116,8 +116,9 @@ public class FlywheelLogic {
             pPower = kp;
         }
 
-        if (error < 500) {
-            pPower = 6;
+        if (error < 400) {
+            pPower = 6.7;
+            ffPower = kf * (targetRPM / 6000) * 10;
         }
 
 
