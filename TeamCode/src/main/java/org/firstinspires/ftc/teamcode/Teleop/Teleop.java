@@ -282,7 +282,7 @@ public class Teleop extends OpMode {
             IntakeMotor.setPower(-1.0);
         } else if (intakeReverseHoldBtn.getState()) {
             IntakeMotor.setPower(0.5);
-        } else if (!shooter.isBusy())
+        } else if (!shooter.isBusy() && IntakeMotor.getPower() != 0.0)
             IntakeMotor.setPower(0.0);
 
         if (showAllianceBanner) {
@@ -427,8 +427,11 @@ public class Teleop extends OpMode {
         telemetry.addData("Current Sensitivity", currentSensitivity);
         telemetry.addData("Sensitivity", Sensitivity);
         telemetry.addData("Precision Mode Hold", precisionModeHoldBtn.getState());
+        telemetry.addLine("                                  ");
+        telemetry.addLine("                                  ");
 
         telemetry.addLine("Debug");
+        telemetry.addLine("                                  ");
         telemetry.addData("Motor 1 Power","%.3f",MotorFrontLeft.getPower());
         telemetry.addData("Motor 2 Power","%.3f", MotorFrontRight.getPower());
         telemetry.addData("Motor 3 Power","%.3f", MotorBackLeft.getPower());
