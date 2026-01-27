@@ -38,7 +38,6 @@ public class Teleop extends OpMode {
     private DcMotor MotorFrontLeft;
     private DcMotor MotorFrontRight;
     private DcMotor MotorBackRight;
-    private DcMotor IntakeMotor;
     private DcMotor ShooterM1;
     private DcMotor ShooterM2;
     private DcMotor ShooterRotateMotor;
@@ -115,7 +114,6 @@ public class Teleop extends OpMode {
         MotorFrontRight = hardwareMap.get(DcMotor.class, "Motor Front Right");
         MotorBackRight = hardwareMap.get(DcMotor.class, "Motor Back Right");
 
-        IntakeMotor = hardwareMap.get(DcMotor.class, "Intake Motor");
         ShooterM1 = hardwareMap.get(DcMotor.class, "Shooter M1");
         ShooterM2 = hardwareMap.get(DcMotor.class, "Shooter M2");
         ShooterS1 = hardwareMap.get(Servo.class, "Shooter S1");
@@ -279,11 +277,11 @@ public class Teleop extends OpMode {
         }
 
         if (intakeHoldBtn.getState()) {
-            IntakeMotor.setPower(-1.0);
+            shooter.getIntake().setIntakeOnVelocity(-1.0);
         } else if (intakeReverseHoldBtn.getState()) {
-            IntakeMotor.setPower(0.5);
-        } else if (!shooter.isBusy() && IntakeMotor.getPower() != 0.0)
-            IntakeMotor.setPower(0.0);
+            shooter.getIntake().setIntakeOnVelocity(0.5);
+        } else if (!shooter.isBusy())
+            shooter.getIntake().setIntakeOnVelocity(0.0);
 
         if (showAllianceBanner) {
             if (allianceBannerTimer.seconds() < .6767) {
@@ -441,7 +439,6 @@ public class Teleop extends OpMode {
         telemetry.addData("Shooter Servo2", ShooterS2.getPosition());
         telemetry.addData("Shooter M1 Input", ShooterM1.getPower());
         telemetry.addData("Shooter M2 Input", ShooterM2.getPower());
-        telemetry.addData("Intake Power", IntakeMotor.getPower());
         telemetry.addLine("                                  ");
         telemetry.addData("Target RPM", shooter.getTargetRPM());
         telemetry.addData("RPM", shooter.getFlywheelRpm());

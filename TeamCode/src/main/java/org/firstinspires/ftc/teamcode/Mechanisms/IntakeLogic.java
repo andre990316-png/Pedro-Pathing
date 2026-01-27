@@ -43,10 +43,10 @@ public class IntakeLogic {
         startIntake = start;
     }
     public void setIntakeOnVelocity(double p) {
-        intakeOnVelocity = Range.clip(p, 0.0, 1.0);
+        intakeOnVelocity = Range.clip(p, -1.0, 0.5);
     }
     public void setIntakeOffVelocity(double p) {
-        intakeOffVelocity = Range.clip(p, 0.0, 1.0);
+        intakeOffVelocity = Range.clip(p, -1.0, 0.5);
     }
     public boolean isBusy() {
         return intakeState != IntakeState.IDLE;
