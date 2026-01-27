@@ -90,7 +90,7 @@ public class FlywheelLogic {
     }
 
     public void update() {
-        double voltageCamp = (12 / Teleop.battery.getVoltage());
+        double voltageCamp = (13 / Teleop.battery.getVoltage());
         double ffPower;
         double pPower = kp;
         if(targetRPM < 2000) {
@@ -110,6 +110,10 @@ public class FlywheelLogic {
         } else {
             ffPower = kf * (targetRPM / 6000) * 1.2;
             pPower = kp;
+        }
+
+        if (error < 500) {
+            pPower = 6;
         }
 
 
