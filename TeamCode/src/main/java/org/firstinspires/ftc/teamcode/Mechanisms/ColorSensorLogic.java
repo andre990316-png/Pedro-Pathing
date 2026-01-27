@@ -49,7 +49,7 @@ public class ColorSensorLogic {
         if(hsv[1] < 0.2){//if saturation too low, probably nothing
             return 0;
         }
-        if(color.blue < 0.035){//main defining factor between green and purple is the G value
+        if((color.green > 0.02 || color.blue > 0.02) && (color.green < color.blue)){//main defining factor between green and purple is the G value
             return 1;
         }
         return 2;
