@@ -254,7 +254,7 @@ public class Teleop extends OpMode {
             }
         }
         LED1.setGreenLED(true);
-        RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.277);
+        RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.29);
         //teleopGate.update(shooter.getTargetRPM(), gamepad2.right_trigger > 0.3);
         LLResult ll = limelight.getLatestResult();
 
@@ -303,12 +303,12 @@ public class Teleop extends OpMode {
 
         if (intakeHoldBtn.getState()) {
             shooter.getIntake().setIntakeOnVelocity(-1.0);
-            intake.intakeReady(true);
+            shooter.getIntake().intakeReady(true);
         } else if (intakeReverseHoldBtn.getState() && !shoot3Btn.getState() && !intakeHoldBtn.getState()) {
             shooter.getIntake().setIntakeOnVelocity(0.5);
-            intake.intakeReady(true);
+            shooter.getIntake().intakeReady(true);
         } else if (!shoot3Btn.getState() && !intakeHoldBtn.getState() && !intakeReverseHoldBtn.getState()){
-            intake.intakeReady(false);
+            shooter.getIntake().intakeReady(false);
         }
 
         if (showAllianceBanner) {
