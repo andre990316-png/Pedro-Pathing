@@ -15,9 +15,10 @@ import java.util.ArrayList;
 public class ColorSensorLogic {
     public static int[] colors = {0,0,0}; //0=none, 1=purple, 2=green
     ///  order: colors[0] is the closest artifact to intake, and colors[2] is the one about to be shot
-    public static ArrayList<Integer> lastcolors;
     public static int lastColor = 0;
+    public static ArrayList<Integer> lastColors = new ArrayList<>();
     public static NormalizedColorSensor colorSensor;
+    public static boolean candetect=true;
     public int[] returnCurrentColors() {
         return colors;
     }
@@ -26,9 +27,23 @@ public class ColorSensorLogic {
         NormalizedRGBA newColors = colorSensor.getNormalizedColors();
 
         int color = getColor(newColors);
-        if(color != lastColor){
-            push(color);
+        lastColors.add(color);
+        if(lastColors.size()>10){
+            lastColors.remove(0);
         }
+
+        if(candetect){
+            int sk = skimRecent();
+            if(sk==1||sk==2){
+                push(sk);
+                candetect=false;
+            }
+        }else{
+            if(skimRecent()==0){
+                candetect=true;
+            }
+        }
+
         lastColor = color;
 
         telemetry.addLine()
@@ -49,7 +64,7 @@ public class ColorSensorLogic {
         if(hsv[1] < 0.2){//if saturation too low, probably nothing
             return 0;
         }
-        if((color.green > 0.02 || color.blue > 0.02) && (color.green < color.blue)){//main defining factor between green and purple is the G value
+        if((color.green + color.blue > 0.02) && (color.green < color.blue)){//main defining factor between green and purple is the G value
             return 1;
         }
         return 2;
@@ -58,5 +73,14 @@ public class ColorSensorLogic {
         colors[2] = colors[1];
         colors[1] = colors[0];
         colors[0] = c;
+    }
+    public static int skimRecent(){
+        int num = lastColors.get(0);
+        for(int i:lastColors){
+            if(i!=num){
+                return -1;
+            }
+        }
+        return num;
     }
 }
