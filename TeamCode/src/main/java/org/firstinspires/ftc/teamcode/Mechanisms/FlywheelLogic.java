@@ -53,7 +53,7 @@ public class FlywheelLogic {
     // --- Velocity targets (RPM) ---
     private double targetRPM = 0;
     private double calcRPM;
-    private double flywheelMaxSpinupTime = 0;
+    private double flywheelMaxSpinupTime = 0.7;
     private double lastShooterTime=System.nanoTime();
     private IntakeLogic intake = new IntakeLogic();
     private double currentRPM = 0;
@@ -157,7 +157,7 @@ public class FlywheelLogic {
 //                }
 //                break;
             case SPIN_UP:
-                if ((Math.abs(error) <= 100) || stateTimer.seconds() > flywheelMaxSpinupTime) {
+                if (Math.abs(error) <= 100 || stateTimer.seconds() > flywheelMaxSpinupTime) {
                     //intake.setIntakeOnVelocity(-0.3);
                     intake.intakeReady(true);
                     ShooterS2.setPosition(gateOpenAngle);
