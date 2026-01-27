@@ -127,7 +127,7 @@ public class Teleop extends OpMode {
         LED3.init(hardwareMap, 3);
         RGB = hardwareMap.get(Servo.class, "RGB");
         RGB.setPosition(0.48);
-        colorSensorLogic.init(hardwareMap);
+        ColorSensorLogic.init(hardwareMap);
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
@@ -139,7 +139,6 @@ public class Teleop extends OpMode {
         // Motor setup
         MotorBackLeft.setDirection(DcMotor.Direction.REVERSE);
         MotorFrontLeft.setDirection(DcMotor.Direction.REVERSE);
-        //ShooterM2.setDirection(DcMotorSimple.Direction.REVERSE);
 
         ShooterM1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         ShooterM1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -223,7 +222,7 @@ public class Teleop extends OpMode {
     public void loop() {
         shooter.update();
         follower.update();
-        colorSensorLogic.update(telemetry);
+        ColorSensorLogic.update();
         int[] colors = colorSensorLogic.returnCurrentColors();
         for (int i=0; i<3; i++) {
             if (colors[i] == 0) {
