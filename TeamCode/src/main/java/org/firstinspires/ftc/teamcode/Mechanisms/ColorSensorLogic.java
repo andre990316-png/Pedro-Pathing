@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Mechanisms;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+
 import android.graphics.Color;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -20,7 +22,7 @@ public class ColorSensorLogic {
         return colors;
     }
 
-    public void update(Telemetry telemetry){
+    public static void update(){
         NormalizedRGBA newColors = colorSensor.getNormalizedColors();
 
         int color = getColor(newColors);
@@ -38,10 +40,10 @@ public class ColorSensorLogic {
         telemetry.addData("Second color", "%d", colors[1]);
         telemetry.addData("Third color", "%d", colors[2]);
     }
-    public void init(HardwareMap hardwareMap){
+    public static void init(HardwareMap hardwareMap){
         colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorSensor"); /// <-- CHANGE THE NAME TO THE CORRECT ONE
     }
-    public int getColor(NormalizedRGBA color){
+    public static int getColor(NormalizedRGBA color){
         float[] hsv = new float[3];
         Color.colorToHSV(color.toColor(), hsv);
         if(hsv[1] < 0.2){//if saturation too low, probably nothing
@@ -52,7 +54,7 @@ public class ColorSensorLogic {
         }
         return 2;
     }
-    public void push(int c){
+    public static void push(int c){
         colors[2] = colors[1];
         colors[1] = colors[0];
         colors[0] = c;
