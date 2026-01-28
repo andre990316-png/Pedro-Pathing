@@ -527,7 +527,7 @@ public class Auto_V2 extends OpMode {
         updateAuto();
 
         // turret auto-aim
-        if (STEPS.get(currentIndex).action == AutoAction.SHOOT_3) {
+        if (!(currentIndex>=STEPS.size()) && STEPS.get(currentIndex).action == AutoAction.SHOOT_3) {
             double turretPower = 0;
             limelight.updateRobotOrientation(imu.getRobotYawPitchRollAngles().getYaw());
             if (autoAimEnabled) {
