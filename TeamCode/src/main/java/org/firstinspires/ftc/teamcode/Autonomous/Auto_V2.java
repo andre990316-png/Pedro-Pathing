@@ -163,31 +163,31 @@ public class Auto_V2 extends OpMode {
 
         INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1Start, AutoAction.INTAKE_ON, 0));
         INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1End, AutoAction.NONE, 0));
-        INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1Start, AutoAction.INTAKE_OFF, 0));
+        INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1Start, AutoAction.NONE, 0));
 
         INTAKEBLUEBALLPOSITION2.clear();
 
         INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
         INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2End, AutoAction.NONE, 0));
-        INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_OFF, 0));
+        INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2Start, AutoAction.NONE, 0));
 
         INTAKEBLUEBALLPOSITION3.clear();
 
         INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3Start, AutoAction.INTAKE_ON, 0));
         INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3End, AutoAction.NONE, 0));
-        INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3Start, AutoAction.INTAKE_OFF, 0));
+        INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3Start, AutoAction.NONE, 0));
 
         INTAKEBLUEGATE.clear();
 
         INTAKEBLUEGATE.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
         INTAKEBLUEGATE.add(new AutoStep(blueGateIntakePose, AutoAction.NONE, 4000));
-        INTAKEBLUEGATE.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_OFF, 0));
+        INTAKEBLUEGATE.add(new AutoStep(blueBallPosition2Start, AutoAction.NONE, 0));
 
         INTAKEBLUELOADINGZONE.clear();
 
         INTAKEBLUELOADINGZONE.add(new AutoStep(blueLoadingZoneStart, AutoAction.INTAKE_ON, 0));
         INTAKEBLUELOADINGZONE.add(new AutoStep(blueLoadingZoneEnd, AutoAction.NONE, 0));
-        INTAKEBLUELOADINGZONE.add(new AutoStep(blueLoadingZoneStart, AutoAction.INTAKE_OFF, 0));
+        INTAKEBLUELOADINGZONE.add(new AutoStep(blueLoadingZoneStart, AutoAction.NONE, 0));
 
         BLUESHOOT3NEAR.clear();
 
@@ -227,17 +227,17 @@ public class Auto_V2 extends OpMode {
         AUTOTOPLEFT.addAll(INTAKEBLUELOADINGZONE);
         AUTOTOPLEFT.addAll(BLUESHOOT3NEAR);
 
-        AUTOTOPLEFT3.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
-        AUTOTOPLEFT3.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        AUTOTOPLEFT3.add(new AutoStep(topLeftStartPose, AutoAction.INTAKE_ON, 0));
+        AUTOTOPLEFT3.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
         AUTOTOPLEFT3.add(new AutoStep(null, AutoAction.SHOOT_3, 5000));
         AUTOTOPLEFT3.addAll(INTAKEBLUEBALLPOSITION3);
-        AUTOTOPLEFT3.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        AUTOTOPLEFT3.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
         AUTOTOPLEFT3.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         AUTOTOPLEFT3.addAll(INTAKEBLUEBALLPOSITION2);
-        AUTOTOPLEFT3.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        AUTOTOPLEFT3.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
         AUTOTOPLEFT3.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         AUTOTOPLEFT3.addAll(INTAKEBLUEBALLPOSITION1);
-        AUTOTOPLEFT3.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        AUTOTOPLEFT3.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
         AUTOTOPLEFT3.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
 
@@ -527,7 +527,7 @@ public class Auto_V2 extends OpMode {
         updateAuto();
 
         // turret auto-aim
-        if (STEPS.get(currentIndex).action == AutoAction.SHOOT_3) {
+        if (!(currentIndex>=STEPS.size()) && STEPS.get(currentIndex).action == AutoAction.SHOOT_3) {
             double turretPower = 0;
             limelight.updateRobotOrientation(imu.getRobotYawPitchRollAngles().getYaw());
             if (autoAimEnabled) {

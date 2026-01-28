@@ -47,7 +47,7 @@ public class FlywheelLogic {
 
     // --- Gate / shot settings ---
     private double gateCloseAngle = 1;
-    private double gateOpenAngle  = 0.78;
+    private double gateOpenAngle  = 0.7;
     private double gateOpenTime   = 0.06;
     private double gateCloseTime  = 0.06;
 
