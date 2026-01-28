@@ -116,9 +116,9 @@ public class FlywheelLogic {
             pPower = kp;
         }
 
-        if (error > 300) {
+        if (error > 250) {
             pPower = 30;
-            ffPower = ffPower * 2;
+            ffPower = ffPower * (error / 250.0);
         }
 
 
