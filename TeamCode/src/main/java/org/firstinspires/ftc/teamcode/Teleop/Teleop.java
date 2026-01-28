@@ -298,16 +298,16 @@ public class Teleop extends OpMode {
 
         //ShooterS2.setPosition(gateHoldBtn.getState()? 0 : 0.2);
         if (shoot3Btn.getState() && !shooter.isBusy()) {
-            shooter.fireShots(1);
+            shooter.fireShots(3);
         }
 
-        if (intakeHoldBtn.getState()) {
+        if (!shooter.isBusy() && intakeHoldBtn.getState()) {
             shooter.getIntake().setIntakeOnVelocity(-1.0);
             shooter.getIntake().intakeReady(true);
-        } else if (intakeReverseHoldBtn.getState() && !shoot3Btn.getState() && !intakeHoldBtn.getState()) {
+        } else if (!shooter.isBusy() && intakeReverseHoldBtn.getState() && !shoot3Btn.getState() && !intakeHoldBtn.getState()) {
             shooter.getIntake().setIntakeOnVelocity(0.5);
             shooter.getIntake().intakeReady(true);
-        } else if (!shoot3Btn.getState() && !intakeHoldBtn.getState() && !intakeReverseHoldBtn.getState()){
+        } else if (!shooter.isBusy() && !shoot3Btn.getState() && !intakeHoldBtn.getState() && !intakeReverseHoldBtn.getState()){
             shooter.getIntake().intakeReady(false);
         }
 

@@ -47,9 +47,9 @@ public class FlywheelLogic {
 
     // --- Gate / shot settings ---
     private double gateCloseAngle = 1;
-    private double gateOpenAngle  = 0.75;
-    private double gateOpenTime   = 0.04;
-    private double gateCloseTime  = 0.04;
+    private double gateOpenAngle  = 0.78;
+    private double gateOpenTime   = 0.06;
+    private double gateCloseTime  = 0.06;
 
     private int shotsRemaining = 0;
 
@@ -116,8 +116,9 @@ public class FlywheelLogic {
             pPower = kp;
         }
 
-        if (error < 500) {
-            pPower = 6;
+        if (error > 300) {
+            pPower = 30;
+            ffPower = ffPower * 2;
         }
 
 
@@ -169,7 +170,7 @@ public class FlywheelLogic {
 //                break;
             case SPIN_UP:
                 if (Math.abs(error) <= 100 || stateTimer.seconds() > flywheelMaxSpinupTime) {
-                    //intake.setIntakeOnVelocity(-0.3);
+                    intake.setIntakeOnVelocity(-0.55);
                     intake.intakeReady(true);
                     ShooterS2.setPosition(gateOpenAngle);
                     stateTimer.reset();
@@ -203,6 +204,7 @@ public class FlywheelLogic {
                         ShooterM1.setPower(0);
                         ShooterM2.setPower(0);
                         intake.intakeReady(false);
+                        intake.setIntakeOnVelocity(-1);
                         flyWheelState = FlywheelState.IDLE;
                     }
                 }

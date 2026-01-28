@@ -5,17 +5,20 @@ import java.lang.Math;
 
 public class FlywheelAndHoodData {
     public static double[] flywheelRanges = new double[] {
-            40, 42.5, 45, 47.5, 50, 52.5, 55, 57.5, 60, 62.5, 65, 67.5, 70, 80, 90, 100, 110
+            52.5, 55, 57.5, 60, 62.5, 65, 67.5, 70, 72.5, 75, 80, 85, 90, 95, 100, 105, 110
     };
+
     public static double[] flywheelValues = new double[] {
-            3300, 3350, 3400, 3525, 3650, 3900, 4050, 4150, 4225, 4275, 4350, 4400, 4405, 4414, 4426, 4438, 4450
+            3250, 3250, 3275, 3300, 3325, 3350, 3400, 3450, 3550, 3600, 3600, 3700, 3800, 3900, 4000, 4050, 4150
     };
     public static double[] hoodRanges = new double[] {
-            40, 45, 47.5, 50, 52.5, 55, 57.5, 60, 62.5, 65, 67.5, 70
+            52.5, 55, 57.5, 60, 62.5, 65, 67.5, 70, 72.5, 75, 80, 85, 90, 95, 100, 105, 110
     };
+
     public static double[] hoodValues = new double[] {
-            0.84, 0.87, 0.89, 0.91, 0.93, 0.945, 0.955, 0.965, 0.975, 0.98, 0.99, 1.0
+            0.88, 0.89, 0.90, 0.90, 0.90, 0.90, 0.90, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.00
     };
+
 
 
     public static AutoShooting lookupA(double distance) {
@@ -36,7 +39,7 @@ public class FlywheelAndHoodData {
             flywheelRPM = 4400;
             hoodAngle = 1.00;
         }*/
-        return new AutoShooting(flywheelRPM, hoodAngle);
+        return new AutoShooting(flywheelRPM - 50, hoodAngle);
     }
 //    public static AutoShooting lookupA(double ta) {
 //        if (ta >= 2.37) return new AutoShooting(3500, 0.90);

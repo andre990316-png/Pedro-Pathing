@@ -93,8 +93,8 @@ public class Auto_V2 extends OpMode {
     private final Pose topRightStartPose = new Pose(124, 118.5, Math.toRadians(36));
 
     //close shoot poses (on big V)
-    private final Pose blueShootPoseClose = new Pose(56.05641748942172, 86.9280677009873, Math.toRadians(137));
-    private final Pose redShootPoseClose = new Pose(87.9435825106, 86.9280677009873, Math.toRadians(137));
+    private final Pose blueShootPoseClose = new Pose(45, 96, Math.toRadians(137));
+    private final Pose redShootPoseClose = new Pose(99, 96, Math.toRadians(137));
 
     //medium shoot poses (on big V)
     private final Pose blueShootPoseMed = new Pose(64,80,Math.toRadians(135));
@@ -228,13 +228,17 @@ public class Auto_V2 extends OpMode {
         AUTOTOPLEFT.addAll(BLUESHOOT3NEAR);
 
         AUTOTOPLEFT3.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
-        AUTOTOPLEFT.addAll(BLUESHOOT3NEAR);
-        AUTOTOPLEFT.addAll(INTAKEBLUEBALLPOSITION3);
-        AUTOTOPLEFT.addAll(BLUESHOOT3NEAR);
-        AUTOTOPLEFT.addAll(INTAKEBLUEBALLPOSITION2);
-        AUTOTOPLEFT.addAll(BLUESHOOT3NEAR);
-        AUTOTOPLEFT.addAll(INTAKEBLUEGATE);
-        AUTOTOPLEFT.addAll(BLUESHOOT3NEAR);
+        AUTOTOPLEFT3.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        AUTOTOPLEFT3.add(new AutoStep(null, AutoAction.SHOOT_3, 5000));
+        AUTOTOPLEFT3.addAll(INTAKEBLUEBALLPOSITION3);
+        AUTOTOPLEFT3.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        AUTOTOPLEFT3.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        AUTOTOPLEFT3.addAll(INTAKEBLUEBALLPOSITION2);
+        AUTOTOPLEFT3.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        AUTOTOPLEFT3.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        AUTOTOPLEFT3.addAll(INTAKEBLUEBALLPOSITION1);
+        AUTOTOPLEFT3.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        AUTOTOPLEFT3.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
 
         //the video has more stuff but they're way faster so i think this is about as far as we're gonna get
@@ -281,7 +285,7 @@ public class Auto_V2 extends OpMode {
 
         AUTOTOPRIGHT2 = AutoStep.flipped(AUTOTOPLEFT2);
 
-        //STEPS.addAll(AUTOTOPLEFT);//change path here
+        STEPS.addAll(AUTOTOPLEFT3);//change path here
     }
 
     // ------------------------------------------------------------
@@ -405,8 +409,7 @@ public class Auto_V2 extends OpMode {
         follower = Constants.createFollower(hardwareMap);
 
         buildSteps();
-        Pose goalPose = AllianceData.getGoalPose();
-        STEPS.addAll(AUTOTOPLEFT);
+        //STEPS.addAll(AUTOTOPLEFT);
 
         Pose start = (!STEPS.isEmpty() && STEPS.get(0).pose != null) ? STEPS.get(0).pose : topLeftStartPose;
         follower.setStartingPose(start);   // recommended for Pedro
@@ -439,63 +442,59 @@ public class Auto_V2 extends OpMode {
         telemetry.update();
     }
 
-    @Override
-    public void init_loop(){
-        if(selectedAuto){
-            telemetry.addLine("auto selected.");
-            telemetry.update();
-        }else{
-            String[] names = {"top left","top right","bottom left","bottom right"};
-            ArrayList<ArrayList<AutoStep>> paths = new ArrayList<>();
-
-            paths.add(AUTOTOPLEFT);
-            paths.add(AUTOTOPRIGHT);
-            paths.add(AUTOBOTTOMLEFT);
-            paths.add(AUTOBOTTOMRIGHT);
-
-            lastinputs = new boolean[inputs.length];
-            for(int i=0; i<inputs.length; i++){
-                lastinputs[i]=inputs[i];
-            }
-            inputs = new boolean[]{gamepad1.dpad_up, gamepad1.dpad_down, gamepad1.a};
-            inputpressed = new boolean[inputs.length];
-            for(int i=0; i<inputs.length; i++){
-                inputpressed[i] = inputs[i]&&!lastinputs[i];
-            }
-            if(inputpressed[0]){
-                PATHNUM--;
-                if(PATHNUM<0){
-                    PATHNUM=names.length-1;
-                }
-            }
-            if(inputpressed[1]){
-                PATHNUM++;
-                if(PATHNUM>names.length-1){
-                    PATHNUM=0;
-                }
-            }
-            if(inputpressed[2]){
-
-                STEPS.clear();
-                STEPS.addAll(paths.get(PATHNUM));
-                Pose start = STEPS.get(0).pose;
-                follower.setStartingPose(start);
-                buildChainsFromSteps();
-                selectedAuto=true;
-
-            }
-
-            telemetry.addLine("select auto plz");
-            for(int i=0; i<names.length; i++){
-                telemetry.addLine(names[i]+(PATHNUM==i?" <":""));
-            }
-            telemetry.update();
-        }
-
-
-
-
-    }
+//    @Override
+//    public void init_loop(){
+//        if(selectedAuto){
+//            telemetry.addLine("auto selected.");
+//            telemetry.update();
+//        }else{
+//            String[] names = {"top left","top right","bottom left","bottom right"};
+//            ArrayList<ArrayList<AutoStep>> paths = new ArrayList<>();
+//
+//            paths.add(AUTOTOPLEFT);
+//            paths.add(AUTOTOPRIGHT);
+//            paths.add(AUTOBOTTOMLEFT);
+//            paths.add(AUTOBOTTOMRIGHT);
+//
+//            lastinputs = new boolean[inputs.length];
+//            for(int i=0; i<inputs.length; i++){
+//                lastinputs[i]=inputs[i];
+//            }
+//            inputs = new boolean[]{gamepad1.dpad_up, gamepad1.dpad_down, gamepad1.a};
+//            inputpressed = new boolean[inputs.length];
+//            for(int i=0; i<inputs.length; i++){
+//                inputpressed[i] = inputs[i]&&!lastinputs[i];
+//            }
+//            if(inputpressed[0]){
+//                PATHNUM--;
+//                if(PATHNUM<0){
+//                    PATHNUM=names.length-1;
+//                }
+//            }
+//            if(inputpressed[1]){
+//                PATHNUM++;
+//                if(PATHNUM>names.length-1){
+//                    PATHNUM=0;
+//                }
+//            }
+//            if(inputpressed[2]){
+//
+//                STEPS.clear();
+//                STEPS.addAll(paths.get(PATHNUM));
+//                Pose start = STEPS.get(0).pose;
+//                follower.setStartingPose(start);
+//                buildChainsFromSteps();
+//                selectedAuto=true;
+//
+//            }
+//
+//            telemetry.addLine("select auto plz");
+//            for(int i=0; i<names.length; i++){
+//                telemetry.addLine(names[i]+(PATHNUM==i?" <":""));
+//            }
+//            telemetry.update();
+//        }
+//    }
 
     @Override
     public void start() {
