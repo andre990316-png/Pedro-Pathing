@@ -88,7 +88,7 @@ public class Teleop extends OpMode {
     private ButtonLogic intakeUpBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);
     private ButtonLogic intakeDownBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);
 
-    //private ButtonLogic gateHoldBtn    = new ButtonLogic(ButtonLogic.Mode.HOLD, false);   // right_trigger
+    private ButtonLogic gateHoldBtn    = new ButtonLogic(ButtonLogic.Mode.HOLD, false);   // right_trigger
     private ButtonLogic shoot3Btn = new ButtonLogic(ButtonLogic.Mode.HOLD, false);   // right_trigger
     private ButtonLogic autoAimHoldBtn = new ButtonLogic(ButtonLogic.Mode.HOLD, false);   // left_trigger
 
@@ -283,7 +283,7 @@ public class Teleop extends OpMode {
         rpmUpBtn.update(gamepad2.dpad_up);
         rpmDownBtn.update(gamepad2.dpad_down);
         shoot3Btn.update(gamepad2.right_trigger > 0.3);
-        //gateHoldBtn.update(gamepad2.right_trigger > 0.03);
+        gateHoldBtn.update(gamepad2.right_trigger > 0.03);
         autoAimHoldBtn.update(gamepad2.left_trigger > 0.3);
         autoSort.update(gamepad2.left_bumper);
         greenBtn.update(gamepad1.a);
@@ -301,16 +301,26 @@ public class Teleop extends OpMode {
         sensitivityDownBtn.update(gamepad1.dpad_down);
         sensitivityUpBtn.update(gamepad1.dpad_up);
 
-        //ShooterS2.setPosition(gateHoldBtn.getState()? 0 : 0.2);
-        if (shoot3Btn.getState() && !shooter.isBusy()) {
+        ShooterS2.setPosition(gateHoldBtn.getState()? 0.7 : 1);
+        /*if (shoot3Btn.getState() && !shooter.isBusy()) {
             shooter.fireShots(3);
+            shooter.getIntake().setIntakeOnVelocity(-0.6);
+            shooter.getIntake().intakeReady(true);
+        }else if (shoot3Btn.getState()) {
+            shooter.getIntake().setIntakeOnVelocity(-0.6);
+            shooter.getIntake().intakeReady(true);
+        }*/
+
+        if (gateHoldBtn.getState()) {
+            shooter.getIntake().setIntakeOnVelocity(-0.4);
+            shooter.getIntake().intakeReady(true);
         }
 
         if (!shooter.isBusy() && intakeHoldBtn.getState()) {
-            shooter.getIntake().setIntakeOnVelocity(Math.abs(IntakeLogic.intakeOnVelocity));
+            shooter.getIntake().setIntakeOnVelocity(-1);
             shooter.getIntake().intakeReady(true);
         } else if (!shooter.isBusy() && intakeReverseHoldBtn.getState() && !shoot3Btn.getState() && !intakeHoldBtn.getState()) {
-            shooter.getIntake().setIntakeOnVelocity(Math.abs(IntakeLogic.intakeOnVelocity) * -1);
+            shooter.getIntake().setIntakeOnVelocity(1);
             shooter.getIntake().intakeReady(true);
         } else if (!shooter.isBusy() && !shoot3Btn.getState() && !intakeHoldBtn.getState() && !intakeReverseHoldBtn.getState()){
             shooter.getIntake().intakeReady(false);
@@ -348,7 +358,7 @@ public class Teleop extends OpMode {
 
         XL = gamepad1.left_stick_x * currentSensitivity;
         YL = -gamepad1.left_stick_y * currentSensitivity;
-        XR = gamepad1.right_stick_x * currentSensitivity;
+        XR = gamepad1.right_stick_x * currentSensitivity * 0.8;
         YR = -gamepad1.right_stick_y * currentSensitivity;
 
         TempMax1 = Math.max(Math.abs(YL + XL + XR), Math.abs((YL - XL) - XR));
@@ -420,7 +430,7 @@ public class Teleop extends OpMode {
             pos = Range.clip(pos, 0.84, 1.0);
             ShooterS1.setPosition(pos);
         }
-        if(intakeUpBtn.justPressed()){
+       /* if(intakeUpBtn.justPressed()){
             IntakeLogic.intakeOnVelocity+=0.05;
             if(IntakeLogic.intakeOnVelocity>0){
                 IntakeLogic.intakeOnVelocity=0;
@@ -431,7 +441,7 @@ public class Teleop extends OpMode {
             if(IntakeLogic.intakeOnVelocity<-1){
                 IntakeLogic.intakeOnVelocity=-1;
             }
-        }
+        }*/
 
         if (!patternLocked) {
 
@@ -440,7 +450,7 @@ public class Teleop extends OpMode {
 
             if (purpleBtn.justPressed() && driverPatternEntry.size() < 3)
                 driverPatternEntry.add(PatternLogic.Color.P);
-            /// TODO: add LED lights to confirm selection
+            /// TODO: add LED lights to confirm selection‎‎
 
             if (patternResetBtn.justPressed()) {
                 driverPatternEntry.clear();
