@@ -50,7 +50,7 @@ public class Teleop extends OpMode {
     private LEDClass LED1 = new LEDClass();
     private LEDClass LED2 = new LEDClass();
     private LEDClass LED3 = new LEDClass();
-    private Servo RGB = null;
+    //private Servo RGB = null;
     private LimelightAim autoAim = new LimelightAim();
     private boolean precisionMode;
     private boolean poseSnapped = false;
@@ -84,6 +84,9 @@ public class Teleop extends OpMode {
     private ButtonLogic hoodDownBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);  // dpad_left
     private ButtonLogic rpmUpBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);  // dpad_up
     private ButtonLogic rpmDownBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);  // dpad_down
+
+    private ButtonLogic intakeUpBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);
+    private ButtonLogic intakeDownBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);
 
     //private ButtonLogic gateHoldBtn    = new ButtonLogic(ButtonLogic.Mode.HOLD, false);   // right_trigger
     private ButtonLogic shoot3Btn = new ButtonLogic(ButtonLogic.Mode.HOLD, false);   // right_trigger
@@ -125,8 +128,8 @@ public class Teleop extends OpMode {
         LED1.init(hardwareMap, 1);
         LED2.init(hardwareMap, 2);
         LED3.init(hardwareMap, 3);
-        RGB = hardwareMap.get(Servo.class, "RGB");
-        RGB.setPosition(0.48);
+        //RGB = hardwareMap.get(Servo.class, "RGB");
+        //RGB.setPosition(0.48);
         ColorSensorLogic.init(hardwareMap);
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(
@@ -254,7 +257,7 @@ public class Teleop extends OpMode {
             }
         }
         LED1.setGreenLED(true);
-        RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.29);
+        //RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.29);
         //teleopGate.update(shooter.getTargetRPM(), gamepad2.right_trigger > 0.3);
         LLResult ll = limelight.getLatestResult();
 
@@ -288,6 +291,8 @@ public class Teleop extends OpMode {
         patternResetBtn.update(gamepad1.start);
         patternConfirmBtn.update(gamepad1.right_bumper);
         intakeHoldBtn.update(gamepad1.left_bumper);
+        intakeUpBtn.update(gamepad1.dpad_right);
+        intakeDownBtn.update(gamepad1.dpad_left);
         intakeReverseHoldBtn.update(gamepad1.left_trigger > 0.3);
         autoFlywheelAndHoodToggleBtn.update(gamepad2.right_bumper);
 
@@ -302,10 +307,10 @@ public class Teleop extends OpMode {
         }
 
         if (!shooter.isBusy() && intakeHoldBtn.getState()) {
-            shooter.getIntake().setIntakeOnVelocity(-1.0);
+            shooter.getIntake().setIntakeOnVelocity(Math.abs(IntakeLogic.intakeOnVelocity));
             shooter.getIntake().intakeReady(true);
         } else if (!shooter.isBusy() && intakeReverseHoldBtn.getState() && !shoot3Btn.getState() && !intakeHoldBtn.getState()) {
-            shooter.getIntake().setIntakeOnVelocity(0.5);
+            shooter.getIntake().setIntakeOnVelocity(Math.abs(IntakeLogic.intakeOnVelocity) * -1);
             shooter.getIntake().intakeReady(true);
         } else if (!shooter.isBusy() && !shoot3Btn.getState() && !intakeHoldBtn.getState() && !intakeReverseHoldBtn.getState()){
             shooter.getIntake().intakeReady(false);
@@ -415,6 +420,18 @@ public class Teleop extends OpMode {
             pos = Range.clip(pos, 0.84, 1.0);
             ShooterS1.setPosition(pos);
         }
+        if(intakeUpBtn.justPressed()){
+            IntakeLogic.intakeOnVelocity+=0.05;
+            if(IntakeLogic.intakeOnVelocity>0){
+                IntakeLogic.intakeOnVelocity=0;
+            }
+        }
+        if(intakeDownBtn.justPressed()){
+            IntakeLogic.intakeOnVelocity-=0.05;
+            if(IntakeLogic.intakeOnVelocity<-1){
+                IntakeLogic.intakeOnVelocity=-1;
+            }
+        }
 
         if (!patternLocked) {
 
@@ -492,6 +509,7 @@ public class Teleop extends OpMode {
             telemetry.addData("LLPose", "no valid tag");
         }
         telemetry.addData("DistanceToGoal", distToGoal);
+        telemetry.addData("Intake speed", IntakeLogic.intakeOnVelocity);
         telemetry.update();
     }
 }

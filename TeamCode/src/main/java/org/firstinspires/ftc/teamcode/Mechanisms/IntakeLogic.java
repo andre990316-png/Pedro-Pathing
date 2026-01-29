@@ -14,8 +14,8 @@ public class IntakeLogic {
     }
     private IntakeState intakeState;
     private boolean startIntake = false;
-    private double intakeOffVelocity = -0.3;
-    private double intakeOnVelocity = -1;
+    public static double intakeOffVelocity = 0;
+    public static double intakeOnVelocity = -0.5;
     public void init(HardwareMap hardwareMap) {
         IntakeMotor = hardwareMap.get(DcMotor.class, "Intake Motor");
         intakeState = IntakeState.IDLE;
