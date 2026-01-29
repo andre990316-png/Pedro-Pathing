@@ -229,7 +229,7 @@ public class Auto_V2 extends OpMode {
 
         AUTOTOPLEFT3.add(new AutoStep(topLeftStartPose, AutoAction.INTAKE_ON, 0));
         AUTOTOPLEFT3.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
-        AUTOTOPLEFT3.add(new AutoStep(null, AutoAction.SHOOT_3, 5000));
+        AUTOTOPLEFT3.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         AUTOTOPLEFT3.addAll(INTAKEBLUEBALLPOSITION3);
         AUTOTOPLEFT3.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
         AUTOTOPLEFT3.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
@@ -514,6 +514,7 @@ public class Auto_V2 extends OpMode {
         follower.update();
         shooter.update();
 
+        RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.29);
         Auto_lastPose.currentPose = follower.getPose();
 
         Pose robotPose = follower.getPose();
