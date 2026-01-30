@@ -330,6 +330,7 @@ public class Auto_V2 extends OpMode {
 
             case INTAKE_ON:
                 // You were already using shooter.getIntake().intakeReady(true)
+                shooter.getIntake().setIntakeOnVelocity(-1);
                 shooter.getIntake().intakeReady(true);
                 break;
 
@@ -338,7 +339,8 @@ public class Auto_V2 extends OpMode {
                 break;
 
             case SHOOT_3:
-                shooter.fireShots(3);
+                shooter.getIntake().setIntakeOnVelocity(-0.4);
+                shooter.fireShots(3);///TODO: fix
                 waitingForShooter = shooter.isBusy();   // keep your existing blocking behavior
                 if (!waitingForShooter) actionActioned = false;  // retry SHOOT_3 next loop
                 break;
@@ -367,9 +369,13 @@ public class Auto_V2 extends OpMode {
 
         // 2) 正在射球就卡在這裡，直到射完
         if (waitingForShooter) {
-            if (shooter.isBusy()) return;   // shooter 還忙
-            waitingForShooter = false;      // shooter 完成
+            if (!shooter.isBusy()) {
+                waitingForShooter = false;
+            } else {
+                return;
+            }
         }
+
 
         // 3) Pause（如果你有用 PAUSE_MS）
         if (pauseEndTimeMs > 0) {

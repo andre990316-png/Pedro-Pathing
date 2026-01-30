@@ -42,16 +42,18 @@ public class FlywheelLogic {
     }
 
     // --- State machine ---
-    private enum FlywheelState { IDLE, SPIN_UP, LAUNCH, RESET_GATE }
+    private enum FlywheelState { IDLE, SPIN_UP, LAUNCH}
     private FlywheelState flyWheelState = FlywheelState.IDLE;
 
     // --- Gate / shot settings ---
     private double gateCloseAngle = 1;
     private double gateOpenAngle  = 0.7;
-    private double gateOpenTime   = 0.06;
-    private double gateCloseTime  = 0.06;
+//    private double gateOpenTime   = 0.06;
+//    private double gateCloseTime  = 0.06;
+private double launchTime = 3.5; // seconds gate stays open
 
     private int shotsRemaining = 0;
+    private double singleShotTime = 2;
 
     // --- Velocity targets (RPM) ---
     private double targetRPM = 0;
@@ -169,59 +171,65 @@ public class FlywheelLogic {
 //                }
 //                break;
             case SPIN_UP:
+                stateTimer.reset();
                 if (Math.abs(error) <= 100 || stateTimer.seconds() > flywheelMaxSpinupTime) {
-                    intake.setIntakeOnVelocity(-0.55);
-                    intake.intakeReady(true);
                     ShooterS2.setPosition(gateOpenAngle);
+                    intake.setIntakeOnVelocity(-0.4);
                     stateTimer.reset();
                     flyWheelState = FlywheelState.LAUNCH;
                 }
                 break;
-            case LAUNCH:
-                if (stateTimer.seconds() > gateOpenTime) {
-                    shotsRemaining -= 1;
-                    intake.intakeReady(false);
-                    if (swapNextTwoBalls)
-                        swaped++;
-                    ShooterS2.setPosition(gateCloseAngle);
-                    stateTimer.reset();
-                    flyWheelState = FlywheelState.RESET_GATE;
-                }
-                break;
 
-            case RESET_GATE:
-                if (stateTimer.seconds() > gateCloseTime) {
+            case LAUNCH:
+                if (stateTimer.seconds() > singleShotTime) {
+                    shotsRemaining--;
                     if (shotsRemaining > 0) {
-                        if (swapNextTwoBalls && swaped == 1)
-                            switchAngle = false;
-                        else if (swapNextTwoBalls && swaped == 2) {
-                            swapNextTwoBalls = false;
-                            swaped = 0;
-                        }
+                        intake.setIntakeOnVelocity(-0.4);
+                        intake.intakeReady(true);
                         stateTimer.reset();
-                        flyWheelState = FlywheelState.SPIN_UP;
                     } else {
                         ShooterM1.setPower(0);
                         ShooterM2.setPower(0);
                         intake.intakeReady(false);
-                        intake.setIntakeOnVelocity(-1);
+                        ShooterS2.setPosition(gateCloseAngle);
                         flyWheelState = FlywheelState.IDLE;
                     }
                 }
+
                 break;
+
+//            case RESET_GATE:
+//                if (stateTimer.seconds() > gateCloseTime) {
+//                    if (shotsRemaining > 0) {
+//                        if (swapNextTwoBalls && swaped == 1)
+//                            switchAngle = false;
+//                        else if (swapNextTwoBalls && swaped == 2) {
+//                            swapNextTwoBalls = false;
+//                            swaped = 0;
+//                        }
+//                        stateTimer.reset();
+//                        flyWheelState = FlywheelState.SPIN_UP;
+//                    } else {
+//                        ShooterM1.setPower(0);
+//                        ShooterM2.setPower(0);
+//                        intake.intakeReady(false);
+//                        intake.setIntakeOnVelocity(-1);
+//                        flyWheelState = FlywheelState.IDLE;
+//                    }
+//                }
+//                break;
         }
     }
     public void fireShots(int numberOfShots) {
         if (flyWheelState == FlywheelState.IDLE) {
             shotsRemaining = numberOfShots;
-            if (shotsRemaining > 0) {
-                intake.intakeReady(true);
-                stateTimer.reset();
-                flyWheelState = FlywheelState.SPIN_UP;
-            }
+            singleShotTime = launchTime / numberOfShots;
 
+            stateTimer.reset();
+            flyWheelState = FlywheelState.SPIN_UP;
         }
     }
+
     public boolean isBusy() {
         return flyWheelState != FlywheelState.IDLE;
     }
