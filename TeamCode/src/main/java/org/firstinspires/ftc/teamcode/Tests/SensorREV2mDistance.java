@@ -33,6 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.firstinspires.ftc.teamcode.Tests;
 
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -50,6 +51,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
  * See the sensor's product page: https://www.revrobotics.com/rev-31-1505/
  */
 @TeleOp(name = "Sensor: REV2mDistance", group = "Sensor")
+@Disabled
 public class SensorREV2mDistance extends LinearOpMode {
 
     private DistanceSensor sensorDistance;
@@ -57,7 +59,7 @@ public class SensorREV2mDistance extends LinearOpMode {
     @Override
     public void runOpMode() {
         // you can use this as a regular DistanceSensor.
-        sensorDistance = hardwareMap.get(DistanceSensor.class, "sensor_distance");
+        sensorDistance = hardwareMap.get(DistanceSensor.class, "sensor distance");
 
         // you can also cast this to a Rev2mDistanceSensor if you want to use added
         // methods associated with the Rev2mDistanceSensor class.

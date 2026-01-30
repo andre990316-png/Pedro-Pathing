@@ -514,7 +514,7 @@ public class Auto_V2 extends OpMode {
         follower.update();
         shooter.update();
 
-        RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.29);
+        //RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.29);
         Auto_lastPose.currentPose = follower.getPose();
 
         Pose robotPose = follower.getPose();
