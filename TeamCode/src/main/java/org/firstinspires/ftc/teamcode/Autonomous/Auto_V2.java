@@ -146,6 +146,11 @@ public class Auto_V2 extends OpMode {
     // Build Steps (pose + action) ONCE
     // Action runs when the segment STARTS (before followPath).
     // ------------------------------------------------------------
+
+    public static String[] autonames = {"top left","top right","bottom left","bottom right"};
+    ArrayList<ArrayList<AutoStep>> paths = new ArrayList<>();
+
+
     private void buildSteps() {
 
         STEPS.clear();
@@ -308,6 +313,13 @@ public class Auto_V2 extends OpMode {
 
             telemetry.addData("Auto Path", "BLUE (Left Side)");
         }
+
+        paths.add(AUTOTOPLEFT3);
+        paths.add(AUTOTOPRIGHT3);
+        paths.add(AUTOBOTTOMLEFT);
+        paths.add(AUTOBOTTOMRIGHT);
+
+
 
     }
 
@@ -479,59 +491,52 @@ public class Auto_V2 extends OpMode {
         telemetry.update();
     }
 
-//    @Override
-//    public void init_loop(){
-//        if(selectedAuto){
-//            telemetry.addLine("auto selected.");
-//            telemetry.update();
-//        }else{
-//            String[] names = {"top left","top right","bottom left","bottom right"};
-//            ArrayList<ArrayList<AutoStep>> paths = new ArrayList<>();
-//
-//            paths.add(AUTOTOPLEFT);
-//            paths.add(AUTOTOPRIGHT);
-//            paths.add(AUTOBOTTOMLEFT);
-//            paths.add(AUTOBOTTOMRIGHT);
-//
-//            lastinputs = new boolean[inputs.length];
-//            for(int i=0; i<inputs.length; i++){
-//                lastinputs[i]=inputs[i];
-//            }
-//            inputs = new boolean[]{gamepad1.dpad_up, gamepad1.dpad_down, gamepad1.a};
-//            inputpressed = new boolean[inputs.length];
-//            for(int i=0; i<inputs.length; i++){
-//                inputpressed[i] = inputs[i]&&!lastinputs[i];
-//            }
-//            if(inputpressed[0]){
-//                PATHNUM--;
-//                if(PATHNUM<0){
-//                    PATHNUM=names.length-1;
-//                }
-//            }
-//            if(inputpressed[1]){
-//                PATHNUM++;
-//                if(PATHNUM>names.length-1){
-//                    PATHNUM=0;
-//                }
-//            }
-//            if(inputpressed[2]){
-//
-//                STEPS.clear();
-//                STEPS.addAll(paths.get(PATHNUM));
-//                Pose start = STEPS.get(0).pose;
-//                follower.setStartingPose(start);
-//                buildChainsFromSteps();
-//                selectedAuto=true;
-//
-//            }
-//
-//            telemetry.addLine("select auto plz");
-//            for(int i=0; i<names.length; i++){
-//                telemetry.addLine(names[i]+(PATHNUM==i?" <":""));
-//            }
-//            telemetry.update();
-//        }
-//    }
+    @Override
+    public void init_loop(){
+        if(selectedAuto){
+            telemetry.addLine("auto selected.");
+            telemetry.update();
+        }else{
+
+            lastinputs = new boolean[inputs.length];
+            for(int i=0; i<inputs.length; i++){
+                lastinputs[i]=inputs[i];
+            }
+            inputs = new boolean[]{gamepad1.dpad_up, gamepad1.dpad_down, gamepad1.a};
+            inputpressed = new boolean[inputs.length];
+            for(int i=0; i<inputs.length; i++){
+                inputpressed[i] = inputs[i]&&!lastinputs[i];
+            }
+            if(inputpressed[0]){
+                PATHNUM--;
+                if(PATHNUM<0){
+                    PATHNUM=autonames.length-1;
+                }
+            }
+            if(inputpressed[1]){
+                PATHNUM++;
+                if(PATHNUM>autonames.length-1){
+                    PATHNUM=0;
+                }
+            }
+            if(inputpressed[2]){
+
+                STEPS.clear();
+                STEPS.addAll(paths.get(PATHNUM));
+                Pose start = STEPS.get(0).pose;
+                follower.setStartingPose(start);
+                buildChainsFromSteps();
+                selectedAuto=true;
+
+            }
+
+            telemetry.addLine("select auto plz");
+            for(int i=0; i<autonames.length; i++){
+                telemetry.addLine(autonames[i]+(PATHNUM==i?" <":""));
+            }
+            telemetry.update();
+        }
+    }
 
     @Override
     public void start() {

@@ -23,6 +23,7 @@ import org.firstinspires.ftc.teamcode.Mechanisms.FlywheelLogic;
 import java.util.ArrayList;
 
 @Autonomous(name = "Auto_V3")
+
 public class Auto_V3 extends OpMode {
 
     // Motors / hardware
