@@ -49,8 +49,8 @@ public class FlywheelLogic {
     private double gateCloseAngle = 1;
     private double gateOpenAngle  = 0.7;
 //    private double gateOpenTime   = 0.06;
-//    private double gateCloseTime  = 0.06;
-private double launchTime = 3.5; // seconds gate stays open
+//    private double gateCloseTime  = 0.06;s
+private double launchTime = 2; // seconds gate stays open
 
     private int shotsRemaining = 0;
     private double singleShotTime = 2;
