@@ -62,6 +62,8 @@ public class Auto_V2 extends OpMode {
     private ArrayList<AutoStep> AUTOTOPLEFT = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTOPLEFT2 = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTOPLEFT3 = new ArrayList<>();
+    private ArrayList<AutoStep> AUTOTOPLEFT4 = new ArrayList<>();
+    private ArrayList<AutoStep> AUTOTOPRIGHT4 = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTOPRIGHT2 = new ArrayList<>();
     private ArrayList<AutoStep> AUTOBOTTOMLEFT = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTOPRIGHT = new ArrayList<>();
@@ -238,6 +240,16 @@ public class Auto_V2 extends OpMode {
         AUTOTOPLEFT3.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
         AUTOTOPLEFT3.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
+        AUTOTOPLEFT4.add(new AutoStep(topLeftStartPose, AutoAction.INTAKE_ON, 0));
+        AUTOTOPLEFT4.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
+        AUTOTOPLEFT4.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        AUTOTOPLEFT4.addAll(INTAKEBLUEBALLPOSITION3);
+        AUTOTOPLEFT4.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
+        AUTOTOPLEFT4.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        AUTOTOPLEFT4.addAll(INTAKEBLUEBALLPOSITION2);
+        AUTOTOPLEFT4.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
+        AUTOTOPLEFT4.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+
 
         //the video has more stuff but they're way faster so i think this is about as far as we're gonna get
 
@@ -282,6 +294,7 @@ public class Auto_V2 extends OpMode {
         AUTOBOTTOMRIGHT = AutoStep.flipped(AUTOBOTTOMLEFT);
 
         AUTOTOPRIGHT2 = AutoStep.flipped(AUTOTOPLEFT2);
+        AUTOTOPRIGHT4 = AutoStep.flipped(AUTOTOPLEFT4);
 
         if (AllianceData.isRed()) {
 
