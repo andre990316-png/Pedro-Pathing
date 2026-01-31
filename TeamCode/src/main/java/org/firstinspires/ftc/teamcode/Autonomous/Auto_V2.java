@@ -152,6 +152,7 @@ public class Auto_V2 extends OpMode {
 
 
     private void buildSteps() {
+        paths.clear();
 
         STEPS.clear();
         AUTOTEST.clear();
@@ -300,10 +301,11 @@ public class Auto_V2 extends OpMode {
 
         AUTOTOPRIGHT2 = AutoStep.flipped(AUTOTOPLEFT2);
         AUTOTOPRIGHT4 = AutoStep.flipped(AUTOTOPLEFT4);
+        AUTOTOPRIGHT3 = AutoStep.flipped(AUTOTOPLEFT3);
 
         if (AllianceData.isRed()) {
 
-            AUTOTOPRIGHT3 = AutoStep.flipped(AUTOTOPLEFT3);
+
             STEPS.addAll(AUTOTOPRIGHT3);
 
             telemetry.addData("Auto Path", "RED (Right Side)");
@@ -523,9 +525,12 @@ public class Auto_V2 extends OpMode {
 
                 STEPS.clear();
                 STEPS.addAll(paths.get(PATHNUM));
-                Pose start = STEPS.get(0).pose;
-                follower.setStartingPose(start);
                 buildChainsFromSteps();
+                if(PATHNUM==0||PATHNUM==2){
+                    AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
+                }else{
+                    AllianceData.selectedAlliance = AllianceData.Alliance.RED;
+                }
                 selectedAuto=true;
 
             }
@@ -542,6 +547,7 @@ public class Auto_V2 extends OpMode {
     public void start() {
         opModeTimer.resetTimer();
         pathTimer.resetTimer();
+        follower.setPose(STEPS.get(0).pose);
 
         currentIndex = 0;
         pauseEndTimeMs = 0;
