@@ -75,9 +75,9 @@ public class LimelightAim {
 
             turretPower = Range.clip(turretPower, -maxTurretPower, maxTurretPower);
 
-            if (Math.abs(tx) > deadband && Math.abs(turretPower) < minTurretPower) {
-                turretPower = Math.copySign(minTurretPower, turretPower);
-            }
+//            if (Math.abs(tx) > deadband && Math.abs(turretPower) < minTurretPower) {
+//                turretPower = Math.copySign(minTurretPower, turretPower);
+//            }
 
             lastTx = tx;
             lastAimTime = runtimeSeconds;
