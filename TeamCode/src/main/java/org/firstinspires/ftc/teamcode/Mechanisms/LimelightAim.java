@@ -22,7 +22,6 @@ public class LimelightAim {
     /** Convert your pipeline name -> number (so opmodes can call pipelineSwitch(int)). */
     public static int pipelineFromName(String name) {
         currentPipeline = name;
-        if (name == null) return 3;
         switch (name) {
             case "GPP": return 0;
             case "PGP": return 1;

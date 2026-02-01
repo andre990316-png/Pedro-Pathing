@@ -250,9 +250,9 @@ public class Auto_V2 extends OpMode {
         AUTOTOPLEFT4.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
         AUTOTOPLEFT4.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
-        INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
-        INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2End, AutoAction.NONE, 0));
-        INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueGateIntakePose, AutoAction.NONE, 3000));
+        AUTOTOPLEFT4.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
+        AUTOTOPLEFT4.add(new AutoStep(blueBallPosition2End, AutoAction.NONE, 0));
+        AUTOTOPLEFT4.add(new AutoStep(blueGateIntakePose, AutoAction.NONE, 3000));
         AUTOTOPLEFT4.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
         AUTOTOPLEFT4.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
@@ -314,18 +314,18 @@ public class Auto_V2 extends OpMode {
         if (AllianceData.isRed()) {
 
 
-            STEPS.addAll(AUTOTOPRIGHT3);
+            STEPS.addAll(AUTOTOPRIGHT);
 
             telemetry.addData("Auto Path", "RED (Right Side)");
         } else {
 
-            STEPS.addAll(AUTOTOPLEFT3);
+            STEPS.addAll(AUTOTOPLEFT);
 
             telemetry.addData("Auto Path", "BLUE (Left Side)");
         }
 
-        paths.add(AUTOTOPLEFT3);
-        paths.add(AUTOTOPRIGHT3);
+        paths.add(AUTOTOPLEFT);
+        paths.add(AUTOTOPRIGHT);
         paths.add(AUTOBOTTOMLEFT);
         paths.add(AUTOBOTTOMRIGHT);
 
