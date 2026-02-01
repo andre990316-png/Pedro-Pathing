@@ -105,6 +105,7 @@ public class Teleop extends OpMode {
     private ButtonLogic precisionModeHoldBtn = new ButtonLogic(ButtonLogic.Mode.HOLD, false);//gamepad1.right_trigger
     private ButtonLogic sensitivityUpBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);//gamepad1.dpad_up
     private ButtonLogic sensitivityDownBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);//gamepad1.dpad_down
+    private ButtonLogic fieldOrientedModeToggleBtn = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);
     private Follower follower;
 
     private Pose selectedStartPose;
@@ -296,12 +297,12 @@ public class Teleop extends OpMode {
         purpleBtn.update(gamepad1.x);
         patternResetBtn.update(gamepad1.start);
         patternConfirmBtn.update(gamepad1.right_bumper);
-        intakeHoldBtn.update(gamepad1.left_trigger > 0.3);
         intakeUpBtn.update(gamepad1.dpad_right);
         intakeDownBtn.update(gamepad1.dpad_left);
+        intakeHoldBtn.update(gamepad1.left_trigger > 0.3);
         intakeReverseHoldBtn.update(gamepad1.left_bumper);
         autoFlywheelAndHoodToggleBtn.update(gamepad2.right_bumper);
-
+        fieldOrientedModeToggleBtn.update(gamepad1.right_bumper);
         precisionModeHoldBtn.update(gamepad1.right_trigger > 0.3);
         //precisionModeToggleBtn.update(gamepad1.right_bumper);
         sensitivityDownBtn.update(gamepad1.dpad_down);
@@ -362,10 +363,34 @@ public class Teleop extends OpMode {
             currentSensitivity = Sensitivity;
         }
 
-        XL = gamepad1.left_stick_x * currentSensitivity;
-        YL = -gamepad1.left_stick_y * currentSensitivity;
-        XR = gamepad1.right_stick_x * currentSensitivity * 0.8;
-        YR = -gamepad1.right_stick_y * currentSensitivity;
+        // Raw joystick (FIELD intent)
+        double fieldStrafe  = gamepad1.left_stick_x;
+        double fieldForward = -gamepad1.left_stick_y;
+        double rotation = gamepad1.right_stick_x * 0.8;
+
+        double strafe;
+        double forward;
+
+        if (fieldOrientedModeToggleBtn.getState()) {
+            double heading = follower.getPose().getHeading();
+
+            double cos = Math.cos(heading);
+            double sin = Math.sin(heading);
+
+            strafe  = fieldStrafe * cos + fieldForward * sin;
+            forward = -fieldStrafe * sin + fieldForward * cos;
+        } else {
+            strafe  = fieldStrafe;
+            forward = fieldForward;
+        }
+
+        strafe  *= currentSensitivity;
+        forward *= currentSensitivity;
+        rotation *= currentSensitivity * 0.8;
+
+        XL = strafe;
+        YL = forward;
+        XR = rotation;
 
         TempMax1 = Math.max(Math.abs(YL + XL + XR), Math.abs((YL - XL) - XR));
         TempMax2 = Math.max(Math.abs((YL - XL) + XR), Math.abs((YL + XL) - XR));
