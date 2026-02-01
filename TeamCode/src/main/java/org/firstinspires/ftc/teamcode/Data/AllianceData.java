@@ -10,7 +10,7 @@ public class AllianceData {
     }
 
     // Selected alliance (set in init_loop)
-    public static Alliance selectedAlliance = Alliance.RED; // default
+    public static Alliance selectedAlliance = Alliance.BLUE; // default
 
     // Fixed poses
     private static final Pose BLUE_GOAL_POSE =
