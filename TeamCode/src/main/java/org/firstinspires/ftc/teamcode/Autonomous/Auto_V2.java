@@ -528,14 +528,16 @@ public class Auto_V2 extends OpMode {
                 buildChainsFromSteps();
                 if(PATHNUM==0||PATHNUM==2){
                     AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
+                    limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
                 }else{
                     AllianceData.selectedAlliance = AllianceData.Alliance.RED;
+                    limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
                 }
                 selectedAuto=true;
 
             }
 
-            telemetry.addLine("select auto plz");
+            telemetry.addLine("select auto plz (A)");
             for(int i=0; i<autonames.length; i++){
                 telemetry.addLine(autonames[i]+(PATHNUM==i?" <":""));
             }
