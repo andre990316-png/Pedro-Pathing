@@ -7,11 +7,11 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class LimelightAim {
 
     // ===== tunables =====
-    public double Kp = 0.023;
+    public double Kp = 0.017 ;
     public double Kd = 0.0003;
-    public double deadband = 0.3;
+    public double deadband = 0.1;
     public double maxTurretPower = 1.0;
-    public double minTurretPower = 0.12;
+    public double minTurretPower = 0.09;
     public static String currentPipeline;
 
     // ===== history =====
@@ -75,9 +75,9 @@ public class LimelightAim {
 
             turretPower = Range.clip(turretPower, -maxTurretPower, maxTurretPower);
 
-//            if (Math.abs(tx) > deadband && Math.abs(turretPower) < minTurretPower) {
-//                turretPower = Math.copySign(minTurretPower, turretPower);
-//            }
+            if (Math.abs(tx) > deadband && Math.abs(turretPower) < minTurretPower) {
+                turretPower = Math.copySign(minTurretPower, turretPower);
+            }
 
             lastTx = tx;
             lastAimTime = runtimeSeconds;

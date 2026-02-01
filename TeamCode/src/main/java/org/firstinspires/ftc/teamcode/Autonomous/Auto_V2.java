@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -31,7 +32,7 @@ public class Auto_V2 extends OpMode {
     private LEDClass LED1 = new LEDClass();
     private LEDClass LED2 = new LEDClass();
     private LEDClass LED3 = new LEDClass();
-    //private Servo RGB = null;
+    private Servo RGB = null;
     private Follower follower;
     private Timer pathTimer, opModeTimer;
     private Pose goalPose;
@@ -503,11 +504,11 @@ public class Auto_V2 extends OpMode {
         LED1.init(hardwareMap, 1);
         LED2.init(hardwareMap, 2);
         LED3.init(hardwareMap, 3);
-        //RGB = hardwareMap.get(Servo.class, "RGB");
+        RGB = hardwareMap.get(Servo.class, "RGB");
         LED1.setGreenLED(true);
         LED2.setGreenLED(true);
         LED3.setGreenLED(true);
-        //RGB.setPosition(0.48);
+        RGB.setPosition(0.48);
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
@@ -610,7 +611,7 @@ public class Auto_V2 extends OpMode {
         follower.update();
         shooter.update();
 
-        //RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.29);
+        RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.29);
         Auto_lastPose.currentPose = follower.getPose();
 
         Pose robotPose = follower.getPose();

@@ -50,7 +50,7 @@ public class Teleop extends OpMode {
     private LEDClass LED1 = new LEDClass();
     private LEDClass LED2 = new LEDClass();
     private LEDClass LED3 = new LEDClass();
-    //private Servo RGB = null;
+    private Servo RGB = null;
     private LimelightAim autoAim = new LimelightAim();
     private boolean precisionMode;
     private boolean poseSnapped = false;
@@ -131,8 +131,8 @@ public class Teleop extends OpMode {
         LED1.init(hardwareMap, 1);
         LED2.init(hardwareMap, 2);
         LED3.init(hardwareMap, 3);
-        //RGB = hardwareMap.get(Servo.class, "RGB");
-        //RGB.setPosition(0.48);
+        RGB = hardwareMap.get(Servo.class, "RGB");
+        RGB.setPosition(0.48);
         ColorSensorLogic.init(hardwareMap);
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(
@@ -263,7 +263,7 @@ public class Teleop extends OpMode {
             }
         }
         LED1.setGreenLED(true);
-        //RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.29);
+        RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.29);
         //teleopGate.update(shooter.getTargetRPM(), gamepad2.right_trigger > 0.3);
         LLResult ll = limelight.getLatestResult();
 
