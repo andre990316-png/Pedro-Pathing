@@ -467,6 +467,7 @@ public class Auto_V2 extends OpMode {
         // 7) 進下一步
         currentIndex++;
         actionActioned = false;
+        stuckon=0;
     }
 
     @Override
