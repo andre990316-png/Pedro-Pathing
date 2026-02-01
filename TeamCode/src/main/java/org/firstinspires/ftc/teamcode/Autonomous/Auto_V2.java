@@ -131,7 +131,7 @@ public class Auto_V2 extends OpMode {
     private final Pose redLoadingZoneEnd = new Pose(133.8,10, Math.toRadians(0));
 
     //gate and intake poses
-    private final Pose blueGateIntakePose = new Pose(11,62, Math.toRadians(120));
+    private final Pose blueGateIntakePose = new Pose(11,55, Math.toRadians(130));
     private final Pose redGateIntakePose = new Pose(11,62, Math.toRadians(120));
 
 
@@ -252,17 +252,25 @@ public class Auto_V2 extends OpMode {
         AUTOTOPLEFT4.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
         AUTOTOPLEFT4.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
-        AUTOTOPLEFT4.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
-        AUTOTOPLEFT4.add(new AutoStep(blueBallPosition2End, AutoAction.NONE, 0));
-        AUTOTOPLEFT4.add(new AutoStep(blueGateIntakePose, AutoAction.NONE, 3000));
+//        AUTOTOPLEFT4.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
+//        AUTOTOPLEFT4.add(new AutoStep(blueBallPosition2End, AutoAction.NONE, 0));
+//        AUTOTOPLEFT4.add(new AutoStep(blueGateIntakePose, AutoAction.NONE, 3000));
+        AUTOTOPLEFT4.addAll(INTAKEBLUEBALLPOSITION2);
         AUTOTOPLEFT4.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
         AUTOTOPLEFT4.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
-        AUTOTOPLEFT4.addAll(INTAKEBLUEBALLPOSITION1);
+
+        AUTOTOPLEFT4.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
+        AUTOTOPLEFT4.add(new AutoStep(blueGateIntakePose, AutoAction.NONE, 1500));
+        AUTOTOPLEFT4.add(new AutoStep(blueBallPosition2Start, AutoAction.NONE, 0));
         AUTOTOPLEFT4.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
         AUTOTOPLEFT4.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
         AUTOTOPLEFT4.addAll(INTAKEBLUEBALLPOSITION3);
+        AUTOTOPLEFT4.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
+        AUTOTOPLEFT4.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+
+        AUTOTOPLEFT4.addAll(INTAKEBLUEBALLPOSITION1);
         AUTOTOPLEFT4.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
         AUTOTOPLEFT4.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
