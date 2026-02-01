@@ -534,6 +534,14 @@ public class Auto_V2 extends OpMode {
                 STEPS.clear();
                 STEPS.addAll(paths.get(PATHNUM));
                 buildChainsFromSteps();
+
+                currentIndex = 0;
+                actionActioned = false;
+                waitingForShooter = false;
+                pauseEndTimeMs = 0;
+
+                follower.setStartingPose(STEPS.get(0).pose);
+
                 if(PATHNUM==0||PATHNUM==2){
                     AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
                     limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
@@ -541,9 +549,10 @@ public class Auto_V2 extends OpMode {
                     AllianceData.selectedAlliance = AllianceData.Alliance.RED;
                     limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
                 }
-                selectedAuto=true;
 
+                selectedAuto=true;
             }
+
 
             telemetry.addLine("select auto plz (A)");
             for(int i=0; i<autonames.length; i++){

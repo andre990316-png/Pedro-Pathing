@@ -170,33 +170,35 @@ private double launchTime = 2; // seconds gate stays open
 //                    flyWheelState = FlywheelState.SPIN_UP;
 //                }
 //                break;
-            case SPIN_UP:
-                stateTimer.reset();
-                if (Math.abs(error) <= 100 || stateTimer.seconds() > flywheelMaxSpinupTime) {
-                    ShooterS2.setPosition(gateOpenAngle);
-                    intake.setIntakeOnVelocity(-0.4);
-                    stateTimer.reset();
-                    flyWheelState = FlywheelState.LAUNCH;
-                }
-                break;
 
-            case LAUNCH:
-                if (stateTimer.seconds() > singleShotTime) {
-                    shotsRemaining--;
-                    if (shotsRemaining > 0) {
+                case SPIN_UP:
+                    if (Math.abs(error) <= 100 || stateTimer.seconds() > flywheelMaxSpinupTime) {
+                        ShooterS2.setPosition(gateOpenAngle);
                         intake.setIntakeOnVelocity(-0.4);
                         intake.intakeReady(true);
                         stateTimer.reset();
-                    } else {
-                        ShooterM1.setPower(0);
-                        ShooterM2.setPower(0);
-                        intake.intakeReady(false);
-                        ShooterS2.setPosition(gateCloseAngle);
-                        flyWheelState = FlywheelState.IDLE;
+                        flyWheelState = FlywheelState.LAUNCH;
                     }
-                }
+                    break;
 
-                break;
+                case LAUNCH:
+                    if (stateTimer.seconds() > singleShotTime) {
+                        shotsRemaining--;
+                        if (shotsRemaining > 0) {
+                            intake.setIntakeOnVelocity(-0.4);
+                            intake.intakeReady(true);
+                            stateTimer.reset();
+                            flyWheelState = FlywheelState.SPIN_UP;
+                        } else {
+                            ShooterM1.setPower(0);
+                            ShooterM2.setPower(0);
+                            intake.intakeReady(false);
+                            ShooterS2.setPosition(gateCloseAngle);
+                            flyWheelState = FlywheelState.IDLE;
+                        }
+                    }
+                    break;
+
 
 //            case RESET_GATE:
 //                if (stateTimer.seconds() > gateCloseTime) {
