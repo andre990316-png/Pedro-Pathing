@@ -131,7 +131,7 @@ public class Auto_V2 extends OpMode {
     private final Pose redLoadingZoneEnd = new Pose(133.8,10, Math.toRadians(0));
 
     //gate and intake poses
-    private final Pose blueGateIntakePose = new Pose(11,62, Math.toRadians(120));
+    private final Pose blueGateIntakePose = new Pose(13,54, Math.toRadians(140));
     private final Pose redGateIntakePose = new Pose(11,62, Math.toRadians(120));
 
 
@@ -252,17 +252,25 @@ public class Auto_V2 extends OpMode {
         AUTOTOPLEFT4.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
         AUTOTOPLEFT4.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
-        AUTOTOPLEFT4.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
-        AUTOTOPLEFT4.add(new AutoStep(blueBallPosition2End, AutoAction.NONE, 0));
-        AUTOTOPLEFT4.add(new AutoStep(blueGateIntakePose, AutoAction.NONE, 3000));
+//        AUTOTOPLEFT4.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
+//        AUTOTOPLEFT4.add(new AutoStep(blueBallPosition2End, AutoAction.NONE, 0));
+//        AUTOTOPLEFT4.add(new AutoStep(blueGateIntakePose, AutoAction.NONE, 3000));
+        AUTOTOPLEFT4.addAll(INTAKEBLUEBALLPOSITION2);
         AUTOTOPLEFT4.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
         AUTOTOPLEFT4.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
-        AUTOTOPLEFT4.addAll(INTAKEBLUEBALLPOSITION1);
+
+        AUTOTOPLEFT4.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
+        AUTOTOPLEFT4.add(new AutoStep(blueGateIntakePose, AutoAction.NONE, 1500));
+        AUTOTOPLEFT4.add(new AutoStep(blueBallPosition2Start, AutoAction.NONE, 0));
         AUTOTOPLEFT4.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
         AUTOTOPLEFT4.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
         AUTOTOPLEFT4.addAll(INTAKEBLUEBALLPOSITION3);
+        AUTOTOPLEFT4.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
+        AUTOTOPLEFT4.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+
+        AUTOTOPLEFT4.addAll(INTAKEBLUEBALLPOSITION1);
         AUTOTOPLEFT4.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
         AUTOTOPLEFT4.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
@@ -316,18 +324,20 @@ public class Auto_V2 extends OpMode {
         if (AllianceData.isRed()) {
 
 
-            STEPS.addAll(AUTOTOPRIGHT);
+            STEPS.addAll(AUTOTOPRIGHT2);
 
             telemetry.addData("Auto Path", "RED (Right Side)");
+            limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
         } else {
 
-            STEPS.addAll(AUTOTOPLEFT);
+            STEPS.addAll(AUTOTOPLEFT2);
 
             telemetry.addData("Auto Path", "BLUE (Left Side)");
+            limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
         }
 
-        paths.add(AUTOTOPLEFT);
-        paths.add(AUTOTOPRIGHT);
+        paths.add(AUTOTOPLEFT4);
+        paths.add(AUTOTOPRIGHT4);
         paths.add(AUTOBOTTOMLEFT);
         paths.add(AUTOBOTTOMRIGHT);
 
@@ -472,6 +482,7 @@ public class Auto_V2 extends OpMode {
 
     @Override
     public void init() {
+        limelight = hardwareMap.get(Limelight3A.class, "Limelight");
         pathTimer = new Timer();
         opModeTimer = new Timer();
 
@@ -482,8 +493,8 @@ public class Auto_V2 extends OpMode {
         buildSteps();
         //STEPS.addAll(AUTOTOPLEFT);
 
-        Pose start = (!STEPS.isEmpty() && STEPS.get(0).pose != null) ? STEPS.get(0).pose : topLeftStartPose;
-        follower.setStartingPose(start);   // recommended for Pedro
+        //Pose start = STEPS.get(0).pose;
+        //follower.setStartingPose(start);   // recommended for Pedro
 
 
         buildChainsFromSteps();
@@ -504,7 +515,7 @@ public class Auto_V2 extends OpMode {
         );
         imu.initialize(new IMU.Parameters(revHubOrientationOnRobot));
 
-        limelight = hardwareMap.get(Limelight3A.class, "Limelight");
+
         if (AllianceData.isRed()) {
             limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
             telemetry.addData("Alliance", "RED (Pipeline set to Red)");
@@ -637,6 +648,23 @@ public class Auto_V2 extends OpMode {
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
         telemetry.addData("stuckon", stuckon);
+        if (currentIndex < STEPS.size()) {
+            Pose currentPose = follower.getPose();
+            Pose nextPose = STEPS.get(currentIndex).pose;
+
+            if (nextPose != null) {
+                double dx2 = nextPose.getX() - currentPose.getX();
+                double dy2 = nextPose.getY() - currentPose.getY();
+                double distanceToNext = Math.hypot(dx2, dy2);
+
+                telemetry.addData("Distance to Next Pose", "%.2f", distanceToNext);
+                telemetry.addData("Next Pose X/Y", "%.2f / %.2f", nextPose.getX(), nextPose.getY());
+            } else {
+                telemetry.addData("Distance to Next Pose", "No target (null pose)");
+            }
+        } else {
+            telemetry.addData("Distance to Next Pose", "DONE");
+        }
         telemetry.update();
     }
 }
