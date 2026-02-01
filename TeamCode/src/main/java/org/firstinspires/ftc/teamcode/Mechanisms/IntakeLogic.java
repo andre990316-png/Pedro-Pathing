@@ -31,7 +31,7 @@ public class IntakeLogic {
     private int lastPos = 0;
     private double pidOutput = 0;
     private double currentRPM = 0;
-    private double targetRPM = 660;
+    private double targetRPM = 100;//660
 
     public void init(HardwareMap hardwareMap) {
         IntakeMotor = hardwareMap.get(DcMotor.class, "Intake Motor");
@@ -66,16 +66,17 @@ public class IntakeLogic {
 
         // --- PID calculation for display only ---
         double dt = pidTimer.seconds();
-        if(dt <= 0) dt = 0.02;
         pidTimer.reset();
+
+        if (dt < 0.01) return;
 
         int pos = IntakeMotor.getCurrentPosition();
         int deltaTicks = pos - lastPos;
         lastPos = pos;
 
         double ticksPerRev = 145.1;
-        double revs = deltaTicks / ticksPerRev;
-        currentRPM = (revs / dt) * 60.0; // convert to RPM
+        double revs = (double) deltaTicks / ticksPerRev;
+        currentRPM = Math.abs((revs / dt) * 60.0);
 
         // PID for debugging (not applied to motor)
         double error = targetRPM - currentRPM;
