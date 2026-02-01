@@ -294,10 +294,10 @@ public class Teleop extends OpMode {
         purpleBtn.update(gamepad1.x);
         patternResetBtn.update(gamepad1.start);
         patternConfirmBtn.update(gamepad1.right_bumper);
-        intakeHoldBtn.update(gamepad1.left_bumper);
+        intakeHoldBtn.update(gamepad1.left_trigger > 0.3);
         intakeUpBtn.update(gamepad1.dpad_right);
         intakeDownBtn.update(gamepad1.dpad_left);
-        intakeReverseHoldBtn.update(gamepad1.left_trigger > 0.3);
+        intakeReverseHoldBtn.update(gamepad1.left_bumper);
         autoFlywheelAndHoodToggleBtn.update(gamepad2.right_bumper);
 
         precisionModeHoldBtn.update(gamepad1.right_trigger > 0.3);
