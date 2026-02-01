@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -31,7 +32,7 @@ public class Auto_V2 extends OpMode {
     private LEDClass LED1 = new LEDClass();
     private LEDClass LED2 = new LEDClass();
     private LEDClass LED3 = new LEDClass();
-    //private Servo RGB = null;
+    private Servo RGB = null;
     private Follower follower;
     private Timer pathTimer, opModeTimer;
     private Pose goalPose;
@@ -131,7 +132,7 @@ public class Auto_V2 extends OpMode {
     private final Pose redLoadingZoneEnd = new Pose(133.8,10, Math.toRadians(0));
 
     //gate and intake poses
-    private final Pose blueGateIntakePose = new Pose(11,62, Math.toRadians(120));
+    private final Pose blueGateIntakePose = new Pose(13,54, Math.toRadians(140));
     private final Pose redGateIntakePose = new Pose(11,62, Math.toRadians(120));
 
 
@@ -252,17 +253,25 @@ public class Auto_V2 extends OpMode {
         AUTOTOPLEFT4.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
         AUTOTOPLEFT4.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
-        AUTOTOPLEFT4.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
-        AUTOTOPLEFT4.add(new AutoStep(blueBallPosition2End, AutoAction.NONE, 0));
-        AUTOTOPLEFT4.add(new AutoStep(blueGateIntakePose, AutoAction.NONE, 3000));
+//        AUTOTOPLEFT4.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
+//        AUTOTOPLEFT4.add(new AutoStep(blueBallPosition2End, AutoAction.NONE, 0));
+//        AUTOTOPLEFT4.add(new AutoStep(blueGateIntakePose, AutoAction.NONE, 3000));
+        AUTOTOPLEFT4.addAll(INTAKEBLUEBALLPOSITION2);
         AUTOTOPLEFT4.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
         AUTOTOPLEFT4.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
-        AUTOTOPLEFT4.addAll(INTAKEBLUEBALLPOSITION1);
+
+        AUTOTOPLEFT4.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
+        AUTOTOPLEFT4.add(new AutoStep(blueGateIntakePose, AutoAction.NONE, 1500));
+        AUTOTOPLEFT4.add(new AutoStep(blueBallPosition2Start, AutoAction.NONE, 0));
         AUTOTOPLEFT4.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
         AUTOTOPLEFT4.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
         AUTOTOPLEFT4.addAll(INTAKEBLUEBALLPOSITION3);
+        AUTOTOPLEFT4.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
+        AUTOTOPLEFT4.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+
+        AUTOTOPLEFT4.addAll(INTAKEBLUEBALLPOSITION1);
         AUTOTOPLEFT4.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
         AUTOTOPLEFT4.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
@@ -495,11 +504,11 @@ public class Auto_V2 extends OpMode {
         LED1.init(hardwareMap, 1);
         LED2.init(hardwareMap, 2);
         LED3.init(hardwareMap, 3);
-        //RGB = hardwareMap.get(Servo.class, "RGB");
+        RGB = hardwareMap.get(Servo.class, "RGB");
         LED1.setGreenLED(true);
         LED2.setGreenLED(true);
         LED3.setGreenLED(true);
-        //RGB.setPosition(0.48);
+        RGB.setPosition(0.48);
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
@@ -602,7 +611,7 @@ public class Auto_V2 extends OpMode {
         follower.update();
         shooter.update();
 
-        //RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.29);
+        RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.29);
         Auto_lastPose.currentPose = follower.getPose();
 
         Pose robotPose = follower.getPose();
