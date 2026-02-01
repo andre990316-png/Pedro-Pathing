@@ -150,8 +150,6 @@ public class Teleop extends OpMode {
         ShooterM1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         ShooterM2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        ShooterS1.setPosition(0.84);
-
         shooter.setTargetRPM(0);
 
         currentSensitivity = 1.0;
@@ -217,6 +215,7 @@ public class Teleop extends OpMode {
         }
         allianceBannerTimer.reset();
         showAllianceBanner = true;
+        ShooterS1.setPosition(0.84);
 
     }
 

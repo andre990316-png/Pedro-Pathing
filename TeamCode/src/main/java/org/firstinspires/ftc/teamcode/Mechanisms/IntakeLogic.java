@@ -31,7 +31,7 @@ public class IntakeLogic {
     private int lastPos = 0;
     private double pidOutput = 0;
     private double currentRPM = 0;
-    private double targetRPM = 100;//660
+    private double targetRPM = 660;//660
 
     public void init(HardwareMap hardwareMap) {
         IntakeMotor = hardwareMap.get(DcMotor.class, "Intake Motor");
