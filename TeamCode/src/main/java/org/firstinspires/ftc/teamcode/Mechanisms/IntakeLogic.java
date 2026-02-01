@@ -29,8 +29,9 @@ public class IntakeLogic {
     private double integral = 0;
     private double lastError = 0;
     private int lastPos = 0;
+    private double pidOutput = 0;
     private double currentRPM = 0;
-    private double targetRPM = 0; // GoBilda 5203 motor max RPM
+    private double targetRPM = 660;
 
     public void init(HardwareMap hardwareMap) {
         IntakeMotor = hardwareMap.get(DcMotor.class, "Intake Motor");
@@ -81,11 +82,7 @@ public class IntakeLogic {
         integral += error * dt;
         double derivative = (error - lastError) / dt;
         lastError = error;
-        double pidOutput = kp * error + ki * integral + kd * derivative;
-
-        // Display PID values (for telemetry)
-        // Example usage in OpMode: telemetry.addData("Intake RPM", intake.getCurrentRPM());
-        // telemetry.addData("PID Output", intake.getPidOutput());
+        pidOutput = kp * error + ki * integral + kd * derivative;
     }
 
     public void intakeReady(boolean start) {
@@ -110,6 +107,7 @@ public class IntakeLogic {
     }
 
     public double getPidOutput() {
-        return kp * (targetRPM - currentRPM) + ki * integral + kd * ((targetRPM - currentRPM) - lastError) / pidTimer.seconds();
+        return pidOutput;
     }
+
 }

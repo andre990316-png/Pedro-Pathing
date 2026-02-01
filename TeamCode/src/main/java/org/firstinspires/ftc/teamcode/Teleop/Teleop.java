@@ -80,6 +80,7 @@ public class Teleop extends OpMode {
 
     private IntakeLogic intake = new IntakeLogic();
     private FlywheelLogic shooter = new FlywheelLogic();
+
     private ButtonLogic hoodUpBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);  // dpad_right
     private ButtonLogic hoodDownBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);  // dpad_left
     private ButtonLogic rpmUpBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);  // dpad_up
@@ -158,8 +159,7 @@ public class Teleop extends OpMode {
 
         shooter.init(hardwareMap);
 
-        IntakeLogic intakeLogic = new IntakeLogic();
-        intakeLogic.init(hardwareMap);
+        intake.init(hardwareMap);
 
         if (Auto_lastPose.currentPose != null){
             selectedStartPose = Auto_lastPose.currentPose;
@@ -228,6 +228,8 @@ public class Teleop extends OpMode {
     @Override
     public void loop() {
         shooter.update();
+        shooter.getIntake().update();
+        intake.update();
         follower.update();
         ColorSensorLogic.update(telemetry);
         int[] colors = colorSensorLogic.returnCurrentColors();
