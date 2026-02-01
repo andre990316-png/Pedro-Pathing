@@ -77,6 +77,7 @@ public class Teleop extends OpMode {
     private boolean patternLocked = false;
     private PatternLogic patternLogic = new PatternLogic();
     private int detectedTag = -1;
+    private double side;
 
     private IntakeLogic intake = new IntakeLogic();
     private FlywheelLogic shooter = new FlywheelLogic();
@@ -211,8 +212,10 @@ public class Teleop extends OpMode {
 
         if (AllianceData.isRed()) {
             limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
+            side = -1;
         } else {
             limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
+            side = 1;
         }
         allianceBannerTimer.reset();
         showAllianceBanner = true;
@@ -387,8 +390,8 @@ public class Teleop extends OpMode {
         forward *= currentSensitivity;
         rotation *= currentSensitivity * 0.8;
 
-        XL = strafe;
-        YL = forward;
+        XL = side * strafe;
+        YL = side * forward;
         XR = rotation;
 
         TempMax1 = Math.max(Math.abs(YL + XL + XR), Math.abs((YL - XL) - XR));
