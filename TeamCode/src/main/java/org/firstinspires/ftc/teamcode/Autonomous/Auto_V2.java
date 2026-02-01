@@ -45,6 +45,8 @@ public class Auto_V2 extends OpMode {
     private IMU imu;
     private LimelightAim autoAim = new LimelightAim();
 
+    public static int stuckon=0;
+
     // ====== STEP SYSTEM ======
     public enum AutoAction {
         NONE,
@@ -250,9 +252,9 @@ public class Auto_V2 extends OpMode {
         AUTOTOPLEFT4.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
         AUTOTOPLEFT4.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
-        INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
-        INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2End, AutoAction.NONE, 0));
-        INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueGateIntakePose, AutoAction.NONE, 3000));
+        AUTOTOPLEFT4.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
+        AUTOTOPLEFT4.add(new AutoStep(blueBallPosition2End, AutoAction.NONE, 0));
+        AUTOTOPLEFT4.add(new AutoStep(blueGateIntakePose, AutoAction.NONE, 3000));
         AUTOTOPLEFT4.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 0));
         AUTOTOPLEFT4.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
@@ -314,18 +316,18 @@ public class Auto_V2 extends OpMode {
         if (AllianceData.isRed()) {
 
 
-            STEPS.addAll(AUTOTOPRIGHT3);
+            STEPS.addAll(AUTOTOPRIGHT);
 
             telemetry.addData("Auto Path", "RED (Right Side)");
         } else {
 
-            STEPS.addAll(AUTOTOPLEFT3);
+            STEPS.addAll(AUTOTOPLEFT);
 
             telemetry.addData("Auto Path", "BLUE (Left Side)");
         }
 
-        paths.add(AUTOTOPLEFT3);
-        paths.add(AUTOTOPRIGHT3);
+        paths.add(AUTOTOPLEFT);
+        paths.add(AUTOTOPRIGHT);
         paths.add(AUTOBOTTOMLEFT);
         paths.add(AUTOBOTTOMRIGHT);
 
@@ -406,17 +408,22 @@ public class Auto_V2 extends OpMode {
     // ------------------------------------------------------------
     private void updateAuto() {
         if (currentIndex >= STEPS.size()){
+            stuckon=1;
             return;
         }
 
         // 1) 車子還在跑路徑，就不要進行下一步
-        if (follower.isBusy()) return;
+        if (follower.isBusy()){
+            stuckon=2;
+            return;
+        }
 
         // 2) 正在射球就卡在這裡，直到射完
         if (waitingForShooter) {
             if (!shooter.isBusy()) {
                 waitingForShooter = false;
             } else {
+                stuckon=3;
                 return;
             }
         }
@@ -425,7 +432,10 @@ public class Auto_V2 extends OpMode {
         // 3) Pause（如果你有用 PAUSE_MS）
         if (pauseEndTimeMs > 0) {
             long now = System.currentTimeMillis();
-            if (now < pauseEndTimeMs) return;
+            if (now < pauseEndTimeMs) {
+                stuckon=4;
+                return;
+            }
             pauseEndTimeMs = 0;
         }
 
@@ -434,12 +444,19 @@ public class Auto_V2 extends OpMode {
         // 4) 每個 step 的 action 只執行一次（避免射球被重複觸發）
         if (!actionActioned) {
             executeAction(step);
+            stuckon=5;
             actionActioned = true;
         }
 
         // 5) 如果這個 action 觸發了「阻塞行為」（射球 / pause），就先不要啟動 path
-        if (waitingForShooter) return;
-        if (pauseEndTimeMs > 0 && System.currentTimeMillis() < pauseEndTimeMs) return;
+        if (waitingForShooter){
+            stuckon=6;
+            return;
+        }
+        if (pauseEndTimeMs > 0 && System.currentTimeMillis() < pauseEndTimeMs){
+            stuckon=7;
+            return;
+        }
 
         // 6) action 都做完了，才開始跑到下一個 pose
         PathChain chain = (currentIndex < CHAINS.size()) ? CHAINS.get(currentIndex) : null;
@@ -450,6 +467,7 @@ public class Auto_V2 extends OpMode {
         // 7) 進下一步
         currentIndex++;
         actionActioned = false;
+        stuckon=0;
     }
 
     @Override
@@ -534,6 +552,14 @@ public class Auto_V2 extends OpMode {
                 STEPS.clear();
                 STEPS.addAll(paths.get(PATHNUM));
                 buildChainsFromSteps();
+
+                currentIndex = 0;
+                actionActioned = false;
+                waitingForShooter = false;
+                pauseEndTimeMs = 0;
+
+                follower.setStartingPose(STEPS.get(0).pose);
+
                 if(PATHNUM==0||PATHNUM==2){
                     AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
                     limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
@@ -541,9 +567,10 @@ public class Auto_V2 extends OpMode {
                     AllianceData.selectedAlliance = AllianceData.Alliance.RED;
                     limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
                 }
-                selectedAuto=true;
 
+                selectedAuto=true;
             }
+
 
             telemetry.addLine("select auto plz (A)");
             for(int i=0; i<autonames.length; i++){
@@ -609,6 +636,7 @@ public class Auto_V2 extends OpMode {
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
+        telemetry.addData("stuckon", stuckon);
         telemetry.update();
     }
 }
