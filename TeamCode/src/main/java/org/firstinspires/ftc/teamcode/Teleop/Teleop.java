@@ -14,6 +14,8 @@ import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
+
+import org.firstinspires.ftc.teamcode.Autonomous.Auto_V2;
 import org.firstinspires.ftc.teamcode.Autonomous.Constants;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -118,6 +120,7 @@ public class Teleop extends OpMode {
     private ColorSensorLogic colorSensorLogic = new ColorSensorLogic();
 
     private boolean autogating = false;
+    private boolean autosuctiongating = false;
 
     public static BezierPoint bluegate = new BezierPoint(14, 70);
     public static BezierPoint redgate = new BezierPoint(130, 70);
@@ -406,6 +409,7 @@ public class Teleop extends OpMode {
         MaxPower = Math.max(TempMax1, TempMax2);
 
         autogating= gamepad1.x;
+        autosuctiongating= gamepad1.y;
 
         if(autogating){
             if(AllianceData.isRed()){
@@ -414,6 +418,12 @@ public class Teleop extends OpMode {
                 follower.holdPoint(bluegate, Math.toRadians(90));
             }
 
+        }else if(autosuctiongating){
+            if(AllianceData.isRed()){
+                follower.holdPoint(Auto_V2.redGateIntakePose);
+            }else{
+                follower.holdPoint(Auto_V2.blueGateIntakePose);
+            }
         }else{
             if (MaxPower > 1) {
                 MotorFrontLeft.setPower((YL + XL + XR) / MaxPower);
