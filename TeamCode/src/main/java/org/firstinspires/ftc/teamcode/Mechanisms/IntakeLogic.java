@@ -20,9 +20,9 @@ public class IntakeLogic {
     private boolean startIntake = false;
 
     // PID tuning (start here)
-    private double kp = 0.0015;
-    private double ki = 0.0000;
-    private double kd = 0.00000;
+    private double kp = 0.0065;
+    private double ki = 0.00;
+    private double kd = 0.00004;
 
     private double integral = 0;
     private double lastError = 0;
