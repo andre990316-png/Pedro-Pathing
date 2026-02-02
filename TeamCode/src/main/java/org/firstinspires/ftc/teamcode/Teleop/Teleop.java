@@ -325,10 +325,10 @@ public class Teleop extends OpMode {
         }
 
         if (!shooter.isBusy() && intakeHoldBtn.getState()) {
-            intake.setTargetRPM(500);
+            intake.setTargetRPM(-900);
             shooter.getIntake().intakeReady(true);
         } else if (!shooter.isBusy() && intakeReverseHoldBtn.getState() && !shoot3Btn.getState() && !intakeHoldBtn.getState()) {
-            ///TODO 100% power
+            intake.setTargetRPM(900);
             shooter.getIntake().intakeReady(true);
         } else if (!shooter.isBusy() && !shoot3Btn.getState() && !intakeHoldBtn.getState() && !intakeReverseHoldBtn.getState()){
             shooter.getIntake().intakeReady(false);
@@ -380,6 +380,8 @@ public class Teleop extends OpMode {
 
             strafe  = fieldStrafe * cos + fieldForward * sin;
             forward = -fieldStrafe * sin + fieldForward * cos;
+            strafe += side;
+            forward += side;
         } else {
             strafe  = fieldStrafe;
             forward = fieldForward;
@@ -389,8 +391,8 @@ public class Teleop extends OpMode {
         forward *= currentSensitivity;
         rotation *= currentSensitivity * 0.8;
 
-        XL = side * strafe;
-        YL = side * forward;
+        XL = strafe;
+        YL = forward;
         XR = rotation;
 
         TempMax1 = Math.max(Math.abs(YL + XL + XR), Math.abs((YL - XL) - XR));
@@ -421,13 +423,6 @@ public class Teleop extends OpMode {
             autoAim.resetHistory(getRuntime());
         }
         ShooterRotateMotor.setPower(turretPower);
-
-        double ta = 0;
-        boolean llValid = false;
-        if (ll != null && ll.isValid()) {
-            llValid = true;
-            ta = ll.getTa();
-        }
 
         Pose robotPose = follower.getPose();
         double dx = AllianceData.getGoalPose().getX() - robotPose.getX();
@@ -551,6 +546,7 @@ public class Teleop extends OpMode {
             telemetry.addData("LLPose", "no valid tag");
         }
         telemetry.addData("DistanceToGoal", distToGoal);
+        telemetry.addData("Intake Target RPM", intake.getTargetRPM());
         telemetry.addData("Intake RPM", intake.getCurrentRPM());
         telemetry.addData("Intake PID Output", intake.getPidPower());
 

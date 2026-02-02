@@ -61,6 +61,7 @@ public class IntakeLogic {
 
         if (intakeState == IntakeState.INTAKE) {
 
+
             double dt = pidTimer.seconds();
             pidTimer.reset();
 
@@ -84,7 +85,6 @@ public class IntakeLogic {
             pidPower = kp * error + ki * integral + kd * derivative;
             pidPower = Range.clip(pidPower, -1.0, 1.0);
 
-            // APPLY POWER EVERY LOOP
             IntakeMotor.setPower(pidPower);
 
         } else {
