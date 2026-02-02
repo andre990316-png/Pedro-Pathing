@@ -380,8 +380,8 @@ public class Teleop extends OpMode {
 
             strafe  = fieldStrafe * cos + fieldForward * sin;
             forward = -fieldStrafe * sin + fieldForward * cos;
-            strafe += side;
-            forward += side;
+            strafe *= side;
+            forward *= side;
         } else {
             strafe  = fieldStrafe;
             forward = fieldForward;
