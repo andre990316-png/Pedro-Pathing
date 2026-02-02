@@ -22,7 +22,7 @@ public class IntakeLogic {
     // PID tuning (start here)
     private double kp = 0.0015;
     private double ki = 0.0000;
-    private double kd = 0.00005;
+    private double kd = 0.00000;
 
     private double integral = 0;
     private double lastError = 0;
@@ -43,7 +43,6 @@ public class IntakeLogic {
         IntakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         IntakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        IntakeMotor.setDirection(DcMotor.Direction.REVERSE);
         IntakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         pidTimer.reset();
