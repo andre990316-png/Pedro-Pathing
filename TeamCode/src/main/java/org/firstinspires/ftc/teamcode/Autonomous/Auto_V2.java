@@ -253,7 +253,7 @@ public class Auto_V2 extends OpMode {
         PATH3LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
         PATH3LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH3LEFT.add(new AutoStep(bottonLeftEndPose, AutoAction.NONE, 0));
-
+        /*
         //shoots preload, gets row 2 and shoots
         AUTOTOPLEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
         AUTOTOPLEFT.addAll(BLUESHOOT3NEAR);
@@ -340,19 +340,16 @@ public class Auto_V2 extends OpMode {
         AUTOTOPLEFT2.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         AUTOTOPLEFT2.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
+        */
 
-
-        /// top right auto
-
-        //flipped copy of top left
-        AUTOTOPRIGHT = AutoStep.flipped(AUTOTOPLEFT);
-
-        /// bottom right auto
-
-        AUTOBOTTOMRIGHT = AutoStep.flipped(AUTOBOTTOMLEFT);
-
-        AUTOTOPRIGHT2 = AutoStep.flipped(AUTOTOPLEFT2);
-        AUTOTOPRIGHT4 = AutoStep.flipped(AUTOTOPLEFT4);
+        PATH1RIGHT = AutoStep.flipped(PATH1LEFT);
+        PATH2RIGHT = AutoStep.flipped(PATH2LEFT);
+        PATH3RIGHT = AutoStep.flipped(PATH3LEFT);
+        PATH4RIGHT = AutoStep.flipped(PATH4LEFT);
+        PATH5RIGHT = AutoStep.flipped(PATH5LEFT);
+        PATH6RIGHT = AutoStep.flipped(PATH6LEFT);
+        PATH7RIGHT = AutoStep.flipped(PATH7LEFT);
+        PATH8RIGHT = AutoStep.flipped(PATH8LEFT);
 
         if (AllianceData.isRed()) {
             STEPS.addAll(AUTOTOPRIGHT2);
