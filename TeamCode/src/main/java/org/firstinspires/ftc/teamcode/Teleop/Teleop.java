@@ -325,10 +325,10 @@ public class Teleop extends OpMode {
         }
 
         if (!shooter.isBusy() && intakeHoldBtn.getState()) {
-            intake.setTargetRPM(500);
+            intake.setTargetRPM(-900);
             shooter.getIntake().intakeReady(true);
         } else if (!shooter.isBusy() && intakeReverseHoldBtn.getState() && !shoot3Btn.getState() && !intakeHoldBtn.getState()) {
-            ///TODO 100% power
+            intake.setTargetRPM(900);
             shooter.getIntake().intakeReady(true);
         } else if (!shooter.isBusy() && !shoot3Btn.getState() && !intakeHoldBtn.getState() && !intakeReverseHoldBtn.getState()){
             shooter.getIntake().intakeReady(false);
@@ -546,6 +546,7 @@ public class Teleop extends OpMode {
             telemetry.addData("LLPose", "no valid tag");
         }
         telemetry.addData("DistanceToGoal", distToGoal);
+        telemetry.addData("Intake Target RPM", intake.getTargetRPM());
         telemetry.addData("Intake RPM", intake.getCurrentRPM());
         telemetry.addData("Intake PID Output", intake.getPidPower());
 
