@@ -226,7 +226,12 @@ public class Auto_V2 extends OpMode {
         PATH1LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         PATH1LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH1LEFT.addAll(INTAKEBLUEBALLPOSITION3);
+        PATH1LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        PATH1LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH1LEFT.add(new AutoStep(topLeftEndPose, AutoAction.NONE, 0));
+
+
+
 
         //PATH2
         PATH2LEFT.clear();
@@ -241,6 +246,8 @@ public class Auto_V2 extends OpMode {
         PATH2LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         PATH2LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH2LEFT.addAll(INTAKEBLUEBALLPOSITION3);
+        PATH2LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        PATH2LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH2LEFT.add(new AutoStep(topLeftEndPose, AutoAction.NONE, 0));
 
         //PATH3
@@ -253,6 +260,97 @@ public class Auto_V2 extends OpMode {
         PATH3LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
         PATH3LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH3LEFT.add(new AutoStep(bottonLeftEndPose, AutoAction.NONE, 0));
+
+
+        //PATH4
+        PATH4LEFT.clear();
+
+        PATH4LEFT.add(new AutoStep(bottomLeftStartPose, AutoAction.NONE, 0));
+        PATH4LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
+        PATH4LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH4LEFT.addAll(INTAKEBLUELOADINGZONE);
+        PATH4LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
+        PATH4LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH4LEFT.addAll(INTAKEBLUEBALLPOSITION1);
+        PATH4LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
+        PATH4LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH4LEFT.add(new AutoStep(bottonLeftEndPose, AutoAction.NONE, 0));
+
+
+
+
+        //PATH5
+        PATH5LEFT.clear();
+
+        PATH5LEFT.add(new AutoStep(bottomLeftStartPose, AutoAction.NONE, 0));
+        PATH5LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
+        PATH5LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH5LEFT.addAll(INTAKEBLUELOADINGZONE);
+        PATH5LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
+        PATH5LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH5LEFT.addAll(INTAKEBLUELOADINGZONE);
+        PATH5LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
+        PATH5LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH5LEFT.add(new AutoStep(bottonLeftEndPose, AutoAction.NONE, 0));
+
+
+
+
+        //PATH6
+        PATH6LEFT.clear();
+
+        PATH6LEFT.add(new AutoStep(bottomLeftStartPose, AutoAction.NONE, 0));
+        PATH6LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
+        PATH6LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH6LEFT.addAll(INTAKEBLUELOADINGZONE);
+        PATH6LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
+        PATH6LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH6LEFT.addAll(INTAKEBLUEBALLPOSITION1);
+        PATH6LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
+        PATH6LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH6LEFT.addAll(INTAKEBLUELOADINGZONE);
+        PATH6LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
+        PATH6LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH6LEFT.add(new AutoStep(bottonLeftEndPose, AutoAction.NONE, 0));
+
+
+
+
+
+        //PATH7
+        PATH7LEFT.clear();
+
+        PATH7LEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
+        PATH7LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        PATH7LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH7LEFT.addAll(INTAKEBLUEBALLPOSITION2);
+        PATH7LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        PATH7LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH7LEFT.addAll(INTAKEBLUEBALLPOSITION3);
+        PATH7LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        PATH7LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH7LEFT.add(new AutoStep(topLeftEndPose, AutoAction.NONE, 0));
+
+
+
+
+
+        //PATH8
+        PATH8LEFT.clear();
+
+        PATH8LEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
+        PATH8LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        PATH8LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH8LEFT.addAll(INTAKEBLUEBALLPOSITION2ANDOPENGATE);
+        PATH8LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        PATH8LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH8LEFT.addAll(INTAKEBLUEBALLPOSITION3);
+        PATH8LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        PATH8LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH8LEFT.add(new AutoStep(topLeftEndPose, AutoAction.NONE, 0));
+
+
+
         /*
         //shoots preload, gets row 2 and shoots
         AUTOTOPLEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
