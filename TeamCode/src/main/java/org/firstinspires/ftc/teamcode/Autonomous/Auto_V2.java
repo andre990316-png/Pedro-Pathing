@@ -109,18 +109,14 @@ public class Auto_V2 extends OpMode {
 
     //end poses
     private final Pose topLeftEndPose = new Pose();
-    private final Pose BottonLeftEndPose = new Pose();
+    private final Pose bottonLeftEndPose = new Pose();
 
     //close shoot poses (on big V)
     private final Pose blueShootPoseClose = new Pose(45, 96, Math.toRadians(137));
     private final Pose redShootPoseClose = new Pose(99, 96, Math.toRadians(137));
 
-    //medium shoot poses (on big V)
-    private final Pose blueShootPoseMed = new Pose(64,80,Math.toRadians(135));
-    private final Pose redShootPoseMed = new Pose(80,80,Math.toRadians(45));
-
     //far shoot poses (on small v)
-    private final Pose blueShootPoseFar = new Pose(64,20,Math.toRadians(116));
+    private final Pose blueShootPoseFar = new Pose(58,16,Math.toRadians(116));
     private final Pose redShootPoseFar = new Pose(80,20,Math.toRadians(64));
 
     //artifact intaking poses (blue)
@@ -217,7 +213,6 @@ public class Auto_V2 extends OpMode {
         BLUESHOOT3NEAR.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         BLUESHOOT3NEAR.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
-
         //PATH1
         PATH1LEFT.clear();
 
@@ -232,7 +227,6 @@ public class Auto_V2 extends OpMode {
         PATH1LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH1LEFT.addAll(INTAKEBLUEBALLPOSITION3);
         PATH1LEFT.add(new AutoStep(topLeftEndPose, AutoAction.NONE, 0));
-
 
         //PATH2
         PATH2LEFT.clear();
@@ -249,9 +243,16 @@ public class Auto_V2 extends OpMode {
         PATH2LEFT.addAll(INTAKEBLUEBALLPOSITION3);
         PATH2LEFT.add(new AutoStep(topLeftEndPose, AutoAction.NONE, 0));
 
+        //PATH3
+        PATH3LEFT.clear();
 
-        /*
-        ///top left auto
+        PATH3LEFT.add(new AutoStep(bottomLeftStartPose, AutoAction.NONE, 0));
+        PATH3LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
+        PATH3LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH3LEFT.addAll(INTAKEBLUELOADINGZONE);
+        PATH3LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
+        PATH3LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH3LEFT.add(new AutoStep(bottonLeftEndPose, AutoAction.NONE, 0));
 
         //shoots preload, gets row 2 and shoots
         AUTOTOPLEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
@@ -351,7 +352,7 @@ public class Auto_V2 extends OpMode {
         AUTOBOTTOMRIGHT = AutoStep.flipped(AUTOBOTTOMLEFT);
 
         AUTOTOPRIGHT2 = AutoStep.flipped(AUTOTOPLEFT2);
-        AUTOTOPRIGHT4 = AutoStep.flipped(AUTOTOPLEFT4);*/
+        AUTOTOPRIGHT4 = AutoStep.flipped(AUTOTOPLEFT4);
 
         if (AllianceData.isRed()) {
             STEPS.addAll(AUTOTOPRIGHT2);
