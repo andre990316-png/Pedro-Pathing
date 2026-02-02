@@ -43,68 +43,56 @@ public class IntakeLogic {
         IntakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         IntakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        IntakeMotor.setDirection(DcMotor.Direction.REVERSE);
         IntakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         pidTimer.reset();
         lastPos = IntakeMotor.getCurrentPosition();
 
-        IntakeMotor.setPower(0);
+//        IntakeMotor.setPower(0);
     }
 
     public void update() {
 
+        // --- RPM calculation ---
+        double dt = pidTimer.seconds();
+        pidTimer.reset();
+        if (dt < 0.01) dt = 0.02;
+
+        int pos = IntakeMotor.getCurrentPosition();
+        int deltaTicks = pos - lastPos;
+        lastPos = pos;
+
+        double ticksPerRev = 145.1;
+        double revs = deltaTicks / ticksPerRev;
+        currentRPM = Math.abs((revs / dt) * 60.0);
+
+        // --- PID ---
+        double error = Math.abs(targetRPM) - currentRPM;
+
+        integral += error * dt;
+        integral = Range.clip(integral, -300, 300);
+
+        double derivative = (error - lastError) / dt;
+        lastError = error;
+
+        pidPower = kp * error + ki * integral + kd * derivative;
+        pidPower = Range.clip(pidPower, -1, 1);
+
+        // --- APPLY POWER ---
         if (startIntake) {
-            intakeState = IntakeState.INTAKE;
+            IntakeMotor.setPower(Math.signum(targetRPM) * pidPower);
         } else {
-            intakeState = IntakeState.IDLE;
-        }
-
-        if (intakeState == IntakeState.INTAKE) {
-
-
-            double dt = pidTimer.seconds();
-            pidTimer.reset();
-
-            if (dt < 0.01) return;
-
-            int pos = IntakeMotor.getCurrentPosition();
-            int deltaTicks = pos - lastPos;
-            lastPos = pos;
-
-            double revs = deltaTicks / TICKS_PER_REV;
-            currentRPM = (revs / dt) * 60.0;
-
-            double error = targetRPM - currentRPM;
-
-            integral += error * dt;
-            integral = Range.clip(integral, -500, 500);
-
-            double derivative = (error - lastError) / dt;
-            lastError = error;
-
-            pidPower = kp * error + ki * integral + kd * derivative;
-            pidPower = Range.clip(pidPower, -1.0, 1.0);
-
-            IntakeMotor.setPower(pidPower);
-
-        } else {
-
-            // IDLE
             IntakeMotor.setPower(0);
-            pidPower = 0;
             integral = 0;
-            lastError = 0;
-            currentRPM = 0;
         }
     }
+
+
     public void intakeReady(boolean start) {
         startIntake = start;
-        if (!start) {
-            targetRPM = 0;
-            integral = 0;
-            pidPower = 0;
-        }
     }
+
 
     public boolean isBusy() {
         return intakeState == IntakeState.INTAKE;

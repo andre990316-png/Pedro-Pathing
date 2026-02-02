@@ -321,17 +321,17 @@ public class Teleop extends OpMode {
 
         if (gateHoldBtn.getState()) {
             intake.setTargetRPM(-660);
-            shooter.getIntake().intakeReady(true);
+            intake.intakeReady(true);
         }
 
         if (!shooter.isBusy() && intakeHoldBtn.getState()) {
             intake.setTargetRPM(-900);
-            shooter.getIntake().intakeReady(true);
+            intake.intakeReady(true);
         } else if (!shooter.isBusy() && intakeReverseHoldBtn.getState() && !shoot3Btn.getState() && !intakeHoldBtn.getState()) {
             intake.setTargetRPM(900);
-            shooter.getIntake().intakeReady(true);
+            intake.intakeReady(true);
         } else if (!shooter.isBusy() && !shoot3Btn.getState() && !intakeHoldBtn.getState() && !intakeReverseHoldBtn.getState()){
-            shooter.getIntake().intakeReady(false);
+            intake.intakeReady(false);
         }
 
         if (showAllianceBanner) {
