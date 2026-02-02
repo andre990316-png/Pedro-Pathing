@@ -217,6 +217,10 @@ public class Auto_V2 extends OpMode {
         BLUESHOOT3NEAR.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         BLUESHOOT3NEAR.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
+
+        //PATH1
+        PATH1LEFT.clear();
+
         PATH1LEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
         PATH1LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         PATH1LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
@@ -228,6 +232,10 @@ public class Auto_V2 extends OpMode {
         PATH1LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH1LEFT.addAll(INTAKEBLUEBALLPOSITION3);
         PATH1LEFT.add(new AutoStep(topLeftEndPose, AutoAction.NONE, 0));
+
+
+        //PATH2
+        PATH2LEFT.clear();
 
         PATH2LEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
         PATH2LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
