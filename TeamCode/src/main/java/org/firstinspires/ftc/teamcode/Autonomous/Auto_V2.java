@@ -29,6 +29,7 @@ public class Auto_V2 extends OpMode {
 
     // Motors / hardware you already had
     private DcMotor ShooterRotateMotor;
+    private Servo ShooterS2;
 
     private LEDClass LED1 = new LEDClass();
     private LEDClass LED2 = new LEDClass();
@@ -38,6 +39,8 @@ public class Auto_V2 extends OpMode {
     private Timer pathTimer, opModeTimer;
     private Pose goalPose;
 
+    private double gateCloseAngle = 1;
+    private double gateOpenAngle  = 0.7;
     // Flywheel Logic
     private FlywheelLogic shooter = new FlywheelLogic();
 
@@ -532,11 +535,12 @@ public class Auto_V2 extends OpMode {
 
         switch (step.action) {
             case NONE:
+                ShooterS2.setPosition(gateCloseAngle);
                 break;
 
             case INTAKE_ON:
                 // You were already using shooter.getIntake().intakeReady(true)
-                intake.setTargetRPM(-1100);
+                intake.setTargetRPM(-1);
                 intake.intakeReady(true);
                 break;
 
@@ -545,8 +549,9 @@ public class Auto_V2 extends OpMode {
                 break;
 
             case SHOOT_3:
-                intake.setTargetRPM(-1100);
-                shooter.fireShots(3);
+                intake.setTargetRPM(-0.37);
+                intake.intakeReady(true);
+                ShooterS2.setPosition(gateOpenAngle);
                 waitingForShooter = shooter.isBusy();   // keep your existing blocking behavior
                 if (!waitingForShooter) actionActioned = false;  // retry SHOOT_3 next loop
                 break;
@@ -631,11 +636,15 @@ public class Auto_V2 extends OpMode {
 
     @Override
     public void init() {
+        ShooterS2 = hardwareMap.get(Servo.class, "Shooter S2");
+        ShooterS2.setPosition(gateCloseAngle);
         limelight = hardwareMap.get(Limelight3A.class, "Limelight");
         pathTimer = new Timer();
         opModeTimer = new Timer();
 
         follower = Constants.createFollower(hardwareMap);
+
+        intake.init(hardwareMap);
 
         //AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
 
@@ -757,7 +766,8 @@ public class Auto_V2 extends OpMode {
     @Override
     public void loop() {
         follower.update();
-        shooter.update();
+        shooter.update(intake);
+        intake.update();
 
         RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.29);
         Auto_lastPose.currentPose = follower.getPose();

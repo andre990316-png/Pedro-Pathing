@@ -149,7 +149,7 @@ public class Auto extends OpMode {
             case GoToBlue3Start:
                 if (!follower.isBusy()) {
                     // If you have shooter.getIntake(), keep it. Otherwise remove these lines.
-                    shooter.getIntake().intakeReady(true);
+                    //shooter.getIntake().intakeReady(true);
 
                     follower.followPath(driveShootPoseToBlueBallPosition3Pose, true);
                     setPathState(PathState.Blue3ToEnd);
@@ -175,7 +175,7 @@ public class Auto extends OpMode {
                     follower.followPath(driveBlueBallPosition3PoseToShootPose, true);
 
                     // Optional: turn intake off when leaving
-                    shooter.getIntake().intakeReady(false);
+                    //shooter.getIntake().intakeReady(false);
 
                     setPathState(PathState.ShootPreload); // this will wait while returning
                 }
@@ -226,7 +226,7 @@ public class Auto extends OpMode {
     @Override
     public void loop() {
         follower.update();
-        shooter.update();
+        //shooter.update();
         //intake.update();
         statePathUpdate();
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();

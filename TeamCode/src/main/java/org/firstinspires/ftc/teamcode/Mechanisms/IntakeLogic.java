@@ -80,7 +80,8 @@ public class IntakeLogic {
 
         // --- APPLY POWER ---
         if (startIntake) {
-            IntakeMotor.setPower(Math.signum(targetRPM) * pidPower);
+            //IntakeMotor.setPower(Math.signum(targetRPM) * pidPower);
+            IntakeMotor.setPower(targetRPM);
         } else {
             IntakeMotor.setPower(0);
             integral = 0;

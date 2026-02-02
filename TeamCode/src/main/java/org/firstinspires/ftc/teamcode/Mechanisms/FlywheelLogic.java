@@ -60,7 +60,7 @@ private double launchTime = 2; // seconds gate stays open
     private double calcRPM;
     private double flywheelMaxSpinupTime = 0.7;
     private double lastShooterTime=System.nanoTime();
-    private IntakeLogic intake = new IntakeLogic();
+    //private IntakeLogic intake = new IntakeLogic();
     private double currentRPM = 0;
     private double lastError = 0;
     private double error = 0;
@@ -91,10 +91,10 @@ private double launchTime = 2; // seconds gate stays open
         velTimer.reset();
         stateTimer.reset();
         flyWheelState = FlywheelState.IDLE;
-        intake.init(hardwareMap);
+        //intake.init(hardwareMap);
     }
 
-    public void update() {
+    public void update(IntakeLogic intake) {
         double voltage = battery.getVoltage();
         double voltageCamp = (13 / voltage);
         double ffPower;
@@ -159,7 +159,7 @@ private double launchTime = 2; // seconds gate stays open
         /// set shooter motors
         ShooterM1.setPower(calcRPM);
         ShooterM2.setPower(-calcRPM);
-        intake.update();
+        //intake.update();
 
         switch (flyWheelState) {
             case IDLE:
@@ -167,8 +167,8 @@ private double launchTime = 2; // seconds gate stays open
 
                 case SPIN_UP:
                     if (Math.abs(error) <= 100 || stateTimer.seconds() > flywheelMaxSpinupTime) {
-                        ShooterS2.setPosition(gateOpenAngle);
-                        intake.setTargetRPM(-660);
+                        //ShooterS2.setPosition(gateOpenAngle);
+                        intake.setTargetRPM(-0.37);
                         intake.intakeReady(true);
                         stateTimer.reset();
                         flyWheelState = FlywheelState.LAUNCH;
@@ -179,7 +179,7 @@ private double launchTime = 2; // seconds gate stays open
                     if (stateTimer.seconds() > singleShotTime) {
                         shotsRemaining--;
                         if (shotsRemaining > 0) {
-                            intake.setTargetRPM(-660);
+                            intake.setTargetRPM(-0.37);
                             intake.intakeReady(true);
                             stateTimer.reset();
                             flyWheelState = FlywheelState.SPIN_UP;
@@ -187,7 +187,7 @@ private double launchTime = 2; // seconds gate stays open
                             ShooterM1.setPower(0);
                             ShooterM2.setPower(0);
                             intake.intakeReady(false);
-                            ShooterS2.setPosition(gateCloseAngle);
+                            //ShooterS2.setPosition(gateCloseAngle);
                             flyWheelState = FlywheelState.IDLE;
                         }
                     }
@@ -237,9 +237,9 @@ private double launchTime = 2; // seconds gate stays open
         return (Math.abs(error) <= 100);
     }
 
-    public IntakeLogic getIntake(){
-        return intake;
-    }
+//    public IntakeLogic getIntake(){
+//        return intake;
+//    }
 
     public void setTargetRPM(double rpm) {
         targetRPM = rpm;

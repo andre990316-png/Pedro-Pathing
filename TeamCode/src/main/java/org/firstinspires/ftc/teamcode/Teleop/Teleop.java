@@ -242,7 +242,7 @@ public class Teleop extends OpMode {
     //====================
     @Override
     public void loop() {
-        shooter.update();
+        shooter.update(intake);
         intake.update();
         follower.update();
         ColorSensorLogic.update(telemetry);
@@ -332,15 +332,15 @@ public class Teleop extends OpMode {
         }*/
 
         if (gateHoldBtn.getState()) {
-            intake.setTargetRPM(-660);
+            intake.setTargetRPM(-0.37);
             intake.intakeReady(true);
         }
 
         if (!shooter.isBusy() && intakeHoldBtn.getState()) {
-            intake.setTargetRPM(-900);
+            intake.setTargetRPM(-1);
             intake.intakeReady(true);
         } else if (!shooter.isBusy() && intakeReverseHoldBtn.getState() && !shoot3Btn.getState() && !intakeHoldBtn.getState()) {
-            intake.setTargetRPM(900);
+            intake.setTargetRPM(0.4);
             intake.intakeReady(true);
         } else if (!shooter.isBusy() && !shoot3Btn.getState() && !intakeHoldBtn.getState() && !intakeReverseHoldBtn.getState()){
             intake.intakeReady(false);
