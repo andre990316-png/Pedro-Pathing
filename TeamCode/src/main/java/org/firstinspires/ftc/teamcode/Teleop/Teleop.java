@@ -320,12 +320,12 @@ public class Teleop extends OpMode {
         }*/
 
         if (gateHoldBtn.getState()) {
-            /// TODO - 37% power
+            intake.setTargetRPM(-660);
             shooter.getIntake().intakeReady(true);
         }
 
         if (!shooter.isBusy() && intakeHoldBtn.getState()) {
-            /// TODO -100% power
+            intake.setTargetRPM(500);
             shooter.getIntake().intakeReady(true);
         } else if (!shooter.isBusy() && intakeReverseHoldBtn.getState() && !shoot3Btn.getState() && !intakeHoldBtn.getState()) {
             ///TODO 100% power

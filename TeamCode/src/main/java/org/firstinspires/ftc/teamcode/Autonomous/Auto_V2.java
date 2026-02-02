@@ -17,6 +17,7 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 
 import org.firstinspires.ftc.teamcode.Data.AllianceData;
 import org.firstinspires.ftc.teamcode.Data.Auto_lastPose;
+import org.firstinspires.ftc.teamcode.Mechanisms.IntakeLogic;
 import org.firstinspires.ftc.teamcode.Mechanisms.LEDClass;
 import org.firstinspires.ftc.teamcode.Mechanisms.LimelightAim;
 import org.firstinspires.ftc.teamcode.Mechanisms.FlywheelLogic;
@@ -39,6 +40,9 @@ public class Auto_V2 extends OpMode {
 
     // Flywheel Logic
     private FlywheelLogic shooter = new FlywheelLogic();
+
+    // Intake Logic
+    private IntakeLogic intake = new IntakeLogic();
 
     // Auto aim toggle
     private boolean autoAimEnabled = true;
@@ -415,17 +419,17 @@ public class Auto_V2 extends OpMode {
 
             case INTAKE_ON:
                 // You were already using shooter.getIntake().intakeReady(true)
-                shooter.getIntake().setIntakeOnVelocity(-1);
-                shooter.getIntake().intakeReady(true);
+                intake.setTargetRPM(-1100);
+                intake.intakeReady(true);
                 break;
 
             case INTAKE_OFF:
-                shooter.getIntake().intakeReady(false);
+                intake.intakeReady(false);
                 break;
 
             case SHOOT_3:
-                shooter.getIntake().setIntakeOnVelocity(-0.4);
-                shooter.fireShots(3);///TODO: fix
+                intake.setTargetRPM(-1100);
+                shooter.fireShots(3);
                 waitingForShooter = shooter.isBusy();   // keep your existing blocking behavior
                 if (!waitingForShooter) actionActioned = false;  // retry SHOOT_3 next loop
                 break;
