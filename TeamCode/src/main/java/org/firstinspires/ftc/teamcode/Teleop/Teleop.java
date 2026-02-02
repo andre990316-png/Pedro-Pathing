@@ -381,6 +381,8 @@ public class Teleop extends OpMode {
 
             strafe  = fieldStrafe * cos + fieldForward * sin;
             forward = -fieldStrafe * sin + fieldForward * cos;
+            strafe += side;
+            forward += side;
         } else {
             strafe  = fieldStrafe;
             forward = fieldForward;
@@ -390,8 +392,8 @@ public class Teleop extends OpMode {
         forward *= currentSensitivity;
         rotation *= currentSensitivity * 0.8;
 
-        XL = side * strafe;
-        YL = side * forward;
+        XL = strafe;
+        YL = forward;
         XR = rotation;
 
         TempMax1 = Math.max(Math.abs(YL + XL + XR), Math.abs((YL - XL) - XR));
@@ -422,13 +424,6 @@ public class Teleop extends OpMode {
             autoAim.resetHistory(getRuntime());
         }
         ShooterRotateMotor.setPower(turretPower);
-
-        double ta = 0;
-        boolean llValid = false;
-        if (ll != null && ll.isValid()) {
-            llValid = true;
-            ta = ll.getTa();
-        }
 
         Pose robotPose = follower.getPose();
         double dx = AllianceData.getGoalPose().getX() - robotPose.getX();
