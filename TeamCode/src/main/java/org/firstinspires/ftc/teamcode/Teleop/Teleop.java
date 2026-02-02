@@ -121,9 +121,12 @@ public class Teleop extends OpMode {
 
     private boolean autogating = false;
     private boolean autosuctiongating = false;
+    private boolean parking = false;
 
     public static BezierPoint bluegate = new BezierPoint(14, 70);
     public static BezierPoint redgate = new BezierPoint(130, 70);
+    public static BezierPoint redpark = new BezierPoint(38.6, 33.5);
+    public static BezierPoint bluepark = new BezierPoint(105.4, 33.5);
 
     @Override
     public void init() {
@@ -408,8 +411,9 @@ public class Teleop extends OpMode {
         TempMax2 = Math.max(Math.abs((YL - XL) + XR), Math.abs((YL + XL) - XR));
         MaxPower = Math.max(TempMax1, TempMax2);
 
-        autogating= gamepad1.x;
-        autosuctiongating= gamepad1.y;
+        autogating = gamepad1.x;
+        autosuctiongating = gamepad1.y;
+        parking = gamepad1.b;
 
         if(autogating){
             if(AllianceData.isRed()){
@@ -423,6 +427,12 @@ public class Teleop extends OpMode {
                 follower.holdPoint(Auto_V2.redGateIntakePose);
             }else{
                 follower.holdPoint(Auto_V2.blueGateIntakePose);
+            }
+        }else if(parking){
+            if(AllianceData.isRed()){
+                follower.holdPoint(redpark, Math.toRadians(90));
+            }else{
+                follower.holdPoint(bluepark, Math.toRadians(90));
             }
         }else{
             if (MaxPower > 1) {
@@ -471,7 +481,7 @@ public class Teleop extends OpMode {
             if (hoodDownBtn.getState()) pos -= 0.01;
             pos = Range.clip(pos, 0.84, 1.0);
             ShooterS1.setPosition(pos);
-        }
+        };d
         */
 
         if(autoFlywheelAndHoodToggleBtn.justPressed()) shooter.setTargetRPM(0);
