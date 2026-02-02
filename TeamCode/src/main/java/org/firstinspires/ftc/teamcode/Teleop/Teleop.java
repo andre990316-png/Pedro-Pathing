@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
+import com.pedropathing.geometry.BezierPoint;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -13,6 +14,8 @@ import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
+
+import org.firstinspires.ftc.teamcode.Autonomous.Auto_V2;
 import org.firstinspires.ftc.teamcode.Autonomous.Constants;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -115,6 +118,12 @@ public class Teleop extends OpMode {
     private final Pose bottomLeftStartPose = new Pose(48, 10, Math.toRadians(90));
     private final java.util.ArrayList<PatternLogic.Color> driverPatternEntry = new java.util.ArrayList<>(3);
     private ColorSensorLogic colorSensorLogic = new ColorSensorLogic();
+
+    private boolean autogating = false;
+    private boolean autosuctiongating = false;
+
+    public static BezierPoint bluegate = new BezierPoint(14, 70);
+    public static BezierPoint redgate = new BezierPoint(130, 70);
 
     @Override
     public void init() {
@@ -399,17 +408,36 @@ public class Teleop extends OpMode {
         TempMax2 = Math.max(Math.abs((YL - XL) + XR), Math.abs((YL + XL) - XR));
         MaxPower = Math.max(TempMax1, TempMax2);
 
-        if (MaxPower > 1) {
-            MotorFrontLeft.setPower((YL + XL + XR) / MaxPower);
-            MotorFrontRight.setPower(((YL - XL) - XR) / MaxPower);
-            MotorBackLeft.setPower(((YL - XL) + XR) / MaxPower);
-            MotorBackRight.setPower(((YL + XL) - XR) / MaxPower);
-        } else {
-            MotorFrontLeft.setPower(YL + XL + XR);
-            MotorFrontRight.setPower((YL - XL) - XR);
-            MotorBackLeft.setPower((YL - XL) + XR);
-            MotorBackRight.setPower((YL + XL) - XR);
+        autogating= gamepad1.x;
+        autosuctiongating= gamepad1.y;
+
+        if(autogating){
+            if(AllianceData.isRed()){
+                follower.holdPoint(redgate, Math.toRadians(90));
+            }else{
+                follower.holdPoint(bluegate, Math.toRadians(90));
+            }
+
+        }else if(autosuctiongating){
+            if(AllianceData.isRed()){
+                follower.holdPoint(Auto_V2.redGateIntakePose);
+            }else{
+                follower.holdPoint(Auto_V2.blueGateIntakePose);
+            }
+        }else{
+            if (MaxPower > 1) {
+                MotorFrontLeft.setPower((YL + XL + XR) / MaxPower);
+                MotorFrontRight.setPower(((YL - XL) - XR) / MaxPower);
+                MotorBackLeft.setPower(((YL - XL) + XR) / MaxPower);
+                MotorBackRight.setPower(((YL + XL) - XR) / MaxPower);
+            } else {
+                MotorFrontLeft.setPower(YL + XL + XR);
+                MotorFrontRight.setPower((YL - XL) - XR);
+                MotorBackLeft.setPower((YL - XL) + XR);
+                MotorBackRight.setPower((YL + XL) - XR);
+            }
         }
+
 
         double yaw = imu.getRobotYawPitchRollAngles().getYaw();
         limelight.updateRobotOrientation(yaw);

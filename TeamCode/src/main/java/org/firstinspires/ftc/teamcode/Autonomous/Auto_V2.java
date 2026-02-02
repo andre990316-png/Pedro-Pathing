@@ -149,8 +149,8 @@ public class Auto_V2 extends OpMode {
     private final Pose redLoadingZoneEnd = new Pose(133.8,10, Math.toRadians(0));
 
     //gate and intake poses
-    private final Pose blueGateIntakePose = new Pose(13,54, Math.toRadians(140));
-    private final Pose redGateIntakePose = new Pose(11,62, Math.toRadians(120));
+    public static final Pose blueGateIntakePose = new Pose(13,54, Math.toRadians(140));
+    public static final Pose redGateIntakePose = new Pose(131,54, Math.toRadians(40));
 
 
     private ElapsedTime stateTimer = new ElapsedTime();
