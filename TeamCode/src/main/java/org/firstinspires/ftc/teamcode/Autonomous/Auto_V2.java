@@ -167,7 +167,8 @@ public class Auto_V2 extends OpMode {
     // Action runs when the segment STARTS (before followPath).
     // ------------------------------------------------------------
 
-    public static String[] autonames = {"top left","top right","bottom left","bottom right"};
+    public static String[] autonames = {"topleftALL","topleftALL+GATE","bottomleft","bottomleft+R3","bottomleft+EXTRA","bottomleft+R3+EXTRA", "topleft2", "topleft2+GATE",
+            "toprightALL","toprightALL+GATE","bottomright","bottomright+R3","bottomright+EXTRA","bottomright+R3+EXTRA", "topright2", "topright2+GATE"};
     ArrayList<ArrayList<AutoStep>> paths = new ArrayList<>();
 
 
@@ -209,7 +210,7 @@ public class Auto_V2 extends OpMode {
         INTAKEBLUEBALLPOSITION2ANDOPENGATE.clear();
 
         INTAKEBLUEBALLPOSITION2ANDOPENGATE.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
-        INTAKEBLUEBALLPOSITION2ANDOPENGATE.add(new AutoStep(blueBallPosition2EndAndGate, AutoAction.NONE, 0));
+        INTAKEBLUEBALLPOSITION2ANDOPENGATE.add(new AutoStep(blueGateIntakePose, AutoAction.NONE, 0));
         INTAKEBLUEBALLPOSITION2ANDOPENGATE.add(new AutoStep(blueBallPosition2Start, AutoAction.NONE, 0));
 
         BLUESHOOT3NEAR.clear();
@@ -466,10 +467,28 @@ public class Auto_V2 extends OpMode {
             limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
         }
 
-        paths.add(AUTOTOPLEFT4);
-        paths.add(AUTOTOPRIGHT4);
-        paths.add(AUTOBOTTOMLEFT);
-        paths.add(AUTOBOTTOMRIGHT);
+//        paths.add(AUTOTOPLEFT4);
+//        paths.add(AUTOTOPRIGHT4);
+//        paths.add(AUTOBOTTOMLEFT);
+//        paths.add(AUTOBOTTOMRIGHT);
+
+        paths.add(PATH1LEFT);
+        paths.add(PATH2LEFT);
+        paths.add(PATH3LEFT);
+        paths.add(PATH4LEFT);
+        paths.add(PATH5LEFT);
+        paths.add(PATH6LEFT);
+        paths.add(PATH7LEFT);
+        paths.add(PATH8LEFT);
+
+        paths.add(PATH1RIGHT);
+        paths.add(PATH2RIGHT);
+        paths.add(PATH3RIGHT);
+        paths.add(PATH4RIGHT);
+        paths.add(PATH5RIGHT);
+        paths.add(PATH6RIGHT);
+        paths.add(PATH7RIGHT);
+        paths.add(PATH8RIGHT);
 
 
 
@@ -701,7 +720,7 @@ public class Auto_V2 extends OpMode {
 
                 follower.setStartingPose(STEPS.get(0).pose);
 
-                if(PATHNUM==0||PATHNUM==2){
+                if(PATHNUM<8){
                     AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
                     limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
                 }else{
