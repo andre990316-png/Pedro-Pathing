@@ -224,10 +224,10 @@ public class Teleop extends OpMode {
 
         if (AllianceData.isRed()) {
             limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
-            side = -1;
+            side = 1;
         } else {
             limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
-            side = 1;
+            side = -1;
         }
         allianceBannerTimer.reset();
         showAllianceBanner = true;
