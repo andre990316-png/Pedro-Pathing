@@ -59,8 +59,23 @@ public class Auto_V2 extends OpMode {
     }
 
     private ArrayList<AutoStep> STEPS = new ArrayList<>();
-    private ArrayList<AutoStep> AUTOTOPRIGHT3 = new ArrayList<>();
     private ArrayList<PathChain> CHAINS = new ArrayList<>();
+    private ArrayList<AutoStep> PATH1LEFT = new ArrayList<>();
+    private ArrayList<AutoStep> PATH2LEFT = new ArrayList<>();
+    private ArrayList<AutoStep> PATH3LEFT = new ArrayList<>();
+    private ArrayList<AutoStep> PATH4LEFT = new ArrayList<>();
+    private ArrayList<AutoStep> PATH5LEFT = new ArrayList<>();
+    private ArrayList<AutoStep> PATH6LEFT = new ArrayList<>();
+    private ArrayList<AutoStep> PATH7LEFT = new ArrayList<>();
+    private ArrayList<AutoStep> PATH8LEFT = new ArrayList<>();
+    private ArrayList<AutoStep> PATH1RIGHT = new ArrayList<>();
+    private ArrayList<AutoStep> PATH2RIGHT = new ArrayList<>();
+    private ArrayList<AutoStep> PATH3RIGHT = new ArrayList<>();
+    private ArrayList<AutoStep> PATH4RIGHT = new ArrayList<>();
+    private ArrayList<AutoStep> PATH5RIGHT = new ArrayList<>();
+    private ArrayList<AutoStep> PATH6RIGHT = new ArrayList<>();
+    private ArrayList<AutoStep> PATH7RIGHT = new ArrayList<>();
+    private ArrayList<AutoStep> PATH8RIGHT = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTEST = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTOPLEFT = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTOPLEFT2 = new ArrayList<>();
@@ -73,6 +88,7 @@ public class Auto_V2 extends OpMode {
     private ArrayList<AutoStep> AUTOBOTTOMRIGHT = new ArrayList<>();
     private ArrayList<AutoStep> INTAKEBLUEBALLPOSITION1 = new ArrayList<>();
     private ArrayList<AutoStep> INTAKEBLUEBALLPOSITION2 = new ArrayList<>();
+    private ArrayList<AutoStep> INTAKEBLUEBALLPOSITION2ANDOPENGATE = new ArrayList<>();
     private ArrayList<AutoStep> INTAKEBLUEBALLPOSITION3 = new ArrayList<>();
     private ArrayList<AutoStep> INTAKEBLUEGATE = new ArrayList<>();
     private ArrayList<AutoStep> INTAKEBLUELOADINGZONE = new ArrayList<>();
@@ -83,10 +99,6 @@ public class Auto_V2 extends OpMode {
     private boolean waitingForShooter = false;
 
     private double distToGoal = 0;
-    private boolean timerStart = true;
-    private double lastTa = 0;
-    private final Pose blueGoalPose = new Pose(0, 144, 0);
-    private final Pose redGoalPose  = new Pose(144, 144, 0);
 
     // ===== Poses you already had =====
     //start poses
@@ -94,6 +106,10 @@ public class Auto_V2 extends OpMode {
     private final Pose bottomLeftStartPose = new Pose(48, 10, Math.toRadians(90));
     private final Pose bottomRightStartPose = new Pose(96, 10, Math.toRadians(90));
     private final Pose topRightStartPose = new Pose(124, 118.5, Math.toRadians(36));
+
+    //end poses
+    private final Pose topLeftEndPose = new Pose();
+    private final Pose BottonLeftEndPose = new Pose();
 
     //close shoot poses (on big V)
     private final Pose blueShootPoseClose = new Pose(45, 96, Math.toRadians(137));
@@ -112,6 +128,7 @@ public class Auto_V2 extends OpMode {
     private final Pose blueBallPosition1End = new Pose(11, 35.5, Math.toRadians(180));
     private final Pose blueBallPosition2Start = new Pose(50, 58, Math.toRadians(180));
     private final Pose blueBallPosition2End = new Pose(11, 58, Math.toRadians(180));
+    private final Pose blueBallPosition2EndAndGate = new Pose(11, 58, Math.toRadians(180));
     private final Pose blueBallPosition3Start = new Pose(50, 84, Math.toRadians(180));
     private final Pose blueBallPosition3End = new Pose(18, 84, Math.toRadians(180));
 
@@ -158,17 +175,8 @@ public class Auto_V2 extends OpMode {
         paths.clear();
 
         STEPS.clear();
-        AUTOTEST.clear();
-        AUTOTOPLEFT.clear();
-        AUTOTOPLEFT2.clear();
-        AUTOTOPLEFT3.clear();
+
         INTAKEBLUEBALLPOSITION1.clear();
-        AUTOBOTTOMLEFT.clear();
-        AUTOTOPRIGHT.clear();
-        AUTOBOTTOMRIGHT.clear();
-        INTAKEBLUEBALLPOSITION2.clear();
-        INTAKEBLUEBALLPOSITION3.clear();
-        BLUESHOOT3NEAR.clear();
 
         INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1Start, AutoAction.INTAKE_ON, 0));
         INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1End, AutoAction.NONE, 0));
@@ -198,30 +206,43 @@ public class Auto_V2 extends OpMode {
         INTAKEBLUELOADINGZONE.add(new AutoStep(blueLoadingZoneEnd, AutoAction.NONE, 0));
         INTAKEBLUELOADINGZONE.add(new AutoStep(blueLoadingZoneStart, AutoAction.NONE, 0));
 
+        INTAKEBLUEBALLPOSITION2ANDOPENGATE.clear();
+
+        INTAKEBLUEBALLPOSITION2ANDOPENGATE.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
+        INTAKEBLUEBALLPOSITION2ANDOPENGATE.add(new AutoStep(blueBallPosition2EndAndGate, AutoAction.NONE, 0));
+        INTAKEBLUEBALLPOSITION2ANDOPENGATE.add(new AutoStep(blueBallPosition2Start, AutoAction.NONE, 0));
+
         BLUESHOOT3NEAR.clear();
 
         BLUESHOOT3NEAR.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         BLUESHOOT3NEAR.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
-        // Start -> shoot
-        AUTOTEST.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
-        AUTOTEST.add(new AutoStep(blueShootPoseMed, AutoAction.NONE, 0));
+        PATH1LEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
+        PATH1LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        PATH1LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH1LEFT.addAll(INTAKEBLUEBALLPOSITION1);
+        PATH1LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        PATH1LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH1LEFT.addAll(INTAKEBLUEBALLPOSITION2);
+        PATH1LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        PATH1LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH1LEFT.addAll(INTAKEBLUEBALLPOSITION3);
+        PATH1LEFT.add(new AutoStep(topLeftEndPose, AutoAction.NONE, 0));
 
-        // At shoot pose: shoot 3, wait until shooter done (no movement)
-        AUTOTEST.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH2LEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
+        PATH2LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        PATH2LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH2LEFT.addAll(INTAKEBLUEBALLPOSITION2ANDOPENGATE);
+        PATH2LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        PATH2LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH2LEFT.addAll(INTAKEBLUEBALLPOSITION1);
+        PATH2LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        PATH2LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATH2LEFT.addAll(INTAKEBLUEBALLPOSITION3);
+        PATH2LEFT.add(new AutoStep(topLeftEndPose, AutoAction.NONE, 0));
 
-        // Start moving to intake area: turn intake on at start of this segment
-        AUTOTEST.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_ON, 0));
-        AUTOTEST.add(new AutoStep(blueBallPosition3Start, AutoAction.NONE, 0));
-        AUTOTEST.add(new AutoStep(blueBallPosition3End, AutoAction.NONE, 0));
 
-        // Start returning: turn intake off at start of this segment
-        AUTOTEST.add(new AutoStep(blueBallPosition3Start, AutoAction.INTAKE_OFF, 0));
-        AUTOTEST.add(new AutoStep(blueShootPoseClose, AutoAction.SHOOT_3, 0));
-
-        // Optional: pause at shoot pose
-        AUTOTEST.add(new AutoStep(null, AutoAction.NONE, 500));
-
+        /*
         ///top left auto
 
         //shoots preload, gets row 2 and shoots
@@ -284,6 +305,9 @@ public class Auto_V2 extends OpMode {
         AUTOBOTTOMLEFT.add(new AutoStep(bottomLeftStartPose, AutoAction.NONE, 0));
         AUTOBOTTOMLEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
         AUTOBOTTOMLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        AUTOBOTTOMLEFT.addAll(INTAKEBLUEBALLPOSITION1);
+        AUTOBOTTOMLEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
+        AUTOBOTTOMLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
         //get loading zone balls and shoot
         //does this thrice
@@ -319,12 +343,9 @@ public class Auto_V2 extends OpMode {
         AUTOBOTTOMRIGHT = AutoStep.flipped(AUTOBOTTOMLEFT);
 
         AUTOTOPRIGHT2 = AutoStep.flipped(AUTOTOPLEFT2);
-        AUTOTOPRIGHT4 = AutoStep.flipped(AUTOTOPLEFT4);
-        AUTOTOPRIGHT3 = AutoStep.flipped(AUTOTOPLEFT3);
+        AUTOTOPRIGHT4 = AutoStep.flipped(AUTOTOPLEFT4);*/
 
         if (AllianceData.isRed()) {
-
-
             STEPS.addAll(AUTOTOPRIGHT2);
 
             telemetry.addData("Auto Path", "RED (Right Side)");
