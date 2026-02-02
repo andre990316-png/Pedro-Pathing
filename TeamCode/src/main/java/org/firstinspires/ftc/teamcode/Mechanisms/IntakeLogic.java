@@ -69,8 +69,7 @@ public class IntakeLogic {
         // --- PID ---
         double error = Math.abs(targetRPM) - currentRPM;
 
-        integral += error * dt;
-        integral = Range.clip(integral, -300, 300);
+        integral = 0;
 
         double derivative = (error - lastError) / dt;
         lastError = error;
