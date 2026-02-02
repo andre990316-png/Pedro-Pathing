@@ -231,7 +231,6 @@ public class Teleop extends OpMode {
     @Override
     public void loop() {
         shooter.update();
-        shooter.getIntake().update();
         intake.update();
         follower.update();
         ColorSensorLogic.update(telemetry);
@@ -321,15 +320,15 @@ public class Teleop extends OpMode {
         }*/
 
         if (gateHoldBtn.getState()) {
-            shooter.getIntake().setIntakeOnVelocity(-0.37);
+            intake.setTargetRPM(-660);
             shooter.getIntake().intakeReady(true);
         }
 
         if (!shooter.isBusy() && intakeHoldBtn.getState()) {
-            shooter.getIntake().setIntakeOnVelocity(-1);
+            intake.setTargetRPM(500);
             shooter.getIntake().intakeReady(true);
         } else if (!shooter.isBusy() && intakeReverseHoldBtn.getState() && !shoot3Btn.getState() && !intakeHoldBtn.getState()) {
-            shooter.getIntake().setIntakeOnVelocity(1);
+            ///TODO 100% power
             shooter.getIntake().intakeReady(true);
         } else if (!shooter.isBusy() && !shoot3Btn.getState() && !intakeHoldBtn.getState() && !intakeReverseHoldBtn.getState()){
             shooter.getIntake().intakeReady(false);
@@ -547,9 +546,8 @@ public class Teleop extends OpMode {
             telemetry.addData("LLPose", "no valid tag");
         }
         telemetry.addData("DistanceToGoal", distToGoal);
-        telemetry.addData("IntakeOnVelo ", IntakeLogic.intakeOnVelocity);
         telemetry.addData("Intake RPM", intake.getCurrentRPM());
-        telemetry.addData("Intake PID Output", intake.getPidOutput());
+        telemetry.addData("Intake PID Output", intake.getPidPower());
 
         telemetry.update();
 

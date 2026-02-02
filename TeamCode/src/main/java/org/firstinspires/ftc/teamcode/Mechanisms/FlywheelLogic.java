@@ -168,7 +168,7 @@ private double launchTime = 2; // seconds gate stays open
                 case SPIN_UP:
                     if (Math.abs(error) <= 100 || stateTimer.seconds() > flywheelMaxSpinupTime) {
                         ShooterS2.setPosition(gateOpenAngle);
-                        intake.setIntakeOnVelocity(-0.4);
+                        intake.setTargetRPM(-660);
                         intake.intakeReady(true);
                         stateTimer.reset();
                         flyWheelState = FlywheelState.LAUNCH;
@@ -179,7 +179,7 @@ private double launchTime = 2; // seconds gate stays open
                     if (stateTimer.seconds() > singleShotTime) {
                         shotsRemaining--;
                         if (shotsRemaining > 0) {
-                            intake.setIntakeOnVelocity(-0.4);
+                            intake.setTargetRPM(-660);
                             intake.intakeReady(true);
                             stateTimer.reset();
                             flyWheelState = FlywheelState.SPIN_UP;
