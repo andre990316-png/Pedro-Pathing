@@ -164,12 +164,6 @@ private double launchTime = 2; // seconds gate stays open
         switch (flyWheelState) {
             case IDLE:
                 break;
-//            case WAIT:
-//                if (stateTimer.seconds() > 0) {
-//                    stateTimer.reset();
-//                    flyWheelState = FlywheelState.SPIN_UP;
-//                }
-//                break;
 
                 case SPIN_UP:
                     if (Math.abs(error) <= 100 || stateTimer.seconds() > flywheelMaxSpinupTime) {

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
+import com.pedropathing.geometry.BezierPoint;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -13,6 +14,8 @@ import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
+
+import org.firstinspires.ftc.teamcode.Autonomous.Auto_V2;
 import org.firstinspires.ftc.teamcode.Autonomous.Constants;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -115,6 +118,15 @@ public class Teleop extends OpMode {
     private final Pose bottomLeftStartPose = new Pose(48, 10, Math.toRadians(90));
     private final java.util.ArrayList<PatternLogic.Color> driverPatternEntry = new java.util.ArrayList<>(3);
     private ColorSensorLogic colorSensorLogic = new ColorSensorLogic();
+
+    private boolean autogating = false;
+    private boolean autosuctiongating = false;
+    private boolean parking = false;
+
+    public static BezierPoint bluegate = new BezierPoint(14, 70);
+    public static BezierPoint redgate = new BezierPoint(130, 70);
+    public static BezierPoint redpark = new BezierPoint(38.6, 33.5);
+    public static BezierPoint bluepark = new BezierPoint(105.4, 33.5);
 
     @Override
     public void init() {
@@ -380,6 +392,8 @@ public class Teleop extends OpMode {
 
             strafe  = fieldStrafe * cos + fieldForward * sin;
             forward = -fieldStrafe * sin + fieldForward * cos;
+            strafe *= side;
+            forward *= side;
         } else {
             strafe  = fieldStrafe;
             forward = fieldForward;
@@ -389,25 +403,51 @@ public class Teleop extends OpMode {
         forward *= currentSensitivity;
         rotation *= currentSensitivity * 0.8;
 
-        XL = side * strafe;
-        YL = side * forward;
+        XL = strafe;
+        YL = forward;
         XR = rotation;
 
         TempMax1 = Math.max(Math.abs(YL + XL + XR), Math.abs((YL - XL) - XR));
         TempMax2 = Math.max(Math.abs((YL - XL) + XR), Math.abs((YL + XL) - XR));
         MaxPower = Math.max(TempMax1, TempMax2);
 
-        if (MaxPower > 1) {
-            MotorFrontLeft.setPower((YL + XL + XR) / MaxPower);
-            MotorFrontRight.setPower(((YL - XL) - XR) / MaxPower);
-            MotorBackLeft.setPower(((YL - XL) + XR) / MaxPower);
-            MotorBackRight.setPower(((YL + XL) - XR) / MaxPower);
-        } else {
-            MotorFrontLeft.setPower(YL + XL + XR);
-            MotorFrontRight.setPower((YL - XL) - XR);
-            MotorBackLeft.setPower((YL - XL) + XR);
-            MotorBackRight.setPower((YL + XL) - XR);
+        autogating = gamepad1.x;
+        autosuctiongating = gamepad1.y;
+        parking = gamepad1.b;
+
+        if(autogating){
+            if(AllianceData.isRed()){
+                follower.holdPoint(redgate, Math.toRadians(90));
+            }else{
+                follower.holdPoint(bluegate, Math.toRadians(90));
+            }
+
+        }else if(autosuctiongating){
+            if(AllianceData.isRed()){
+                follower.holdPoint(Auto_V2.redGateIntakePose);
+            }else{
+                follower.holdPoint(Auto_V2.blueGateIntakePose);
+            }
+        }else if(parking){
+            if(AllianceData.isRed()){
+                follower.holdPoint(redpark, Math.toRadians(90));
+            }else{
+                follower.holdPoint(bluepark, Math.toRadians(90));
+            }
+        }else{
+            if (MaxPower > 1) {
+                MotorFrontLeft.setPower((YL + XL + XR) / MaxPower);
+                MotorFrontRight.setPower(((YL - XL) - XR) / MaxPower);
+                MotorBackLeft.setPower(((YL - XL) + XR) / MaxPower);
+                MotorBackRight.setPower(((YL + XL) - XR) / MaxPower);
+            } else {
+                MotorFrontLeft.setPower(YL + XL + XR);
+                MotorFrontRight.setPower((YL - XL) - XR);
+                MotorBackLeft.setPower((YL - XL) + XR);
+                MotorBackRight.setPower((YL + XL) - XR);
+            }
         }
+
 
         double yaw = imu.getRobotYawPitchRollAngles().getYaw();
         limelight.updateRobotOrientation(yaw);
@@ -421,13 +461,6 @@ public class Teleop extends OpMode {
             autoAim.resetHistory(getRuntime());
         }
         ShooterRotateMotor.setPower(turretPower);
-
-        double ta = 0;
-        boolean llValid = false;
-        if (ll != null && ll.isValid()) {
-            llValid = true;
-            ta = ll.getTa();
-        }
 
         Pose robotPose = follower.getPose();
         double dx = AllianceData.getGoalPose().getX() - robotPose.getX();
@@ -448,7 +481,7 @@ public class Teleop extends OpMode {
             if (hoodDownBtn.getState()) pos -= 0.01;
             pos = Range.clip(pos, 0.84, 1.0);
             ShooterS1.setPosition(pos);
-        }
+        };d
         */
 
         if(autoFlywheelAndHoodToggleBtn.justPressed()) shooter.setTargetRPM(0);

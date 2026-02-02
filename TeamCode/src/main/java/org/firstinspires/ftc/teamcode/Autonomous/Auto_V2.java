@@ -107,13 +107,13 @@ public class Auto_V2 extends OpMode {
     // ===== Poses you already had =====
     //start poses
     private final Pose topLeftStartPose = new Pose(20, 118.5, Math.toRadians(144));
-    private final Pose bottomLeftStartPose = new Pose(48, 10, Math.toRadians(90));
+    private final Pose bottomLeftStartPose = new Pose(57, 3, Math.toRadians(90));
     private final Pose bottomRightStartPose = new Pose(96, 10, Math.toRadians(90));
     private final Pose topRightStartPose = new Pose(124, 118.5, Math.toRadians(36));
 
     //end poses
-    private final Pose topLeftEndPose = new Pose();
-    private final Pose bottonLeftEndPose = new Pose();
+    private final Pose topLeftEndPose = new Pose(25, 65, Math.toRadians(180));
+    private final Pose bottonLeftEndPose = new Pose(41, 12, Math.toRadians(180));
 
     //close shoot poses (on big V)
     private final Pose blueShootPoseClose = new Pose(45, 96, Math.toRadians(137));
@@ -149,8 +149,8 @@ public class Auto_V2 extends OpMode {
     private final Pose redLoadingZoneEnd = new Pose(133.8,10, Math.toRadians(0));
 
     //gate and intake poses
-    private final Pose blueGateIntakePose = new Pose(13,54, Math.toRadians(140));
-    private final Pose redGateIntakePose = new Pose(11,62, Math.toRadians(120));
+    public static final Pose blueGateIntakePose = new Pose(13,54, Math.toRadians(140));
+    public static final Pose redGateIntakePose = new Pose(131,54, Math.toRadians(40));
 
 
     private ElapsedTime stateTimer = new ElapsedTime();
@@ -167,7 +167,8 @@ public class Auto_V2 extends OpMode {
     // Action runs when the segment STARTS (before followPath).
     // ------------------------------------------------------------
 
-    public static String[] autonames = {"top left","top right","bottom left","bottom right"};
+    public static String[] autonames = {"topleftALL","topleftALL+GATE","bottomleft","bottomleft+R3","bottomleft+EXTRA","bottomleft+R3+EXTRA", "topleft2", "topleft2+GATE",
+            "toprightALL","toprightALL+GATE","bottomright","bottomright+R3","bottomright+EXTRA","bottomright+R3+EXTRA", "topright2", "topright2+GATE"};
     ArrayList<ArrayList<AutoStep>> paths = new ArrayList<>();
 
 
@@ -209,7 +210,7 @@ public class Auto_V2 extends OpMode {
         INTAKEBLUEBALLPOSITION2ANDOPENGATE.clear();
 
         INTAKEBLUEBALLPOSITION2ANDOPENGATE.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
-        INTAKEBLUEBALLPOSITION2ANDOPENGATE.add(new AutoStep(blueBallPosition2EndAndGate, AutoAction.NONE, 0));
+        INTAKEBLUEBALLPOSITION2ANDOPENGATE.add(new AutoStep(blueGateIntakePose, AutoAction.NONE, 0));
         INTAKEBLUEBALLPOSITION2ANDOPENGATE.add(new AutoStep(blueBallPosition2Start, AutoAction.NONE, 0));
 
         BLUESHOOT3NEAR.clear();
@@ -466,10 +467,28 @@ public class Auto_V2 extends OpMode {
             limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
         }
 
-        paths.add(AUTOTOPLEFT4);
-        paths.add(AUTOTOPRIGHT4);
-        paths.add(AUTOBOTTOMLEFT);
-        paths.add(AUTOBOTTOMRIGHT);
+//        paths.add(AUTOTOPLEFT4);
+//        paths.add(AUTOTOPRIGHT4);
+//        paths.add(AUTOBOTTOMLEFT);
+//        paths.add(AUTOBOTTOMRIGHT);
+
+        paths.add(PATH1LEFT);
+        paths.add(PATH2LEFT);
+        paths.add(PATH3LEFT);
+        paths.add(PATH4LEFT);
+        paths.add(PATH5LEFT);
+        paths.add(PATH6LEFT);
+        paths.add(PATH7LEFT);
+        paths.add(PATH8LEFT);
+
+        paths.add(PATH1RIGHT);
+        paths.add(PATH2RIGHT);
+        paths.add(PATH3RIGHT);
+        paths.add(PATH4RIGHT);
+        paths.add(PATH5RIGHT);
+        paths.add(PATH6RIGHT);
+        paths.add(PATH7RIGHT);
+        paths.add(PATH8RIGHT);
 
 
 
@@ -701,7 +720,7 @@ public class Auto_V2 extends OpMode {
 
                 follower.setStartingPose(STEPS.get(0).pose);
 
-                if(PATHNUM==0||PATHNUM==2){
+                if(PATHNUM<8){
                     AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
                     limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
                 }else{
