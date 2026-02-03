@@ -115,7 +115,6 @@ public class Teleop extends OpMode {
     private Pose selectedStartPose;
     private final Pose topLeftStartPose = new Pose(30, 125, Math.toRadians(93));
     private final Pose topRightStartPose = new Pose(114, 125, Math.toRadians(87));
-    private final Pose bottomLeftStartPose = new Pose(48, 10, Math.toRadians(90));
     private final java.util.ArrayList<PatternLogic.Color> driverPatternEntry = new java.util.ArrayList<>(3);
     private ColorSensorLogic colorSensorLogic = new ColorSensorLogic();
 
@@ -126,7 +125,7 @@ public class Teleop extends OpMode {
     public static BezierPoint bluegate = new BezierPoint(14, 70);
     public static BezierPoint redgate = new BezierPoint(132.5, 70);
     public static BezierPoint redpark = new BezierPoint(29, 41.8);
-    public static BezierPoint bluepark = new BezierPoint(105.4, 33.5);
+    public static BezierPoint bluepark = new BezierPoint(105.4, 36.5);
     private boolean isHoldingPosition = false;
 
     @Override
