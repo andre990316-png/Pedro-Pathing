@@ -383,7 +383,7 @@ public class Teleop extends OpMode {
         // Raw joystick (FIELD intent)
         double fieldStrafe  = gamepad1.left_stick_x;
         double fieldForward = -gamepad1.left_stick_y;
-        double rotation = gamepad1.right_stick_x * 0.8;
+        double rotation = gamepad1.right_stick_x * 0.75;
 
         double strafe;
         double forward;
