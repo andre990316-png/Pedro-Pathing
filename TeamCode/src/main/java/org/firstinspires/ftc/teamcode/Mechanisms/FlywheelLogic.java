@@ -15,7 +15,7 @@ public class FlywheelLogic {
 
     public static final double kp = 2.82;
     public static final double kd = 0.33;
-    public static final double kf = 1.6;
+    public static final double kf = 1.5;
 
 
     // --- Hardware ---
@@ -105,22 +105,22 @@ private double launchTime = 1.7; // seconds gate stays open
             ffPower = kf * (targetRPM / 6000) * 0.69;// slightly reduce for mid RPM
             pPower = kp * 0.77;
         } else if (targetRPM < 4500){
-            ffPower = kf * (targetRPM / 6000) * 0.7;
+            ffPower = kf * (targetRPM / 6000) * 0.665;
             pPower = kp;
         }else if(targetRPM < 5000) {
             ffPower = kf * (targetRPM / 6000) * 0.7;
             pPower = kp;
         }else if (targetRPM < 5500) {
-            ffPower = kf * (targetRPM / 6000) * 0.7967;        // full feedforward for high RPM
+            ffPower = kf * (targetRPM / 6000) * 0.77;        // full feedforward for high RPM
             pPower = kp;
         } else {
-            ffPower = kf * (targetRPM / 6000) * 1.2;
+            ffPower = kf * (targetRPM / 6000) * 1.12;
             pPower = kp;
         }
 
-        if (error > 250) {
-            pPower = 30;
-            ffPower = ffPower * (error / 250.0);
+        if (error > 400) {
+            pPower = 5;
+            ffPower = ffPower * (error /500);
         }
 
 

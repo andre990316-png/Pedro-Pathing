@@ -125,7 +125,7 @@ public class Teleop extends OpMode {
 
     public static BezierPoint bluegate = new BezierPoint(14, 70);
     public static BezierPoint redgate = new BezierPoint(130, 70);
-    public static BezierPoint redpark = new BezierPoint(38.6, 33.5);
+    public static BezierPoint redpark = new BezierPoint(29, 41.8);
     public static BezierPoint bluepark = new BezierPoint(105.4, 33.5);
     private boolean isHoldingPosition = false;
 
@@ -176,8 +176,10 @@ public class Teleop extends OpMode {
 
         if (Auto_lastPose.currentPose != null){
             selectedStartPose = Auto_lastPose.currentPose;
+            AutoPoseAvailable = true;
         }else{
             selectedStartPose = topLeftStartPose;
+            AutoPoseAvailable = false;
         }
 
         follower = Constants.createFollower(hardwareMap);
@@ -226,6 +228,7 @@ public class Teleop extends OpMode {
         if (AllianceData.isRed()) {
             limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
             side = 1;
+
         } else {
             limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
             side = -1;
@@ -333,7 +336,7 @@ public class Teleop extends OpMode {
         }*/
 
         if (gateHoldBtn.getState()) {
-            intake.setTargetRPM(-0.37);
+            intake.setTargetRPM(-0.39);
             intake.intakeReady(true);
         }
 
@@ -402,7 +405,7 @@ public class Teleop extends OpMode {
 
         strafe  *= currentSensitivity;
         forward *= currentSensitivity;
-        rotation *= currentSensitivity * 0.8;
+        rotation *= currentSensitivity * 0.75;
 
         XL = strafe;
         YL = forward;
@@ -440,9 +443,9 @@ public class Teleop extends OpMode {
             // 只有在 "還沒鎖定" 的時候，才發送一次指令
             if (!isHoldingPosition) {
                 if (AllianceData.isRed()) {
-                    follower.holdPoint(redpark, Math.toRadians(90));
+                    follower.holdPoint(redpark, Math.toRadians(-90));
                 } else {
-                    follower.holdPoint(bluepark, Math.toRadians(90));
+                    follower.holdPoint(bluepark, Math.toRadians(-90));
                 }
                 isHoldingPosition = true;
             }
