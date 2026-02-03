@@ -50,13 +50,10 @@ public class FlywheelAndHoodData {
 
     public static AutoShooting lookupB(double ta) {
         double flywheelRPM, hoodAngle = 1;
-        if (ta >= 0.38) return new AutoShooting(4150, 0.96);
-        if (ta >= 0.32) return new AutoShooting(4300, 1.00);
-        if (ta >= 0.29) return new AutoShooting(4600, 1.00);
-        return new AutoShooting(4600, 1.00);
-    }
-    public static double logisticModel(double x) {
-        return 1.04906 / (1.0 + Math.exp(-(0.0533548 * x - 0.774792)));
+        if (ta >= 0.38) return new AutoShooting(4400, 0.96);
+        if (ta >= 0.32) return new AutoShooting(4500, 0.96);
+        if (ta >= 0.29) return new AutoShooting(4600, 0.96);
+        return new AutoShooting(4600, 0.96);
     }
 }
 

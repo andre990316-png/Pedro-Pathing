@@ -111,7 +111,7 @@ public class Auto_V2 extends OpMode {
     // ===== Poses you already had =====
     //start poses
     private final Pose topLeftStartPose = new Pose(30, 125, Math.toRadians(93));
-    private final Pose bottomLeftStartPose = new Pose(57, 3, Math.toRadians(90));
+    private final Pose bottomLeftStartPose = new Pose(64, 2, Math.toRadians(90));
     private final Pose bottomRightStartPose = new Pose(96, 10, Math.toRadians(90));
     private final Pose topRightStartPose = new Pose(124, 118.5, Math.toRadians(36));
 
@@ -120,7 +120,7 @@ public class Auto_V2 extends OpMode {
     private final Pose bottonLeftEndPose = new Pose(41, 12, Math.toRadians(180));
 
     //close shoot poses (on big V)
-    private final Pose blueShootPoseClose = new Pose(45, 96, Math.toRadians(137));
+    private final Pose blueShootPoseClose = new Pose(50, 96, Math.toRadians(137));
     private final Pose redShootPoseClose = new Pose(99, 96, Math.toRadians(137));
 
     //far shoot poses (on small v)
@@ -146,7 +146,7 @@ public class Auto_V2 extends OpMode {
 
     //loading zone intaking poses (red)
     private final Pose blueLoadingZoneStart = new Pose(34,10, Math.toRadians(180));
-    private final Pose blueLoadingZoneEnd = new Pose(11, 10, Math.toRadians(180));
+    private final Pose blueLoadingZoneEnd = new Pose(15, 10, Math.toRadians(180));
 
     //loading zone intaking poses (blue)
     private final Pose redLoadingZoneStart = new Pose(110,10, Math.toRadians(0));
@@ -650,6 +650,7 @@ public class Auto_V2 extends OpMode {
 
     @Override
     public void init() {
+        buildSteps();
         ShooterS2 = hardwareMap.get(Servo.class, "Shooter S2");
         ShooterS2.setPosition(gateCloseAngle);
         limelight = hardwareMap.get(Limelight3A.class, "Limelight");
@@ -660,26 +661,26 @@ public class Auto_V2 extends OpMode {
 
         intake.init(hardwareMap);
 
-        buildSteps();
-
-        STEPS.clear();
-        STEPS.addAll(paths.get(PATHNUM));
-        buildChainsFromSteps();
-
-        currentIndex = 0;
-        actionActioned = false;
-        waitingForShooter = false;
-        pauseEndTimeMs = 0;
-
-        follower.setStartingPose(STEPS.get(0).pose);
-
-        if(PATHNUM<8){
-            AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
-            limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
-        }else{
-            AllianceData.selectedAlliance = AllianceData.Alliance.RED;
-            limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
-        }
+//        buildSteps();
+//
+//        STEPS.clear();
+//        STEPS.addAll(paths.get(PATHNUM));
+//        buildChainsFromSteps();
+//
+//        currentIndex = 0;
+//        actionActioned = false;
+//        waitingForShooter = false;
+//        pauseEndTimeMs = 0;
+//
+//        follower.setStartingPose(STEPS.get(0).pose);
+//
+//        if(PATHNUM<8){
+//            AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
+//            limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
+//        }else{
+//            AllianceData.selectedAlliance = AllianceData.Alliance.RED;
+//            limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
+//        }
 
 
 
@@ -777,6 +778,26 @@ public class Auto_V2 extends OpMode {
 
     @Override
     public void start() {
+
+
+        STEPS.clear();
+        STEPS.addAll(paths.get(PATHNUM));
+        buildChainsFromSteps();
+
+        currentIndex = 0;
+        actionActioned = false;
+        waitingForShooter = false;
+        pauseEndTimeMs = 0;
+
+        follower.setStartingPose(STEPS.get(0).pose);
+
+        if(PATHNUM<8){
+            AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
+            limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
+        }else{
+            AllianceData.selectedAlliance = AllianceData.Alliance.RED;
+            limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
+        }
         opModeTimer.resetTimer();
         pathTimer.resetTimer();
         follower.setPose(STEPS.get(0).pose);
