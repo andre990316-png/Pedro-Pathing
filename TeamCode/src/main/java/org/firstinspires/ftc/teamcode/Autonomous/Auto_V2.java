@@ -116,7 +116,7 @@ public class Auto_V2 extends OpMode {
     private final Pose topRightStartPose = new Pose(124, 118.5, Math.toRadians(36));
 
     //end poses
-    private final Pose topLeftEndPose = new Pose(25, 65, Math.toRadians(180));
+    private final Pose topLeftEndPose = new Pose(30, 65, Math.toRadians(180));
     private final Pose bottonLeftEndPose = new Pose(41, 12, Math.toRadians(180));
 
     //close shoot poses (on big V)
@@ -340,8 +340,8 @@ public class Auto_V2 extends OpMode {
         //PATH7
         PATH7LEFT.clear();
 
-        PATH7LEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
-        PATH7LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 100));
+        PATH7LEFT.add(new AutoStep(topLeftStartPose, AutoAction.INTAKE_ON, 0));
+        PATH7LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 100));
         PATH7LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH7LEFT.addAll(INTAKEBLUEBALLPOSITION2);
         PATH7LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
@@ -358,8 +358,8 @@ public class Auto_V2 extends OpMode {
         //PATH8
         PATH8LEFT.clear();
 
-        PATH8LEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
-        PATH8LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 100));
+        PATH8LEFT.add(new AutoStep(topLeftStartPose, AutoAction.INTAKE_ON, 0));
+        PATH8LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 100));
         PATH8LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH8LEFT.addAll(BLUEBALLPOSITION2ANDOPENGATE);
         PATH8LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
