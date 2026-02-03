@@ -660,16 +660,28 @@ public class Auto_V2 extends OpMode {
 
         intake.init(hardwareMap);
 
-        //AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
-
         buildSteps();
-        //STEPS.addAll(AUTOTOPLEFT);
 
-        //Pose start = STEPS.get(0).pose;
-        //follower.setStartingPose(start);   // recommended for Pedro
-
-
+        STEPS.clear();
+        STEPS.addAll(paths.get(PATHNUM));
         buildChainsFromSteps();
+
+        currentIndex = 0;
+        actionActioned = false;
+        waitingForShooter = false;
+        pauseEndTimeMs = 0;
+
+        follower.setStartingPose(STEPS.get(0).pose);
+
+        if(PATHNUM<8){
+            AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
+            limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
+        }else{
+            AllianceData.selectedAlliance = AllianceData.Alliance.RED;
+            limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
+        }
+
+
 
         ShooterRotateMotor = hardwareMap.get(DcMotor.class, "ShooterRotateMotor");
         LED1.init(hardwareMap, 1);
@@ -730,32 +742,32 @@ public class Auto_V2 extends OpMode {
                     PATHNUM=0;
                 }
             }
-            if(inputpressed[2]){
+//            if(inputpressed[2]){
+//
+//                STEPS.clear();
+//                STEPS.addAll(paths.get(PATHNUM));
+//                buildChainsFromSteps();
+//
+//                currentIndex = 0;
+//                actionActioned = false;
+//                waitingForShooter = false;
+//                pauseEndTimeMs = 0;
+//
+//                follower.setStartingPose(STEPS.get(0).pose);
+//
+//                if(PATHNUM<8){
+//                    AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
+//                    limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
+//                }else{
+//                    AllianceData.selectedAlliance = AllianceData.Alliance.RED;
+//                    limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
+//                }
+//
+//                selectedAuto=true;
+//            }
 
-                STEPS.clear();
-                STEPS.addAll(paths.get(PATHNUM));
-                buildChainsFromSteps();
 
-                currentIndex = 0;
-                actionActioned = false;
-                waitingForShooter = false;
-                pauseEndTimeMs = 0;
-
-                follower.setStartingPose(STEPS.get(0).pose);
-
-                if(PATHNUM<8){
-                    AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
-                    limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
-                }else{
-                    AllianceData.selectedAlliance = AllianceData.Alliance.RED;
-                    limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
-                }
-
-                selectedAuto=true;
-            }
-
-
-            telemetry.addLine("select auto plz (A)");
+            telemetry.addLine("select auto plz");
             for(int i=0; i<autonames.length; i++){
                 telemetry.addLine(autonames[i]+(PATHNUM==i?" <":""));
             }
