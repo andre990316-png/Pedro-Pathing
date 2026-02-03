@@ -127,6 +127,7 @@ public class Teleop extends OpMode {
     public static BezierPoint redgate = new BezierPoint(130, 70);
     public static BezierPoint redpark = new BezierPoint(38.6, 33.5);
     public static BezierPoint bluepark = new BezierPoint(105.4, 33.5);
+    private boolean isHoldingPosition = false;
 
     @Override
     public void init() {
@@ -244,7 +245,7 @@ public class Teleop extends OpMode {
     public void loop() {
         shooter.update(intake);
         intake.update();
-        follower.update();
+        follower.updatePose();
         ColorSensorLogic.update(telemetry);
         int[] colors = colorSensorLogic.returnCurrentColors();
         for (int i=0; i<3; i++) {
@@ -416,25 +417,45 @@ public class Teleop extends OpMode {
         parking = gamepad1.b;
 
         if(autogating){
+            if (!isHoldingPosition){
             if(AllianceData.isRed()){
                 follower.holdPoint(redgate, Math.toRadians(90));
             }else{
                 follower.holdPoint(bluegate, Math.toRadians(90));
             }
-
+                isHoldingPosition = true;
+            }
+            follower.update();
         }else if(autosuctiongating){
-            if(AllianceData.isRed()){
-                follower.holdPoint(Auto_V2.redGateIntakePose);
-            }else{
-                follower.holdPoint(Auto_V2.blueGateIntakePose);
+            if (!isHoldingPosition) {
+                if (AllianceData.isRed()) {
+                    follower.holdPoint(Auto_V2.redGateIntakePose);
+                } else {
+                    follower.holdPoint(Auto_V2.blueGateIntakePose);
+                }
+                isHoldingPosition = true;
             }
-        }else if(parking){
-            if(AllianceData.isRed()){
-                follower.holdPoint(redpark, Math.toRadians(90));
-            }else{
-                follower.holdPoint(bluepark, Math.toRadians(90));
+            follower.update();
+        }else if (parking) {
+            // 只有在 "還沒鎖定" 的時候，才發送一次指令
+            if (!isHoldingPosition) {
+                if (AllianceData.isRed()) {
+                    follower.holdPoint(redpark, Math.toRadians(90));
+                } else {
+                    follower.holdPoint(bluepark, Math.toRadians(90));
+                }
+                isHoldingPosition = true;
             }
+            follower.update();
         }else{
+            // 如果剛剛是停車模式，現在手放開了 B 鍵 -> 解除鎖定，把控制權還給手把
+            if (isHoldingPosition) {
+                follower.breakFollowing();
+                //follower.startTeleopDrive();
+                isHoldingPosition = false;
+                follower.update();
+
+            }
             if (MaxPower > 1) {
                 MotorFrontLeft.setPower((YL + XL + XR) / MaxPower);
                 MotorFrontRight.setPower(((YL - XL) - XR) / MaxPower);

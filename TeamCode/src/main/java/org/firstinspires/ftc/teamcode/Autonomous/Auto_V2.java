@@ -96,6 +96,7 @@ public class Auto_V2 extends OpMode {
     private ArrayList<AutoStep> INTAKEBLUEBALLPOSITION1 = new ArrayList<>();
     private ArrayList<AutoStep> INTAKEBLUEBALLPOSITION2 = new ArrayList<>();
     private ArrayList<AutoStep> INTAKEBLUEBALLPOSITION2ANDOPENGATE = new ArrayList<>();
+    private ArrayList<AutoStep> BLUEBALLPOSITION2ANDOPENGATE = new ArrayList<>();
     private ArrayList<AutoStep> INTAKEBLUEBALLPOSITION3 = new ArrayList<>();
     private ArrayList<AutoStep> INTAKEBLUEGATE = new ArrayList<>();
     private ArrayList<AutoStep> INTAKEBLUELOADINGZONE = new ArrayList<>();
@@ -128,12 +129,12 @@ public class Auto_V2 extends OpMode {
 
     //artifact intaking poses (blue)
     private final Pose blueBallPosition1Start = new Pose(50, 35.5, Math.toRadians(180));
-    private final Pose blueBallPosition1End = new Pose(11, 35.5, Math.toRadians(180));
+    private final Pose blueBallPosition1End = new Pose(13, 35.5, Math.toRadians(180));
     private final Pose blueBallPosition2Start = new Pose(50, 58, Math.toRadians(180));
-    private final Pose blueBallPosition2End = new Pose(11, 58, Math.toRadians(180));
+    private final Pose blueBallPosition2End = new Pose(13, 58, Math.toRadians(180));
     private final Pose blueBallPosition2EndAndGate = new Pose(11, 58, Math.toRadians(180));
     private final Pose blueBallPosition3Start = new Pose(50, 84, Math.toRadians(180));
-    private final Pose blueBallPosition3End = new Pose(18, 84, Math.toRadians(180));
+    private final Pose blueBallPosition3End = new Pose(20, 84, Math.toRadians(180));
 
     //artifact intaking poses (red)
     private final Pose redBallPosition1Start = new Pose(93, 35.5, Math.toRadians(0));
@@ -155,6 +156,9 @@ public class Auto_V2 extends OpMode {
     public static final Pose blueGateIntakePose = new Pose(13,54, Math.toRadians(140));
     public static final Pose redGateIntakePose = new Pose(131,54, Math.toRadians(40));
 
+    private final Pose blueGatePose = new Pose(20, 66, Math.toRadians(180));
+
+    //private final Pose blueGateReadyPose = new Pose(30, 63, Math.toRadians(180));
 
     private ElapsedTime stateTimer = new ElapsedTime();
     private boolean actionActioned=false;
@@ -170,8 +174,8 @@ public class Auto_V2 extends OpMode {
     // Action runs when the segment STARTS (before followPath).
     // ------------------------------------------------------------
 
-    public static String[] autonames = {"topleftALL","topleftALL+GATE","bottomleft","bottomleft+R3","bottomleft+EXTRA","bottomleft+R3+EXTRA", "topleft2", "topleft2+GATE",
-            "toprightALL","toprightALL+GATE","bottomright","bottomright+R3","bottomright+EXTRA","bottomright+R3+EXTRA", "topright2", "topright2+GATE"};
+    public static String[] autonames = {"topleftALL_(P1B)","topleftALL+GATE_(P2B)","bottomleft(P3B)","bottomleft+R3(P4B)","bottomleft+EXTRA(P5B)","bottomleft+R3+EXTRA(P6B)", "topleft2(P7B)", "topleft2+GATE(P8B)",
+            "toprightALL(P1R)","toprightALL+GATE(P2R)","bottomright(P3R)","bottomright+R3(P4R)","bottomright+EXTRA(P5R)","bottomright+R3+EXTRA(P6R)", "topright2(P7R)", "topright2+GATE(P8R)"};
     ArrayList<ArrayList<AutoStep>> paths = new ArrayList<>();
 
 
@@ -183,19 +187,19 @@ public class Auto_V2 extends OpMode {
         INTAKEBLUEBALLPOSITION1.clear();
 
         INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1Start, AutoAction.INTAKE_ON, 0));
-        INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1End, AutoAction.NONE, 0));
+        INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1End, AutoAction.INTAKE_OFF, 0));
         INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1Start, AutoAction.NONE, 0));
 
         INTAKEBLUEBALLPOSITION2.clear();
 
         INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
-        INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2End, AutoAction.NONE, 0));
+        INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2End, AutoAction.INTAKE_OFF, 0));
         INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2Start, AutoAction.NONE, 0));
 
         INTAKEBLUEBALLPOSITION3.clear();
 
         INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3Start, AutoAction.INTAKE_ON, 0));
-        INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3End, AutoAction.NONE, 0));
+        INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3End, AutoAction.INTAKE_OFF, 0));
         INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3Start, AutoAction.NONE, 0));
 
         INTAKEBLUEGATE.clear();
@@ -221,19 +225,27 @@ public class Auto_V2 extends OpMode {
         BLUESHOOT3NEAR.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         BLUESHOOT3NEAR.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
 
+        BLUEBALLPOSITION2ANDOPENGATE.clear();
+
+        BLUEBALLPOSITION2ANDOPENGATE.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
+        //BLUEBALLPOSITION2ANDOPENGATE.add(new AutoStep(blueBallPosition2End, AutoAction.NONE, 0));
+        //BLUEBALLPOSITION2ANDOPENGATE.add(new AutoStep(blueGateReadyPose, AutoAction.NONE, 0));
+        BLUEBALLPOSITION2ANDOPENGATE.add(new AutoStep(blueGatePose, AutoAction.NONE, 1000));
+        BLUEBALLPOSITION2ANDOPENGATE.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
+
         //PATH1
         PATH1LEFT.clear();
 
         PATH1LEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
-        PATH1LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        PATH1LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 100));
         PATH1LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
-        PATH1LEFT.addAll(INTAKEBLUEBALLPOSITION1);
+        PATH1LEFT.addAll(INTAKEBLUEBALLPOSITION3);
         PATH1LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         PATH1LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH1LEFT.addAll(INTAKEBLUEBALLPOSITION2);
         PATH1LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         PATH1LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
-        PATH1LEFT.addAll(INTAKEBLUEBALLPOSITION3);
+        PATH1LEFT.addAll(INTAKEBLUEBALLPOSITION1);
         PATH1LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         PATH1LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH1LEFT.add(new AutoStep(topLeftEndPose, AutoAction.NONE, 0));
@@ -245,9 +257,9 @@ public class Auto_V2 extends OpMode {
         PATH2LEFT.clear();
 
         PATH2LEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
-        PATH2LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        PATH2LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 100));
         PATH2LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
-        PATH2LEFT.addAll(INTAKEBLUEBALLPOSITION2ANDOPENGATE);
+        PATH2LEFT.addAll(BLUEBALLPOSITION2ANDOPENGATE);
         PATH2LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         PATH2LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH2LEFT.addAll(INTAKEBLUEBALLPOSITION1);
@@ -262,7 +274,7 @@ public class Auto_V2 extends OpMode {
         PATH3LEFT.clear();
 
         PATH3LEFT.add(new AutoStep(bottomLeftStartPose, AutoAction.NONE, 0));
-        PATH3LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
+        PATH3LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 100));
         PATH3LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH3LEFT.addAll(INTAKEBLUELOADINGZONE);
         PATH3LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
@@ -274,7 +286,7 @@ public class Auto_V2 extends OpMode {
         PATH4LEFT.clear();
 
         PATH4LEFT.add(new AutoStep(bottomLeftStartPose, AutoAction.NONE, 0));
-        PATH4LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
+        PATH4LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 100));
         PATH4LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH4LEFT.addAll(INTAKEBLUELOADINGZONE);
         PATH4LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
@@ -291,7 +303,7 @@ public class Auto_V2 extends OpMode {
         PATH5LEFT.clear();
 
         PATH5LEFT.add(new AutoStep(bottomLeftStartPose, AutoAction.NONE, 0));
-        PATH5LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
+        PATH5LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 100));
         PATH5LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH5LEFT.addAll(INTAKEBLUELOADINGZONE);
         PATH5LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
@@ -308,7 +320,7 @@ public class Auto_V2 extends OpMode {
         PATH6LEFT.clear();
 
         PATH6LEFT.add(new AutoStep(bottomLeftStartPose, AutoAction.NONE, 0));
-        PATH6LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
+        PATH6LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 100));
         PATH6LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH6LEFT.addAll(INTAKEBLUELOADINGZONE);
         PATH6LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
@@ -329,7 +341,7 @@ public class Auto_V2 extends OpMode {
         PATH7LEFT.clear();
 
         PATH7LEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
-        PATH7LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        PATH7LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 100));
         PATH7LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH7LEFT.addAll(INTAKEBLUEBALLPOSITION2);
         PATH7LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
@@ -347,9 +359,9 @@ public class Auto_V2 extends OpMode {
         PATH8LEFT.clear();
 
         PATH8LEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
-        PATH8LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
+        PATH8LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 100));
         PATH8LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
-        PATH8LEFT.addAll(INTAKEBLUEBALLPOSITION2ANDOPENGATE);
+        PATH8LEFT.addAll(BLUEBALLPOSITION2ANDOPENGATE);
         PATH8LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         PATH8LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH8LEFT.addAll(INTAKEBLUEBALLPOSITION3);
@@ -457,7 +469,7 @@ public class Auto_V2 extends OpMode {
         PATH7RIGHT = AutoStep.flipped(PATH7LEFT);
         PATH8RIGHT = AutoStep.flipped(PATH8LEFT);
 
-        if (AllianceData.isRed()) {
+        /*if (AllianceData.isRed()) {
             STEPS.addAll(AUTOTOPRIGHT2);
 
             telemetry.addData("Auto Path", "RED (Right Side)");
@@ -468,7 +480,7 @@ public class Auto_V2 extends OpMode {
 
             telemetry.addData("Auto Path", "BLUE (Left Side)");
             limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
-        }
+        }*/
 
 //        paths.add(AUTOTOPLEFT4);
 //        paths.add(AUTOTOPRIGHT4);
@@ -549,9 +561,10 @@ public class Auto_V2 extends OpMode {
                 break;
 
             case SHOOT_3:
-                intake.setTargetRPM(-0.37);
-                intake.intakeReady(true);
-                ShooterS2.setPosition(gateOpenAngle);
+                shooter.fireShots(3);
+                //intake.setTargetRPM(-0.37);
+                //intake.intakeReady(true);
+                //ShooterS2.setPosition(gateOpenAngle);
                 waitingForShooter = shooter.isBusy();   // keep your existing blocking behavior
                 if (!waitingForShooter) actionActioned = false;  // retry SHOOT_3 next loop
                 break;
@@ -627,6 +640,7 @@ public class Auto_V2 extends OpMode {
         if (chain != null) {
             follower.followPath(chain, true);
         }
+
 
         // 7) 進下一步
         currentIndex++;

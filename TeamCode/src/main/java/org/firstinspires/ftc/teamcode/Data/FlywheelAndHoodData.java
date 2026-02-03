@@ -9,10 +9,10 @@ public class FlywheelAndHoodData {
     };
 
     public static double[] flywheelValues = new double[] {
-            3250, 3250, 3275, 3300, 3325, 3350, 3400, 3450, 3550, 3600, 3600, 3700, 3800, 3900, 4000, 4050, 4150
+            3150, 3150, 3175, 3200, 3225, 3250, 3300, 3350, 3450, 3500, 3500, 3600, 3700, 3800, 3900, 3950, 4050
     };
     public static double[] hoodRanges = new double[] {
-            52.5, 55, 57.5, 60, 62.5, 65, 67.5, 70, 72.5, 75, 80, 85, 90, 95, 100, 105, 110
+            54.5, 57, 59.5, 62, 64.5, 67, 69.5, 72, 74.5, 77, 82, 87, 92, 97, 100, 105, 110
     };
 
     public static double[] hoodValues = new double[] {
@@ -50,10 +50,10 @@ public class FlywheelAndHoodData {
 
     public static AutoShooting lookupB(double ta) {
         double flywheelRPM, hoodAngle = 1;
-        if (ta >= 0.38) return new AutoShooting(5100, 1.00);
-        if (ta >= 0.32) return new AutoShooting(5200, 1.00);
-        if (ta >= 0.29) return new AutoShooting(5500, 1.00);
-        return new AutoShooting(5700, 1.00);
+        if (ta >= 0.38) return new AutoShooting(4150, 0.96);
+        if (ta >= 0.32) return new AutoShooting(4300, 1.00);
+        if (ta >= 0.29) return new AutoShooting(4600, 1.00);
+        return new AutoShooting(4600, 1.00);
     }
     public static double logisticModel(double x) {
         return 1.04906 / (1.0 + Math.exp(-(0.0533548 * x - 0.774792)));
