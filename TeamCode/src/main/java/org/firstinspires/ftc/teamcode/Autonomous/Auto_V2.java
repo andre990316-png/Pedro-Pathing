@@ -110,7 +110,7 @@ public class Auto_V2 extends OpMode {
 
     // ===== Poses you already had =====
     //start poses
-    private final Pose topLeftStartPose = new Pose(20, 118.5, Math.toRadians(144));
+    private final Pose topLeftStartPose = new Pose(48.25, 134, Math.toRadians(90));
     private final Pose bottomLeftStartPose = new Pose(57, 3, Math.toRadians(90));
     private final Pose bottomRightStartPose = new Pose(96, 10, Math.toRadians(90));
     private final Pose topRightStartPose = new Pose(124, 118.5, Math.toRadians(36));

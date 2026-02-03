@@ -113,8 +113,8 @@ public class Teleop extends OpMode {
     private Follower follower;
 
     private Pose selectedStartPose;
-    private final Pose topLeftStartPose = new Pose(20, 118.5, Math.toRadians(144));
-    private final Pose topRightStartPose = new Pose(113, 120, Math.toRadians(41.8));
+    private final Pose topLeftStartPose = new Pose(48.25, 134, Math.toRadians(90));
+    private final Pose topRightStartPose = new Pose(95.75, 134, Math.toRadians(90));
     private final Pose bottomLeftStartPose = new Pose(48, 10, Math.toRadians(90));
     private final java.util.ArrayList<PatternLogic.Color> driverPatternEntry = new java.util.ArrayList<>(3);
     private ColorSensorLogic colorSensorLogic = new ColorSensorLogic();
@@ -170,8 +170,6 @@ public class Teleop extends OpMode {
         currentSensitivity = 1.0;
         Sensitivity = 1.0;
 
-        shooter.init(hardwareMap);
-
         intake.init(hardwareMap);
 
         if (Auto_lastPose.currentPose != null){
@@ -219,6 +217,7 @@ public class Teleop extends OpMode {
 
     @Override
     public void start() {
+        shooter.init(hardwareMap);
         follower.setStartingPose(selectedStartPose);
         limelight.start();
         autoAim.resetHistory(getRuntime());
