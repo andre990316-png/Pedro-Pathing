@@ -124,7 +124,7 @@ public class Teleop extends OpMode {
     private boolean parking = false;
 
     public static BezierPoint bluegate = new BezierPoint(14, 70);
-    public static BezierPoint redgate = new BezierPoint(133, 70);
+    public static BezierPoint redgate = new BezierPoint(132.5, 70);
     public static BezierPoint redpark = new BezierPoint(29, 41.8);
     public static BezierPoint bluepark = new BezierPoint(105.4, 33.5);
     private boolean isHoldingPosition = false;
