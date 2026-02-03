@@ -113,8 +113,8 @@ public class Teleop extends OpMode {
     private Follower follower;
 
     private Pose selectedStartPose;
-    private final Pose topLeftStartPose = new Pose(48.25, 134, Math.toRadians(90));
-    private final Pose topRightStartPose = new Pose(95.75, 134, Math.toRadians(90));
+    private final Pose topLeftStartPose = new Pose(30, 125, Math.toRadians(93));
+    private final Pose topRightStartPose = new Pose(114, 125, Math.toRadians(87));
     private final Pose bottomLeftStartPose = new Pose(48, 10, Math.toRadians(90));
     private final java.util.ArrayList<PatternLogic.Color> driverPatternEntry = new java.util.ArrayList<>(3);
     private ColorSensorLogic colorSensorLogic = new ColorSensorLogic();
