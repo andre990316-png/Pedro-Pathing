@@ -7,9 +7,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class LimelightAim {
 
     // ===== tunables =====
-    public double Kp = 0.025;
+    public double Kp = 0.018;
     public double Kd = 0.0012;
-    public double deadband = 0.04;
+    public double deadband = 0.043;
     public double maxTurretPower = 1.0;
     public double minTurretPower = 0.07;
     public static String currentPipeline;

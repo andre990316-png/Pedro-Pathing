@@ -10,7 +10,7 @@ public class AllianceData {
     }
 
     // Selected alliance (set in init_loop)
-    public static Alliance selectedAlliance = Alliance.RED; /// TODO: Update this every match to the correct alliance
+    public static Alliance selectedAlliance = null; /// TODO: Update this every match to the correct alliance
 
     // Fixed poses
     private static final Pose BLUE_GOAL_POSE =
