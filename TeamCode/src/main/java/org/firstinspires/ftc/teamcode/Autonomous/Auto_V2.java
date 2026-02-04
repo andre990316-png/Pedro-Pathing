@@ -856,7 +856,6 @@ public class Auto_V2 extends OpMode {
 
         RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.29);
         Auto_lastPose.currentPose = follower.getPose();
-        LLResult ll = limelight.getLatestResult();
 
         Pose robotPose = follower.getPose();
         Pose goalPose = AllianceData.getGoalPose();  // dynamically get current alliance
@@ -868,15 +867,12 @@ public class Auto_V2 extends OpMode {
 
         updateAuto();
 
+        limelight.updateRobotOrientation(imu.getRobotYawPitchRollAngles().getYaw());
+        LLResult ll = limelight.getLatestResult();
+
         // turret auto-aim
-        if (!(currentIndex>=STEPS.size()) && STEPS.get(currentIndex).action == AutoAction.SHOOT_3) {
-            double turretPower = 0;
-            limelight.updateRobotOrientation(imu.getRobotYawPitchRollAngles().getYaw());
-            if (autoAimEnabled) {
-                turretPower = autoAim.update(getRuntime(), ll, telemetry);
-            } else {
-                turretPower = 0;
-            }
+        if (waitingForShooter) {
+            double turretPower = autoAimEnabled ? autoAim.update(getRuntime(), ll, telemetry) : 0;
             ShooterRotateMotor.setPower(turretPower);
         } else {
             ShooterRotateMotor.setPower(0);
