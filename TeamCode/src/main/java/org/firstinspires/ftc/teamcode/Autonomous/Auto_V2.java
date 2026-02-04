@@ -235,7 +235,7 @@ public class Auto_V2 extends OpMode {
         PATH1LEFT.clear();
 
         PATH1LEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
-        PATH1LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 100));
+        PATH1LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 200));
         PATH1LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH1LEFT.addAll(INTAKEBLUEBALLPOSITION3);
         PATH1LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
@@ -255,7 +255,7 @@ public class Auto_V2 extends OpMode {
         PATH2LEFT.clear();
 
         PATH2LEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
-        PATH2LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 100));
+        PATH2LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 200));
         PATH2LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH2LEFT.addAll(BLUEBALLPOSITION2ANDOPENGATE);
         PATH2LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
@@ -272,7 +272,7 @@ public class Auto_V2 extends OpMode {
         PATH3LEFT.clear();
 
         PATH3LEFT.add(new AutoStep(bottomLeftStartPose, AutoAction.NONE, 0));
-        PATH3LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 100));
+        PATH3LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 200));
         PATH3LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH3LEFT.addAll(INTAKEBLUELOADINGZONE);
         PATH3LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
@@ -284,7 +284,7 @@ public class Auto_V2 extends OpMode {
         PATH4LEFT.clear();
 
         PATH4LEFT.add(new AutoStep(bottomLeftStartPose, AutoAction.NONE, 0));
-        PATH4LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 100));
+        PATH4LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 200));
         PATH4LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH4LEFT.addAll(INTAKEBLUELOADINGZONE);
         PATH4LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
@@ -301,7 +301,7 @@ public class Auto_V2 extends OpMode {
         PATH5LEFT.clear();
 
         PATH5LEFT.add(new AutoStep(bottomLeftStartPose, AutoAction.NONE, 0));
-        PATH5LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 100));
+        PATH5LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 200));
         PATH5LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH5LEFT.addAll(INTAKEBLUELOADINGZONE);
         PATH5LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
@@ -318,7 +318,7 @@ public class Auto_V2 extends OpMode {
         PATH6LEFT.clear();
 
         PATH6LEFT.add(new AutoStep(bottomLeftStartPose, AutoAction.NONE, 0));
-        PATH6LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 100));
+        PATH6LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 200));
         PATH6LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH6LEFT.addAll(INTAKEBLUELOADINGZONE);
         PATH6LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
@@ -338,8 +338,8 @@ public class Auto_V2 extends OpMode {
         //PATH7
         PATH7LEFT.clear();
 
-        PATH7LEFT.add(new AutoStep(topLeftStartPose, AutoAction.INTAKE_ON, 0));
-        PATH7LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 100));
+        PATH7LEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
+        PATH7LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 200));
         PATH7LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH7LEFT.addAll(INTAKEBLUEBALLPOSITION2);
         PATH7LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
@@ -356,8 +356,8 @@ public class Auto_V2 extends OpMode {
         //PATH8
         PATH8LEFT.clear();
 
-        PATH8LEFT.add(new AutoStep(topLeftStartPose, AutoAction.INTAKE_ON, 0));
-        PATH8LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 100));
+        PATH8LEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
+        PATH8LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 200));
         PATH8LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH8LEFT.addAll(BLUEBALLPOSITION2ANDOPENGATE);
         PATH8LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
@@ -788,6 +788,7 @@ public class Auto_V2 extends OpMode {
         pauseEndTimeMs = 0;
 
         follower.setStartingPose(STEPS.get(0).pose);
+        ShooterS2.setPosition(gateCloseAngle);
 
         if(PATHNUM<8){
             AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
