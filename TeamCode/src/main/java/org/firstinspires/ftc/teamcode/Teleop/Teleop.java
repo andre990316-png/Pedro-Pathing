@@ -135,6 +135,10 @@ public class Teleop extends OpMode {
         MotorFrontLeft = hardwareMap.get(DcMotor.class, "Motor Front Left");
         MotorFrontRight = hardwareMap.get(DcMotor.class, "Motor Front Right");
         MotorBackRight = hardwareMap.get(DcMotor.class, "Motor Back Right");
+        MotorFrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        MotorFrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        MotorBackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        MotorBackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         ShooterM1 = hardwareMap.get(DcMotor.class, "Shooter M1");
         ShooterM2 = hardwareMap.get(DcMotor.class, "Shooter M2");

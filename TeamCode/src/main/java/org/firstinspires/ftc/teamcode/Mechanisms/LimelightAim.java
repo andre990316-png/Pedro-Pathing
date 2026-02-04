@@ -8,10 +8,10 @@ public class LimelightAim {
 
     // ===== tunables =====
     public double Kp = 0.018;
-    public double Kd = 0.0003;
+    public double Kd = 0.0005;
     public double deadband = 0.05;
     public double maxTurretPower = 1.0;
-    public double minTurretPower = 0.09;
+    public double minTurretPower = 0.07;
     public static String currentPipeline;
 
     // ===== history =====
