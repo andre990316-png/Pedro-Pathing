@@ -172,6 +172,11 @@ public class Auto_V2 extends OpMode {
     // Action runs when the segment STARTS (before followPath).
     // ------------------------------------------------------------
 
+    public static int ALLIANCENUM = 0;
+    public static int uitab=0;
+
+    public static String[] alliancenames = {"BLUE","RED"};
+
     public static String[] autonames = {"topleftALL_(P1B)","topleftALL+GATE_(P2B)","bottomleft(P3B)","bottomleft+R3(P4B)","bottomleft+EXTRA(P5B)","bottomleft+R3+EXTRA(P6B)", "topleft2(P7B)", "topleft2+GATE(P8B)",
             "toprightALL(P1R)","toprightALL+GATE(P2R)","bottomright(P3R)","bottomright+R3(P4R)","bottomright+EXTRA(P5R)","bottomright+R3+EXTRA(P6R)", "topright2(P7R)", "topright2+GATE(P8R)"};
     ArrayList<ArrayList<AutoStep>> paths = new ArrayList<>();
@@ -715,63 +720,95 @@ public class Auto_V2 extends OpMode {
 
     @Override
     public void init_loop(){
-        if(selectedAuto){
-            telemetry.addLine("auto selected.");
-            telemetry.update();
-        }else{
-
-            lastinputs = new boolean[inputs.length];
-            for(int i=0; i<inputs.length; i++){
-                lastinputs[i]=inputs[i];
-            }
-            inputs = new boolean[]{gamepad1.dpad_up, gamepad1.dpad_down, gamepad1.a};
-            inputpressed = new boolean[inputs.length];
-            for(int i=0; i<inputs.length; i++){
-                inputpressed[i] = inputs[i]&&!lastinputs[i];
-            }
-            if(inputpressed[0]){
-                PATHNUM--;
-                if(PATHNUM<0){
-                    PATHNUM=autonames.length-1;
-                }
-            }
-            if(inputpressed[1]){
-                PATHNUM++;
-                if(PATHNUM>autonames.length-1){
-                    PATHNUM=0;
-                }
-            }
-//            if(inputpressed[2]){
-//
-//                STEPS.clear();
-//                STEPS.addAll(paths.get(PATHNUM));
-//                buildChainsFromSteps();
-//
-//                currentIndex = 0;
-//                actionActioned = false;
-//                waitingForShooter = false;
-//                pauseEndTimeMs = 0;
-//
-//                follower.setStartingPose(STEPS.get(0).pose);
-//
-//                if(PATHNUM<8){
-//                    AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
-//                    limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
-//                }else{
-//                    AllianceData.selectedAlliance = AllianceData.Alliance.RED;
-//                    limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
-//                }
-//
-//                selectedAuto=true;
-//            }
 
 
-            telemetry.addLine("select auto plz");
-            for(int i=0; i<autonames.length; i++){
-                telemetry.addLine(autonames[i]+(PATHNUM==i?" <":""));
-            }
-            telemetry.update();
+        lastinputs = new boolean[inputs.length];
+        for(int i=0; i<inputs.length; i++){
+            lastinputs[i]=inputs[i];
         }
+        inputs = new boolean[]{gamepad1.dpad_up, gamepad1.dpad_down, gamepad1.a};
+        inputpressed = new boolean[inputs.length];
+        for(int i=0; i<inputs.length; i++){
+            inputpressed[i] = inputs[i]&&!lastinputs[i];
+        }
+        if(inputpressed[0]){
+            if(uitab==0){
+                ALLIANCENUM=(ALLIANCENUM-1)%2;
+            }else if(uitab==1){
+                PATHNUM--;
+                if(AllianceData.isRed()){
+                    if(PATHNUM<autonames.length/2){
+                        PATHNUM=autonames.length-1;
+                    }
+                }else{
+                    if(PATHNUM<0){
+                        PATHNUM=autonames.length/2-1;
+                    }
+                }
+            }
+
+
+        }
+        if(inputpressed[1]){
+            if(uitab==0){
+                ALLIANCENUM=(ALLIANCENUM+1)%2;
+            }else if(uitab==1){
+                PATHNUM++;
+                if(AllianceData.isRed()){
+                    if(PATHNUM>autonames.length-1){
+                        PATHNUM=autonames.length/2;
+                    }
+                }else{
+                    if(PATHNUM>autonames.length/2-1){
+                        PATHNUM=0;
+                    }
+                }
+            }
+
+
+        }
+
+        if(inputpressed[2]){
+            if(uitab==0){
+                uitab=1;
+                if(ALLIANCENUM==0){
+                    AllianceData.selectedAlliance= AllianceData.Alliance.BLUE;
+                    PATHNUM=0;
+                }else if(ALLIANCENUM==1){
+                    AllianceData.selectedAlliance= AllianceData.Alliance.RED;
+                    PATHNUM=autonames.length/2;
+                }
+            }else if(uitab==1){
+                uitab=2;
+            }else if(uitab==2){
+                uitab=0;
+            }
+        }
+
+
+        if(uitab==0){//alliance select
+            telemetry.addLine("select ALLIANCE plz");
+            for(int i=0; i<alliancenames.length; i++){
+                telemetry.addLine(alliancenames[i]+(ALLIANCENUM==i?" <":""));
+            }
+        }else if(uitab==1){//path select
+            telemetry.addLine("select AUTO plz");
+            if(AllianceData.isRed()){
+                for(int i=autonames.length/2; i<autonames.length; i++){
+                    telemetry.addLine(autonames[i]+(PATHNUM==i?" <":""));
+                }
+            }else{
+                for(int i=0; i<autonames.length/2; i++){
+                    telemetry.addLine(autonames[i]+(PATHNUM==i?" <":""));
+                }
+            }
+        }else if(uitab==2){//confirm screen
+            telemetry.addLine(autonames[PATHNUM]+" selected.");
+            telemetry.addLine("press (A) to reset selection if you fucked up");
+        }
+
+
+        telemetry.update();
     }
 
     @Override
