@@ -172,6 +172,11 @@ public class Auto_V2 extends OpMode {
     // Action runs when the segment STARTS (before followPath).
     // ------------------------------------------------------------
 
+    public static int ALLIANCENUM = 0;
+    public static int uitab=0;
+
+    public static String[] alliancenames = {"BLUE","RED"};
+
     public static String[] autonames = {"topleftALL_(P1B)","topleftALL+GATE_(P2B)","bottomleft(P3B)","bottomleft+R3(P4B)","bottomleft+EXTRA(P5B)","bottomleft+R3+EXTRA(P6B)", "topleft2(P7B)", "topleft2+GATE(P8B)",
             "toprightALL(P1R)","toprightALL+GATE(P2R)","bottomright(P3R)","bottomright+R3(P4R)","bottomright+EXTRA(P5R)","bottomright+R3+EXTRA(P6R)", "topright2(P7R)", "topright2+GATE(P8R)"};
     ArrayList<ArrayList<AutoStep>> paths = new ArrayList<>();
@@ -235,7 +240,7 @@ public class Auto_V2 extends OpMode {
         PATH1LEFT.clear();
 
         PATH1LEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
-        PATH1LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 100));
+        PATH1LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 200));
         PATH1LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH1LEFT.addAll(INTAKEBLUEBALLPOSITION3);
         PATH1LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
@@ -255,7 +260,7 @@ public class Auto_V2 extends OpMode {
         PATH2LEFT.clear();
 
         PATH2LEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
-        PATH2LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 100));
+        PATH2LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 200));
         PATH2LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH2LEFT.addAll(BLUEBALLPOSITION2ANDOPENGATE);
         PATH2LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
@@ -272,7 +277,7 @@ public class Auto_V2 extends OpMode {
         PATH3LEFT.clear();
 
         PATH3LEFT.add(new AutoStep(bottomLeftStartPose, AutoAction.NONE, 0));
-        PATH3LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 100));
+        PATH3LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 200));
         PATH3LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH3LEFT.addAll(INTAKEBLUELOADINGZONE);
         PATH3LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
@@ -284,7 +289,7 @@ public class Auto_V2 extends OpMode {
         PATH4LEFT.clear();
 
         PATH4LEFT.add(new AutoStep(bottomLeftStartPose, AutoAction.NONE, 0));
-        PATH4LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 100));
+        PATH4LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 200));
         PATH4LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH4LEFT.addAll(INTAKEBLUELOADINGZONE);
         PATH4LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
@@ -301,7 +306,7 @@ public class Auto_V2 extends OpMode {
         PATH5LEFT.clear();
 
         PATH5LEFT.add(new AutoStep(bottomLeftStartPose, AutoAction.NONE, 0));
-        PATH5LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 100));
+        PATH5LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 200));
         PATH5LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH5LEFT.addAll(INTAKEBLUELOADINGZONE);
         PATH5LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
@@ -318,7 +323,7 @@ public class Auto_V2 extends OpMode {
         PATH6LEFT.clear();
 
         PATH6LEFT.add(new AutoStep(bottomLeftStartPose, AutoAction.NONE, 0));
-        PATH6LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 100));
+        PATH6LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 200));
         PATH6LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH6LEFT.addAll(INTAKEBLUELOADINGZONE);
         PATH6LEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 0));
@@ -338,8 +343,8 @@ public class Auto_V2 extends OpMode {
         //PATH7
         PATH7LEFT.clear();
 
-        PATH7LEFT.add(new AutoStep(topLeftStartPose, AutoAction.INTAKE_ON, 0));
-        PATH7LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 100));
+        PATH7LEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
+        PATH7LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 200));
         PATH7LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH7LEFT.addAll(INTAKEBLUEBALLPOSITION2);
         PATH7LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
@@ -356,8 +361,8 @@ public class Auto_V2 extends OpMode {
         //PATH8
         PATH8LEFT.clear();
 
-        PATH8LEFT.add(new AutoStep(topLeftStartPose, AutoAction.INTAKE_ON, 0));
-        PATH8LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.INTAKE_OFF, 100));
+        PATH8LEFT.add(new AutoStep(topLeftStartPose, AutoAction.NONE, 0));
+        PATH8LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 200));
         PATH8LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH8LEFT.addAll(BLUEBALLPOSITION2ANDOPENGATE);
         PATH8LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
@@ -715,63 +720,95 @@ public class Auto_V2 extends OpMode {
 
     @Override
     public void init_loop(){
-        if(selectedAuto){
-            telemetry.addLine("auto selected.");
-            telemetry.update();
-        }else{
-
-            lastinputs = new boolean[inputs.length];
-            for(int i=0; i<inputs.length; i++){
-                lastinputs[i]=inputs[i];
-            }
-            inputs = new boolean[]{gamepad1.dpad_up, gamepad1.dpad_down, gamepad1.a};
-            inputpressed = new boolean[inputs.length];
-            for(int i=0; i<inputs.length; i++){
-                inputpressed[i] = inputs[i]&&!lastinputs[i];
-            }
-            if(inputpressed[0]){
-                PATHNUM--;
-                if(PATHNUM<0){
-                    PATHNUM=autonames.length-1;
-                }
-            }
-            if(inputpressed[1]){
-                PATHNUM++;
-                if(PATHNUM>autonames.length-1){
-                    PATHNUM=0;
-                }
-            }
-//            if(inputpressed[2]){
-//
-//                STEPS.clear();
-//                STEPS.addAll(paths.get(PATHNUM));
-//                buildChainsFromSteps();
-//
-//                currentIndex = 0;
-//                actionActioned = false;
-//                waitingForShooter = false;
-//                pauseEndTimeMs = 0;
-//
-//                follower.setStartingPose(STEPS.get(0).pose);
-//
-//                if(PATHNUM<8){
-//                    AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
-//                    limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
-//                }else{
-//                    AllianceData.selectedAlliance = AllianceData.Alliance.RED;
-//                    limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
-//                }
-//
-//                selectedAuto=true;
-//            }
 
 
-            telemetry.addLine("select auto plz");
-            for(int i=0; i<autonames.length; i++){
-                telemetry.addLine(autonames[i]+(PATHNUM==i?" <":""));
-            }
-            telemetry.update();
+        lastinputs = new boolean[inputs.length];
+        for(int i=0; i<inputs.length; i++){
+            lastinputs[i]=inputs[i];
         }
+        inputs = new boolean[]{gamepad1.dpad_up, gamepad1.dpad_down, gamepad1.a};
+        inputpressed = new boolean[inputs.length];
+        for(int i=0; i<inputs.length; i++){
+            inputpressed[i] = inputs[i]&&!lastinputs[i];
+        }
+        if(inputpressed[0]){
+            if(uitab==0){
+                ALLIANCENUM=(ALLIANCENUM-1)%2;
+            }else if(uitab==1){
+                PATHNUM--;
+                if(AllianceData.isRed()){
+                    if(PATHNUM<autonames.length/2){
+                        PATHNUM=autonames.length-1;
+                    }
+                }else{
+                    if(PATHNUM<0){
+                        PATHNUM=autonames.length/2-1;
+                    }
+                }
+            }
+
+
+        }
+        if(inputpressed[1]){
+            if(uitab==0){
+                ALLIANCENUM=(ALLIANCENUM+1)%2;
+            }else if(uitab==1){
+                PATHNUM++;
+                if(AllianceData.isRed()){
+                    if(PATHNUM>autonames.length-1){
+                        PATHNUM=autonames.length/2;
+                    }
+                }else{
+                    if(PATHNUM>autonames.length/2-1){
+                        PATHNUM=0;
+                    }
+                }
+            }
+
+
+        }
+
+        if(inputpressed[2]){
+            if(uitab==0){
+                uitab=1;
+                if(ALLIANCENUM==0){
+                    AllianceData.selectedAlliance= AllianceData.Alliance.BLUE;
+                    PATHNUM=0;
+                }else if(ALLIANCENUM==1){
+                    AllianceData.selectedAlliance= AllianceData.Alliance.RED;
+                    PATHNUM=autonames.length/2;
+                }
+            }else if(uitab==1){
+                uitab=2;
+            }else if(uitab==2){
+                uitab=0;
+            }
+        }
+
+
+        if(uitab==0){//alliance select
+            telemetry.addLine("select ALLIANCE plz");
+            for(int i=0; i<alliancenames.length; i++){
+                telemetry.addLine(alliancenames[i]+(ALLIANCENUM==i?" <":""));
+            }
+        }else if(uitab==1){//path select
+            telemetry.addLine("select AUTO plz");
+            if(AllianceData.isRed()){
+                for(int i=autonames.length/2; i<autonames.length; i++){
+                    telemetry.addLine(autonames[i]+(PATHNUM==i?" <":""));
+                }
+            }else{
+                for(int i=0; i<autonames.length/2; i++){
+                    telemetry.addLine(autonames[i]+(PATHNUM==i?" <":""));
+                }
+            }
+        }else if(uitab==2){//confirm screen
+            telemetry.addLine(autonames[PATHNUM]+" selected.");
+            telemetry.addLine("press (A) to reset selection if you fucked up");
+        }
+
+
+        telemetry.update();
     }
 
     @Override
@@ -788,6 +825,7 @@ public class Auto_V2 extends OpMode {
         pauseEndTimeMs = 0;
 
         follower.setStartingPose(STEPS.get(0).pose);
+        ShooterS2.setPosition(gateCloseAngle);
 
         if(PATHNUM<8){
             AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
