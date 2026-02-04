@@ -179,7 +179,7 @@ public class Teleop extends OpMode {
             selectedStartPose = Auto_lastPose.currentPose;
             AutoPoseAvailable = true;
         }else{
-            selectedStartPose = topLeftStartPose;
+            selectedStartPose = AllianceData.isRed() ? topRightStartPose : topLeftStartPose;
             AutoPoseAvailable = false;
         }
 
