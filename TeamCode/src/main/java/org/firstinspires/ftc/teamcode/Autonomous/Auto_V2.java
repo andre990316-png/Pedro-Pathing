@@ -733,7 +733,7 @@ public class Auto_V2 extends OpMode {
         }
         if(inputpressed[0]){
             if(uitab==0){
-                ALLIANCENUM=(ALLIANCENUM-1)%2;
+                ALLIANCENUM=(ALLIANCENUM+1)%2;
             }else if(uitab==1){
                 PATHNUM--;
                 if(AllianceData.isRed()){
@@ -804,7 +804,7 @@ public class Auto_V2 extends OpMode {
             }
         }else if(uitab==2){//confirm screen
             telemetry.addLine(autonames[PATHNUM]+" selected.");
-            telemetry.addLine("press (A) to reset selection if you fucked up");
+            telemetry.addLine("press (A) to reset selection if you messed up");
         }
 
 
