@@ -703,15 +703,6 @@ public class Auto_V2 extends OpMode {
         );
         imu.initialize(new IMU.Parameters(revHubOrientationOnRobot));
 
-
-        if (AllianceData.isRed()) {
-            limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
-            telemetry.addData("Alliance", "RED (Pipeline set to Red)");
-        } else {
-            limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
-            telemetry.addData("Alliance", "BLUE (Pipeline set to Blue)");
-        }
-
         shooter.init(hardwareMap);
 
         telemetry.addData("Init", "OK");
@@ -813,7 +804,7 @@ public class Auto_V2 extends OpMode {
 
     @Override
     public void start() {
-
+        limelight.start();
 
         STEPS.clear();
         STEPS.addAll(paths.get(PATHNUM));
@@ -842,7 +833,6 @@ public class Auto_V2 extends OpMode {
         pauseEndTimeMs = 0;
         waitingForShooter = false;
 
-        limelight.start();
         autoAim.resetHistory(getRuntime());
     }
 
@@ -854,6 +844,7 @@ public class Auto_V2 extends OpMode {
 
         RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.29);
         Auto_lastPose.currentPose = follower.getPose();
+        LLResult ll = limelight.getLatestResult();
 
         Pose robotPose = follower.getPose();
         Pose goalPose = AllianceData.getGoalPose();  // dynamically get current alliance
@@ -870,7 +861,6 @@ public class Auto_V2 extends OpMode {
             double turretPower = 0;
             limelight.updateRobotOrientation(imu.getRobotYawPitchRollAngles().getYaw());
             if (autoAimEnabled) {
-                LLResult ll = limelight.getLatestResult();
                 turretPower = autoAim.update(getRuntime(), ll, telemetry);
             } else {
                 turretPower = 0;
