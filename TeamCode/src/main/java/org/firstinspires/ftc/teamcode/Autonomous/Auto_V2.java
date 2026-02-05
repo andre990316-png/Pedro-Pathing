@@ -576,6 +576,7 @@ public class Auto_V2 extends OpMode {
                 break;
 
             case SHOOT_3:
+                autoAimEnabled = true;
                 shooter.fireShots(3);
                 //intake.setTargetRPM(-0.37);
                 //intake.intakeReady(true);
