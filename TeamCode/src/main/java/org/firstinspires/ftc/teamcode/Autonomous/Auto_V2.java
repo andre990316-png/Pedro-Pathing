@@ -75,6 +75,7 @@ public class Auto_V2 extends OpMode {
     private ArrayList<AutoStep> PATH6LEFT = new ArrayList<>();
     private ArrayList<AutoStep> PATH7LEFT = new ArrayList<>();
     private ArrayList<AutoStep> PATH8LEFT = new ArrayList<>();
+    private ArrayList<AutoStep> PATHNKSHRIMPLEFT = new ArrayList<>();
     private ArrayList<AutoStep> PATH1RIGHT = new ArrayList<>();
     private ArrayList<AutoStep> PATH2RIGHT = new ArrayList<>();
     private ArrayList<AutoStep> PATH3RIGHT = new ArrayList<>();
@@ -83,6 +84,7 @@ public class Auto_V2 extends OpMode {
     private ArrayList<AutoStep> PATH6RIGHT = new ArrayList<>();
     private ArrayList<AutoStep> PATH7RIGHT = new ArrayList<>();
     private ArrayList<AutoStep> PATH8RIGHT = new ArrayList<>();
+    private ArrayList<AutoStep> PATHNKSHRIMPRIGHT = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTEST = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTOPLEFT = new ArrayList<>();
     private ArrayList<AutoStep> AUTOTOPLEFT2 = new ArrayList<>();
@@ -177,8 +179,8 @@ public class Auto_V2 extends OpMode {
 
     public static String[] alliancenames = {"BLUE","RED"};
 
-    public static String[] autonames = {"topleftALL_(P1B)","topleftALL+GATE_(P2B)","bottomleft(P3B)","bottomleft+R3(P4B)","bottomleft+EXTRA(P5B)","bottomleft+R3+EXTRA(P6B)", "topleft2(P7B)", "topleft2+GATE(P8B)",
-            "toprightALL(P1R)","toprightALL+GATE(P2R)","bottomright(P3R)","bottomright+R3(P4R)","bottomright+EXTRA(P5R)","bottomright+R3+EXTRA(P6R)", "topright2(P7R)", "topright2+GATE(P8R)"};
+    public static String[] autonames = {"topleftALL_(P1B)","topleftALL+GATE_(P2B)","bottomleft(P3B)","bottomleft+R3(P4B)","bottomleft+EXTRA(P5B)","bottomleft+R3+EXTRA(P6B)", "topleft2(P7B)", "topleft2+GATE(P8B)", "NKSHRIMPLEFT",
+            "toprightALL(P1R)","toprightALL+GATE(P2R)","bottomright(P3R)","bottomright+R3(P4R)","bottomright+EXTRA(P5R)","bottomright+R3+EXTRA(P6R)", "topright2(P7R)", "topright2+GATE(P8R)", "NKSHRIMPRIGHT"};
     ArrayList<ArrayList<AutoStep>> paths = new ArrayList<>();
 
 
@@ -373,6 +375,13 @@ public class Auto_V2 extends OpMode {
         PATH8LEFT.add(new AutoStep(topLeftEndPose, AutoAction.NONE, 0));
 
 
+        PATHNKSHRIMPLEFT.clear();
+
+        PATHNKSHRIMPLEFT.add(new AutoStep(bottomLeftStartPose, AutoAction.NONE, 0));
+        PATHNKSHRIMPLEFT.add(new AutoStep(blueShootPoseFar, AutoAction.NONE, 800));
+        PATHNKSHRIMPLEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
+        PATHNKSHRIMPLEFT.addAll(INTAKEBLUELOADINGZONE);
+        PATHNKSHRIMPLEFT.add(new AutoStep(bottonLeftEndPose, AutoAction.NONE, 0));
 
         /*
         //shoots preload, gets row 2 and shoots
@@ -471,6 +480,7 @@ public class Auto_V2 extends OpMode {
         PATH6RIGHT = AutoStep.flipped(PATH6LEFT);
         PATH7RIGHT = AutoStep.flipped(PATH7LEFT);
         PATH8RIGHT = AutoStep.flipped(PATH8LEFT);
+        PATHNKSHRIMPRIGHT = AutoStep.flipped(PATHNKSHRIMPLEFT);
 
         /*if (AllianceData.isRed()) {
             STEPS.addAll(AUTOTOPRIGHT2);
@@ -498,6 +508,7 @@ public class Auto_V2 extends OpMode {
         paths.add(PATH6LEFT);
         paths.add(PATH7LEFT);
         paths.add(PATH8LEFT);
+        paths.add(PATHNKSHRIMPLEFT);
 
         paths.add(PATH1RIGHT);
         paths.add(PATH2RIGHT);
@@ -507,6 +518,7 @@ public class Auto_V2 extends OpMode {
         paths.add(PATH6RIGHT);
         paths.add(PATH7RIGHT);
         paths.add(PATH8RIGHT);
+        paths.add(PATHNKSHRIMPRIGHT);
 
 
 
@@ -845,7 +857,6 @@ public class Auto_V2 extends OpMode {
 
         RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.29);
         Auto_lastPose.currentPose = follower.getPose();
-        LLResult ll = limelight.getLatestResult();
 
         Pose robotPose = follower.getPose();
         Pose goalPose = AllianceData.getGoalPose();  // dynamically get current alliance
@@ -857,15 +868,12 @@ public class Auto_V2 extends OpMode {
 
         updateAuto();
 
+        limelight.updateRobotOrientation(imu.getRobotYawPitchRollAngles().getYaw());
+        LLResult ll = limelight.getLatestResult();
+
         // turret auto-aim
-        if (!(currentIndex>=STEPS.size()) && STEPS.get(currentIndex).action == AutoAction.SHOOT_3) {
-            double turretPower = 0;
-            limelight.updateRobotOrientation(imu.getRobotYawPitchRollAngles().getYaw());
-            if (autoAimEnabled) {
-                turretPower = autoAim.update(getRuntime(), ll, telemetry);
-            } else {
-                turretPower = 0;
-            }
+        if (waitingForShooter) {
+            double turretPower = autoAimEnabled ? autoAim.update(getRuntime(), ll, telemetry) : 0;
             ShooterRotateMotor.setPower(turretPower);
         } else {
             ShooterRotateMotor.setPower(0);
