@@ -15,7 +15,7 @@ public class FlywheelLogic {
 
     public static final double kp = 2.82;
     public static final double kd = 0.33;
-    public static final double kf = 1.666767;
+    public static final double kf = 1.6;
 
 
     // --- Hardware ---

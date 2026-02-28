@@ -312,7 +312,7 @@ public class Teleop extends OpMode {
         }*/
 
         if (gateHoldBtn.getState()) {
-            shooter.getIntake().setIntakeOnVelocity(-0.4);
+            shooter.getIntake().setIntakeOnVelocity(-0.37);
             shooter.getIntake().intakeReady(true);
         }
 
@@ -385,7 +385,7 @@ public class Teleop extends OpMode {
             turretPower = autoAim.update(getRuntime(), ll, telemetry);
         } else {
             double manual = gamepad2.right_stick_x;
-            turretPower = (Math.abs(manual) > 0.08) ? Range.clip(manual * 0.4, -0.4, 0.4) : 0;
+            turretPower = (Math.abs(manual) > 0.08) ? Range.clip(manual * 0.6, -0.8, 0.8) : 0;
             autoAim.resetHistory(getRuntime());
         }
         ShooterRotateMotor.setPower(turretPower);
