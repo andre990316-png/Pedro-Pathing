@@ -106,7 +106,9 @@ public class Teleop extends OpMode {
     private ButtonLogic sensitivityDownBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);//gamepad1.dpad_down
     private Follower follower;
 
+    private Pose selectedStartPose;
     private final Pose topLeftStartPose = new Pose(20, 118.5, Math.toRadians(144));
+    private final Pose topRightStartPose = new Pose(113, 120, Math.toRadians(41.8));
     private final Pose bottomLeftStartPose = new Pose(48, 10, Math.toRadians(90));
     private final java.util.ArrayList<PatternLogic.Color> driverPatternEntry = new java.util.ArrayList<>(3);
     private ColorSensorLogic colorSensorLogic = new ColorSensorLogic();
@@ -155,17 +157,18 @@ public class Teleop extends OpMode {
         Sensitivity = 1.0;
 
         shooter.init(hardwareMap);
-        follower = Constants.createFollower(hardwareMap);
+
+        IntakeLogic intakeLogic = new IntakeLogic();
+        intakeLogic.init(hardwareMap);
 
         if (Auto_lastPose.currentPose != null){
-            follower.setStartingPose(Auto_lastPose.currentPose);
-            AutoPoseAvailable = true;
-            AutoPoseOn = true;
-        }else {
-            follower.setStartingPose(topLeftStartPose);
-            AutoPoseAvailable = false;
-            AutoPoseOn = false;
+            selectedStartPose = Auto_lastPose.currentPose;
+        }else{
+            selectedStartPose = topLeftStartPose;
         }
+
+        follower = Constants.createFollower(hardwareMap);
+
 
         telemetry.addData("Initialize", "Completed");
         telemetry.update();
@@ -176,33 +179,34 @@ public class Teleop extends OpMode {
 
         if (gamepad1.dpad_left) {
             AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
+            selectedStartPose = topLeftStartPose;
         }
         else if (gamepad1.dpad_right) {
             AllianceData.selectedAlliance = AllianceData.Alliance.RED;
+            selectedStartPose = topRightStartPose;
         }
 
-        if(gamepad1.dpad_up) {
-            follower.setStartingPose(topLeftStartPose);
-            telemetry.addLine("Starting Position = topLeftStartingPose");
-            AutoPoseOn = false;
-        }else if(gamepad1.dpad_down && AutoPoseAvailable) {
-            follower.setStartingPose(Auto_lastPose.currentPose);
-            telemetry.addLine("Starting Position = Auto_lastPose");
-            AutoPoseOn = true;
+        if (gamepad1.dpad_down && Auto_lastPose.currentPose != null) {
+            selectedStartPose = Auto_lastPose.currentPose;
         }
+
 
         telemetry.addLine("=== ALLIANCE SELECT ===");
         telemetry.addData("Alliance", AllianceData.selectedAlliance);
         telemetry.addLine("D-pad LEFT = BLUE");
         telemetry.addLine("D-pad RIGHT = RED");
-        telemetry.addLine("D-pad UP = Top Left");
         telemetry.addLine(AutoPoseAvailable ? "D-pad DOWN = Auto" : "D-pad DOWN = Auto (NOT AVAILABLE)");
+        telemetry.addLine("                                 ");
+        telemetry.addData("Selected Start Pose", selectedStartPose);
+
 
         telemetry.update();
     }
 
+
     @Override
     public void start() {
+        follower.setStartingPose(selectedStartPose);
         limelight.start();
         autoAim.resetHistory(getRuntime());
 
@@ -519,7 +523,11 @@ public class Teleop extends OpMode {
             telemetry.addData("LLPose", "no valid tag");
         }
         telemetry.addData("DistanceToGoal", distToGoal);
-        telemetry.addData("Intake speed", IntakeLogic.intakeOnVelocity);
+        telemetry.addData("IntakeOnVelo ", IntakeLogic.intakeOnVelocity);
+        telemetry.addData("Intake RPM", intake.getCurrentRPM());
+        telemetry.addData("Intake PID Output", intake.getPidOutput());
+
         telemetry.update();
+
     }
 }

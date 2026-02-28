@@ -6,22 +6,46 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 public class IntakeLogic {
+
     private DcMotor IntakeMotor;
     private ElapsedTime stateTimer = new ElapsedTime();
+    private ElapsedTime pidTimer = new ElapsedTime();
+
     private enum IntakeState {
         IDLE,
         INTAKE
     }
+
     private IntakeState intakeState;
     private boolean startIntake = false;
+
     public static double intakeOffVelocity = 0;
     public static double intakeOnVelocity = -0.5;
+
+    // PID variables (for display only)
+    private double kp = 0.01;
+    private double ki = 0.001;
+    private double kd = 0.0005;
+    private double integral = 0;
+    private double lastError = 0;
+    private int lastPos = 0;
+    private double currentRPM = 0;
+    private double targetRPM = 0; // GoBilda 5203 motor max RPM
+
     public void init(HardwareMap hardwareMap) {
         IntakeMotor = hardwareMap.get(DcMotor.class, "Intake Motor");
         intakeState = IntakeState.IDLE;
         IntakeMotor.setPower(0);
+
+        IntakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        IntakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        pidTimer.reset();
+        lastPos = IntakeMotor.getCurrentPosition();
     }
+
     public void update() {
+        // --- original intake logic ---
         switch(intakeState) {
             case IDLE:
                 if(startIntake) {
@@ -38,17 +62,54 @@ public class IntakeLogic {
                 }
                 break;
         }
+
+        // --- PID calculation for display only ---
+        double dt = pidTimer.seconds();
+        if(dt <= 0) dt = 0.02;
+        pidTimer.reset();
+
+        int pos = IntakeMotor.getCurrentPosition();
+        int deltaTicks = pos - lastPos;
+        lastPos = pos;
+
+        double ticksPerRev = 145.1;
+        double revs = deltaTicks / ticksPerRev;
+        currentRPM = (revs / dt) * 60.0; // convert to RPM
+
+        // PID for debugging (not applied to motor)
+        double error = targetRPM - currentRPM;
+        integral += error * dt;
+        double derivative = (error - lastError) / dt;
+        lastError = error;
+        double pidOutput = kp * error + ki * integral + kd * derivative;
+
+        // Display PID values (for telemetry)
+        // Example usage in OpMode: telemetry.addData("Intake RPM", intake.getCurrentRPM());
+        // telemetry.addData("PID Output", intake.getPidOutput());
     }
+
     public void intakeReady(boolean start) {
         startIntake = start;
     }
+
     public void setIntakeOnVelocity(double p) {
         intakeOnVelocity = Range.clip(p, -1.0, 0.5);
     }
+
     public void setIntakeOffVelocity(double p) {
         intakeOffVelocity = Range.clip(p, -1.0, 0.5);
     }
+
     public boolean isBusy() {
         return intakeState != IntakeState.IDLE;
+    }
+
+    // --- getters for telemetry/debug ---
+    public double getCurrentRPM() {
+        return currentRPM;
+    }
+
+    public double getPidOutput() {
+        return kp * (targetRPM - currentRPM) + ki * integral + kd * ((targetRPM - currentRPM) - lastError) / pidTimer.seconds();
     }
 }
