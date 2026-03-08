@@ -883,16 +883,16 @@ public class Auto_V2 extends OpMode {
             ShooterRotateMotor.setPower(0);
         }
 
-///        telemetry.addData("Current State", (currentIndex < STEPS.size()) ? STEPS.get(currentIndex).action.name() : "DONE");
-///        telemetry.addData("Step", currentIndex + " / " + STEPS.size());
-///        telemetry.addData("Busy", follower.isBusy());
-///        telemetry.addData("Shooter Busy", shooter.isBusy());
-///        telemetry.addData("WaitingShooter", waitingForShooter);
-///        telemetry.addData("PauseMsLeft", (pauseEndTimeMs > 0) ? (pauseEndTimeMs - System.currentTimeMillis()) : 0);
-///        telemetry.addData("x", follower.getPose().getX());
-///        telemetry.addData("y", follower.getPose().getY());
-///        telemetry.addData("heading", follower.getPose().getHeading());
-///        telemetry.addData("stuckon", stuckon);
+        telemetry.addData("Current State", (currentIndex < STEPS.size()) ? STEPS.get(currentIndex).action.name() : "DONE");
+        telemetry.addData("Step", currentIndex + " / " + STEPS.size());
+        telemetry.addData("Busy", follower.isBusy());
+        telemetry.addData("Shooter Busy", shooter.isBusy());
+        telemetry.addData("WaitingShooter", waitingForShooter);
+        telemetry.addData("PauseMsLeft", (pauseEndTimeMs > 0) ? (pauseEndTimeMs - System.currentTimeMillis()) : 0);
+        telemetry.addData("x", follower.getPose().getX());
+        telemetry.addData("y", follower.getPose().getY());
+        telemetry.addData("heading", follower.getPose().getHeading());
+        telemetry.addData("stuckon", stuckon);
         if (currentIndex < STEPS.size()) {
             Pose currentPose = follower.getPose();
             Pose nextPose = STEPS.get(currentIndex).pose;
@@ -902,28 +902,28 @@ public class Auto_V2 extends OpMode {
                 double dy2 = nextPose.getY() - currentPose.getY();
                 double distanceToNext = Math.hypot(dx2, dy2);
 
-                ///telemetry.addData("Distance to Next Pose", "%.2f", distanceToNext);
-                ///telemetry.addData("Next Pose X/Y", "%.2f / %.2f", nextPose.getX(), nextPose.getY());
+                telemetry.addData("Distance to Next Pose", "%.2f", distanceToNext);
+                telemetry.addData("Next Pose X/Y", "%.2f / %.2f", nextPose.getX(), nextPose.getY());
             } else {
-                ///telemetry.addData("Distance to Next Pose", "No target (null pose)");
+                telemetry.addData("Distance to Next Pose", "No target (null pose)");
             }
         } else {
-            ///telemetry.addData("Distance to Next Pose", "DONE");
+            telemetry.addData("Distance to Next Pose", "DONE");
         }
-        telemetry.addData("limelight x", getRobotPoseFromCamera().getX());
-        telemetry.addData("limelight y", getRobotPoseFromCamera().getY());
-        telemetry.addData("limelight h", getRobotPoseFromCamera().getHeading());
-
-        telemetry.addData("normal x", follower.getPose().getX());
-        telemetry.addData("normal y", follower.getPose().getY());
-        telemetry.addData("normal h", follower.getPose().getHeading());
+//        telemetry.addData("limelight x", getRobotPoseFromCamera().getX());
+//        telemetry.addData("limelight y", getRobotPoseFromCamera().getY());
+//        telemetry.addData("limelight h", getRobotPoseFromCamera().getHeading());
+//
+//        telemetry.addData("normal x", follower.getPose().getX());
+//        telemetry.addData("normal y", follower.getPose().getY());
+//        telemetry.addData("normal h", follower.getPose().getHeading());
         telemetry.update();
     }
-    private Pose getRobotPoseFromCamera() {
-        ///Fill this out to get the robot Pose from the camera's output (apply any filters if you need to using follower.getPose() for fusion)
-        ///Pedro Pathing has built-in KalmanFilter and LowPassFilter classes you can use for this
-        ///Use this to convert standard FTC coordinates to standard Pedro Pathing coordinates
-        Pose3D pose = limelight.getLatestResult().getBotpose();
-        return new Pose(pose.getPosition().x, pose.getPosition().y, follower.getHeading(), FTCCoordinates.INSTANCE).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
-    }
+//    private Pose getRobotPoseFromCamera() {
+//        ///Fill this out to get the robot Pose from the camera's output (apply any filters if you need to using follower.getPose() for fusion)
+//        ///Pedro Pathing has built-in KalmanFilter and LowPassFilter classes you can use for this
+//        ///Use this to convert standard FTC coordinates to standard Pedro Pathing coordinates
+//        Pose3D pose = limelight.getLatestResult().getBotpose();
+//        return new Pose(pose.getPosition().x, pose.getPosition().y, follower.getHeading(), FTCCoordinates.INSTANCE).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
+//    }
 }

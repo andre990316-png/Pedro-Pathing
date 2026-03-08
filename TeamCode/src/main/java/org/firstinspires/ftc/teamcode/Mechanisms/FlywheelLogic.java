@@ -46,8 +46,8 @@ public class FlywheelLogic {
     private FlywheelState flyWheelState = FlywheelState.IDLE;
 
     // --- Gate / shot settings ---
-    private double gateCloseAngle = 0.6;
-    private double gateOpenAngle  = 0.5;
+    private double gateCloseAngle = 0.575;
+    private double gateOpenAngle  = 0.527;
 //    private double gateOpenTime   = 0.06;
 //    private double gateCloseTime  = 0.06;s
 private double launchTime = 1.7; // seconds gate stays open

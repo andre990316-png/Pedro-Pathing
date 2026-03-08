@@ -39,7 +39,7 @@ public class FlywheelAndHoodData {
             flywheelRPM = 4400;
             hoodAngle = 1.00;
         }*/
-        return new AutoShooting(flywheelRPM - 50, hoodAngle + 0.02);
+        return new AutoShooting(flywheelRPM - 50, hoodAngle - 0.03);
     }
 //    public static AutoShooting lookupA(double ta) {
 //        if (ta >= 2.37) return new AutoShooting(3500, 0.90);
@@ -50,10 +50,10 @@ public class FlywheelAndHoodData {
 
     public static AutoShooting lookupB(double ta) {
         double flywheelRPM, hoodAngle = 1;
-        if (ta >= 0.38) return new AutoShooting(4400, 0.98);
-        if (ta >= 0.32) return new AutoShooting(4500, 0.98);
-        if (ta >= 0.29) return new AutoShooting(4600, 0.98);
-        return new AutoShooting(4600, 0.98);
+        if (ta >= 0.38) return new AutoShooting(4400, 0.95);
+        if (ta >= 0.32) return new AutoShooting(4500, 0.95);
+        if (ta >= 0.29) return new AutoShooting(4600, 0.95);
+        return new AutoShooting(4600, 0.95);
     }
 }
 
