@@ -851,7 +851,10 @@ public class Auto_V2 extends OpMode {
     @Override
     public void loop() {
         follower.update();
-        follower.setPose(getRobotPoseFromCamera()); /// questionable
+        if(limelight.getLatestResult().isValid()){
+            follower.setPose(getRobotPoseFromCamera()); /// questionable
+        }
+
         shooter.update(intake);
         intake.update();
 
