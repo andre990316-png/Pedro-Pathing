@@ -192,20 +192,20 @@ public class Auto_V2 extends OpMode {
         INTAKEBLUEBALLPOSITION1.clear();
 
         INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1Start, AutoAction.INTAKE_ON, 0));
-        INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1End, AutoAction.INTAKE_OFF, 0));
-        INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1Start, AutoAction.NONE, 0));
+        INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1End, AutoAction.NONE, 0));
+        INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1Start, AutoAction.INTAKE_OFF, 0));
 
         INTAKEBLUEBALLPOSITION2.clear();
 
         INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
-        INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2End, AutoAction.INTAKE_OFF, 0));
-        INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2Start, AutoAction.NONE, 0));
+        INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2End, AutoAction.NONE, 0));
+        INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_OFF, 0));
 
         INTAKEBLUEBALLPOSITION3.clear();
 
         INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3Start, AutoAction.INTAKE_ON, 0));
-        INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3End, AutoAction.INTAKE_OFF, 0));
-        INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3Start, AutoAction.NONE, 0));
+        INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3End, AutoAction.NONE, 0));
+        INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3Start, AutoAction.INTAKE_OFF, 0));
 
         INTAKEBLUEGATE.clear();
 
@@ -777,9 +777,11 @@ public class Auto_V2 extends OpMode {
                 uitab=1;
                 if(ALLIANCENUM==0){
                     AllianceData.selectedAlliance= AllianceData.Alliance.BLUE;
+                    limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
                     PATHNUM=0;
                 }else if(ALLIANCENUM==1){
                     AllianceData.selectedAlliance= AllianceData.Alliance.RED;
+                    limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
                     PATHNUM=autonames.length/2;
                 }
             }else if(uitab==1){
@@ -831,13 +833,7 @@ public class Auto_V2 extends OpMode {
         follower.setStartingPose(STEPS.get(0).pose);
         ShooterS2.setPosition(gateCloseAngle);
 
-        if(PATHNUM<8){
-            AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
-            limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
-        }else{
-            AllianceData.selectedAlliance = AllianceData.Alliance.RED;
-            limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
-        }
+
         opModeTimer.resetTimer();
         pathTimer.resetTimer();
         follower.setPose(STEPS.get(0).pose);
