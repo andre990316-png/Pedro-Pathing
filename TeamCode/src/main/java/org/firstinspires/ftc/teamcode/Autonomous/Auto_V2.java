@@ -195,20 +195,20 @@ public class Auto_V2 extends OpMode {
         INTAKEBLUEBALLPOSITION1.clear();
 
         INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1Start, AutoAction.INTAKE_ON, 0));
-        INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1End, AutoAction.NONE, 0));
-        INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1Start, AutoAction.INTAKE_OFF, 0));
+        INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1End, AutoAction.INTAKE_OFF, 0));
+        INTAKEBLUEBALLPOSITION1.add(new AutoStep(blueBallPosition1Start, AutoAction.NONE, 0));
 
         INTAKEBLUEBALLPOSITION2.clear();
 
         INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_ON, 0));
-        INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2End, AutoAction.NONE, 0));
-        INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2Start, AutoAction.INTAKE_OFF, 0));
+        INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2End, AutoAction.INTAKE_OFF, 0));
+        INTAKEBLUEBALLPOSITION2.add(new AutoStep(blueBallPosition2Start, AutoAction.NONE, 0));
 
         INTAKEBLUEBALLPOSITION3.clear();
 
         INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3Start, AutoAction.INTAKE_ON, 0));
-        INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3End, AutoAction.NONE, 0));
-        INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3Start, AutoAction.INTAKE_OFF, 0));
+        INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3End, AutoAction.INTAKE_OFF, 0));
+        INTAKEBLUEBALLPOSITION3.add(new AutoStep(blueBallPosition3Start, AutoAction.NONE, 0));
 
         INTAKEBLUEGATE.clear();
 
