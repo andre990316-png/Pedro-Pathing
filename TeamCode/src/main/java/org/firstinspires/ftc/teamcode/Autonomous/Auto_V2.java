@@ -15,12 +15,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.Data.AllianceData;
 import org.firstinspires.ftc.teamcode.Data.Auto_lastPose;
 import org.firstinspires.ftc.teamcode.Mechanisms.IntakeLogic;
 import org.firstinspires.ftc.teamcode.Mechanisms.LEDClass;
 import org.firstinspires.ftc.teamcode.Mechanisms.LimelightAim;
 import org.firstinspires.ftc.teamcode.Mechanisms.FlywheelLogic;
+import com.pedropathing.geometry.PedroCoordinates;
+import com.pedropathing.ftc.FTCCoordinates;
 
 import java.util.ArrayList;
 
@@ -848,6 +851,7 @@ public class Auto_V2 extends OpMode {
     @Override
     public void loop() {
         follower.update();
+        follower.setPose(getRobotPoseFromCamera()); /// questionable
         shooter.update(intake);
         intake.update();
 
@@ -903,5 +907,12 @@ public class Auto_V2 extends OpMode {
             telemetry.addData("Distance to Next Pose", "DONE");
         }
         telemetry.update();
+    }
+    private Pose getRobotPoseFromCamera() {
+        ///Fill this out to get the robot Pose from the camera's output (apply any filters if you need to using follower.getPose() for fusion)
+        ///Pedro Pathing has built-in KalmanFilter and LowPassFilter classes you can use for this
+        ///Use this to convert standard FTC coordinates to standard Pedro Pathing coordinates
+        Pose3D pose = limelight.getLatestResult().getBotpose();
+        return new Pose(pose.getPosition().x, pose.getPosition().y, follower.getHeading(), FTCCoordinates.INSTANCE).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
     }
 }
