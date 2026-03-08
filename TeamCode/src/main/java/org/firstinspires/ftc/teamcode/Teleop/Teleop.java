@@ -327,7 +327,7 @@ public class Teleop extends OpMode {
         sensitivityDownBtn.update(gamepad1.dpad_down);
         sensitivityUpBtn.update(gamepad1.dpad_up);
 
-        ShooterS2.setPosition(gateHoldBtn.getState()? 0.7 : 1);
+        ShooterS2.setPosition(gateHoldBtn.getState()? 0.5 : 0.8);
         /*if (shoot3Btn.getState() && !shooter.isBusy()) {
             shooter.fireShots(3);
             shooter.getIntake().setIntakeOnVelocity(-0.6);
