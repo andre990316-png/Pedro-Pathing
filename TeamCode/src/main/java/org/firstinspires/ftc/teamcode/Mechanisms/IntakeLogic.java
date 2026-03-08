@@ -28,6 +28,8 @@ public class IntakeLogic {
     private double lastError = 0;
     private double pidPower = 0;
 
+    public static double shootRPM = -0.30;
+
     private int lastPos = 0;
 
     private double currentRPM = 0;

@@ -765,9 +765,11 @@ public class Auto_V2 extends OpMode {
                 uitab=1;
                 if(ALLIANCENUM==0){
                     AllianceData.selectedAlliance= AllianceData.Alliance.BLUE;
+                    limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
                     PATHNUM=0;
                 }else if(ALLIANCENUM==1){
                     AllianceData.selectedAlliance= AllianceData.Alliance.RED;
+                    limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
                     PATHNUM=autonames.length/2;
                 }
             }else if(uitab==1){
@@ -819,13 +821,7 @@ public class Auto_V2 extends OpMode {
         follower.setStartingPose(STEPS.get(0).pose);
         ShooterS2.setPosition(gateCloseAngle);
 
-        if(PATHNUM<8){
-            AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
-            limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
-        }else{
-            AllianceData.selectedAlliance = AllianceData.Alliance.RED;
-            limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
-        }
+
         opModeTimer.resetTimer();
         pathTimer.resetTimer();
         follower.setPose(STEPS.get(0).pose);

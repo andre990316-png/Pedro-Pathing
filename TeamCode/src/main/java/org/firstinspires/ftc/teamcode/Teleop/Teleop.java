@@ -338,7 +338,7 @@ public class Teleop extends OpMode {
         }*/
 
         if (gateHoldBtn.getState()) {
-            intake.setTargetRPM(-0.39);
+            intake.setTargetRPM(IntakeLogic.shootRPM);
             intake.intakeReady(true);
         }
 
