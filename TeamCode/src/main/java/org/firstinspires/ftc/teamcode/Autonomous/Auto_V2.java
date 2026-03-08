@@ -116,12 +116,12 @@ public class Auto_V2 extends OpMode {
     private final Pose bottomLeftStartPose = new Pose(55, 0, Math.toRadians(90));
 
     //end poses
-    private final Pose topLeftEndPose = new Pose(30, 65, Math.toRadians(180));
+    private final Pose topLeftEndPose = new Pose(30, 62, Math.toRadians(180));
     private final Pose bottonLeftEndPose = new Pose(41, 12, Math.toRadians(180));
 
     //close shoot poses (on big V)
-    private final Pose blueShootPoseClose = new Pose(50, 96, Math.toRadians(180));
-    private final Pose redShootPoseClose = new Pose(99, 96, Math.toRadians(137));
+    private final Pose blueShootPoseClose = new Pose(50, 84, Math.toRadians(180));
+    private final Pose redShootPoseClose = new Pose(94, 84, Math.toRadians(137));
 
     //far shoot poses (on small v)
     private final Pose blueShootPoseFar = new Pose(58,12,Math.toRadians(180));
@@ -130,8 +130,8 @@ public class Auto_V2 extends OpMode {
     //artifact intaking poses (blue)
     private final Pose blueBallPosition1Start = new Pose(50, 35.5, Math.toRadians(180));
     private final Pose blueBallPosition1End = new Pose(13, 35.5, Math.toRadians(180));
-    private final Pose blueBallPosition2Start = new Pose(50, 58, Math.toRadians(180));
-    private final Pose blueBallPosition2End = new Pose(13, 58, Math.toRadians(180));
+    private final Pose blueBallPosition2Start = new Pose(50, 62, Math.toRadians(180));
+    private final Pose blueBallPosition2End = new Pose(13, 62, Math.toRadians(180));
     private final Pose blueBallPosition2EndAndGate = new Pose(11, 58, Math.toRadians(180));
     private final Pose blueBallPosition3Start = new Pose(50, 84, Math.toRadians(180));
     private final Pose blueBallPosition3End = new Pose(20, 84, Math.toRadians(180));

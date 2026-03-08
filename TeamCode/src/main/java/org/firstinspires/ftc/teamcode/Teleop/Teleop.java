@@ -489,7 +489,7 @@ public class Teleop extends OpMode {
             turretPower = autoAim.update(getRuntime(), ll, telemetry);
         } else {
             double manual = gamepad2.right_stick_x;
-            turretPower = (Math.abs(manual) > 0.08) ? Range.clip(manual, -1, 1) : 0;
+            turretPower = (Math.abs(manual) > 0.08) ? Range.clip(manual, -0.8, 0.8) : 0;
             autoAim.resetHistory(getRuntime());
         }
         ShooterRotateMotor.setPower(turretPower);
