@@ -46,8 +46,8 @@ public class FlywheelLogic {
     private FlywheelState flyWheelState = FlywheelState.IDLE;
 
     // --- Gate / shot settings ---
-    private double gateCloseAngle = 0.9;
-    private double gateOpenAngle  = 0.7;
+    private double gateCloseAngle = 0.6;
+    private double gateOpenAngle  = 0.5;
 //    private double gateOpenTime   = 0.06;
 //    private double gateCloseTime  = 0.06;s
 private double launchTime = 1.7; // seconds gate stays open
@@ -59,7 +59,7 @@ private double launchTime = 1.7; // seconds gate stays open
     private double targetRPM = 0;
     private double calcRPM;
     private double flywheelMaxSpinupTime = 0.7;
-    private double lastShooterTime=System.nanoTime();
+    private double lastShooterTime = System.nanoTime();
     //private IntakeLogic intake = new IntakeLogic();
     private double currentRPM = 0;
     private double lastError = 0;
@@ -77,9 +77,9 @@ private double launchTime = 1.7; // seconds gate stays open
 
         battery = hardwareMap.voltageSensor.iterator().next();
 
-        ShooterM1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //ShooterM1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        // Needed for setVelocity() control
+        // Needed for setVelocity() control1
         ShooterM1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         ShooterM2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 

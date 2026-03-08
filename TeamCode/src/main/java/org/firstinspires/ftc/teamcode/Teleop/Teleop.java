@@ -14,6 +14,9 @@ import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
+import com.bylazar.configurables.annotations.Configurable;
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
 
 import org.firstinspires.ftc.teamcode.Autonomous.Auto_V2;
 import org.firstinspires.ftc.teamcode.Autonomous.Constants;
@@ -34,9 +37,11 @@ import org.firstinspires.ftc.teamcode.Mechanisms.ColorSensorLogic;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
-
+@Configurable
 @TeleOp(name = "Teleop")
 public class Teleop extends OpMode {
+
+    public TelemetryManager telemetryM;
     // Drive + mechanisms
     private DcMotor MotorBackLeft;
     private DcMotor MotorFrontLeft;
@@ -185,6 +190,7 @@ public class Teleop extends OpMode {
 
         follower = Constants.createFollower(hardwareMap);
 
+        telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
         telemetry.addData("Initialize", "Completed");
         telemetry.update();
@@ -327,7 +333,7 @@ public class Teleop extends OpMode {
         sensitivityDownBtn.update(gamepad1.dpad_down);
         sensitivityUpBtn.update(gamepad1.dpad_up);
 
-        ShooterS2.setPosition(gateHoldBtn.getState()? 0.5 : 0.8);
+        ShooterS2.setPosition(gateHoldBtn.getState()? 0.527 : 0.575);
         /*if (shoot3Btn.getState() && !shooter.isBusy()) {
             shooter.fireShots(3);
             shooter.getIntake().setIntakeOnVelocity(-0.6);
@@ -385,7 +391,7 @@ public class Teleop extends OpMode {
         // Raw joystick (FIELD intent)
         double fieldStrafe  = gamepad1.left_stick_x;
         double fieldForward = -gamepad1.left_stick_y;
-        double rotation = gamepad1.right_stick_x * 0.75;
+        double rotation = gamepad1.right_stick_x;
 
         double strafe;
         double forward;
@@ -407,7 +413,7 @@ public class Teleop extends OpMode {
 
         strafe  *= currentSensitivity;
         forward *= currentSensitivity;
-        rotation *= currentSensitivity * 0.75;
+        rotation *= currentSensitivity;
 
         XL = strafe;
         YL = forward;
@@ -483,7 +489,7 @@ public class Teleop extends OpMode {
             turretPower = autoAim.update(getRuntime(), ll, telemetry);
         } else {
             double manual = gamepad2.right_stick_x;
-            turretPower = (Math.abs(manual) > 0.08) ? Range.clip(manual * 0.6, -0.8, 0.8) : 0;
+            turretPower = (Math.abs(manual) > 0.08) ? Range.clip(manual, -1, 1) : 0;
             autoAim.resetHistory(getRuntime());
         }
         ShooterRotateMotor.setPower(turretPower);
@@ -564,9 +570,6 @@ public class Teleop extends OpMode {
         telemetry.addLine("                                  ");
         telemetry.addData("Target RPM ", shooter.getTargetRPM());
         telemetry.addData("RPM ", shooter.getFlywheelRpm());
-        telemetry.addLine("                                  ");
-        telemetry.addData("Shooter Servo ", ShooterS1.getPosition());
-        telemetry.addData("Shooter Servo2 ", ShooterS2.getPosition());
         telemetry.addLine("                                  ");
         telemetry.addData("Current Sensitivity", currentSensitivity);
         telemetry.addData("Sensitivity", Sensitivity);

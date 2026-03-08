@@ -120,11 +120,11 @@ public class Auto_V2 extends OpMode {
     private final Pose bottonLeftEndPose = new Pose(41, 12, Math.toRadians(180));
 
     //close shoot poses (on big V)
-    private final Pose blueShootPoseClose = new Pose(50, 96, Math.toRadians(137));
+    private final Pose blueShootPoseClose = new Pose(50, 96, Math.toRadians(180));
     private final Pose redShootPoseClose = new Pose(99, 96, Math.toRadians(137));
 
     //far shoot poses (on small v)
-    private final Pose blueShootPoseFar = new Pose(58,12,Math.toRadians(116));
+    private final Pose blueShootPoseFar = new Pose(58,12,Math.toRadians(180));
     private final Pose redShootPoseFar = new Pose(80,20,Math.toRadians(64));
 
     //artifact intaking poses (blue)
@@ -153,8 +153,8 @@ public class Auto_V2 extends OpMode {
     private final Pose redLoadingZoneEnd = new Pose(133.8,10, Math.toRadians(0));
 
     //gate and intake poses
-    public static final Pose blueGateIntakePose = new Pose(13,54, Math.toRadians(140));
-    public static final Pose redGateIntakePose = new Pose(131,54, Math.toRadians(40));
+    public static final Pose blueGateIntakePose = new Pose(11,54, Math.toRadians(140));
+    public static final Pose redGateIntakePose = new Pose(133,54, Math.toRadians(40));
 
     private final Pose blueGatePose = new Pose(20, 66, Math.toRadians(180));
 
