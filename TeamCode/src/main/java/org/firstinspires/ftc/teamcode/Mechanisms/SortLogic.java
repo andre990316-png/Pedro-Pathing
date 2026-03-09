@@ -8,15 +8,15 @@ public class SortLogic {
 
     // gamePattern:
     // 0 = no sorting
-    // 1 = target PPG (purple, purple, green)
-    // 2 = target GGP (green, green, purple)  <-- only valid if you truly have 2G+1P; otherwise remove
+    // 1 = target PPG (2 purple + 1 green) at the front
     private int gamePattern = 0;
 
     // Outputs you read from OpMode
+    // Meaning: true = pocket pulls ball OUT (HOLD), false = pocket puts ball BACK (RELEASE)
     private boolean openUpSort = false;     // pocket for slot1
     private boolean openDownSort = false;   // pocket for slot2
     private boolean feed = false;           // run intake/feeder forward
-    private boolean shoot = false;          // shoot (clear slot1)
+    private boolean shoot = false;          // open shooter gate to clear slot1
 
     // Tuning (seconds)
     public double holdTimeoutSec = 0.60;
@@ -27,7 +27,6 @@ public class SortLogic {
     private enum SortingState {
         IDLE,
         HOLD_1,
-        HOLD_2,
         HOLD_BOTH,
         FEED_TO_FRONT,
         SHOOT_FRONT,
@@ -41,7 +40,8 @@ public class SortLogic {
     private enum Move { NONE, ROTATE_LEFT, BRING3_TO_FRONT }
     private Move activeMove = Move.NONE;
 
-    private int desiredReleaseOrder = 12; // 12 means release slot1 pocket then slot2 pocket; 21 means reverse
+    // 12 = release pocket1 then pocket2, 21 = release pocket2 then pocket1
+    private int desiredReleaseOrder = 12;
 
     public void update(int[] colors, int pattern) {
         if (colors != null && colors.length >= 2) {
@@ -59,6 +59,10 @@ public class SortLogic {
         openDownSort = false;
         feed = false;
         shoot = false;
+    }
+
+    public boolean isBusy() {
+        return state != SortingState.IDLE;
     }
 
     public void step(double nowSec, boolean triggerSort) {
@@ -97,46 +101,31 @@ public class SortLogic {
         }
     }
 
-    // ====== Outputs ======
     public boolean isOpenUpSort() { return openUpSort; }
     public boolean isOpenDownSort() { return openDownSort; }
     public boolean isFeedOn() { return feed; }
     public boolean isShootOn() { return shoot; }
 
     // ====== Move planner for 2P+1G ======
-    // Pattern 1: target PPG
-    // Pattern 2: target GPP (optional alternate target)
+    // Target for pattern 1: PPG (front two should be PP)
     private Move chooseMove2P1G(int c1, int c2, int pattern) {
         final int P = 1, G = 2;
 
-        if (pattern == 1) { // want PPG at the front
-            if (c1 == P && c2 == P) return Move.NONE;          // already PPG
-            if (c1 == G && c2 == P) return Move.ROTATE_LEFT;   // GPP -> PPG
-            if (c1 == P && c2 == G) {
-                desiredReleaseOrder = 12;                      // put slot1 back before slot2
-                return Move.BRING3_TO_FRONT;                   // PGP -> PPG
-            }
-            return Move.NONE;
-        }
+        if (pattern != 1) return Move.NONE;
 
-        if (pattern == 2) { // OPTIONAL: target GPP
-            if (c1 == G && c2 == P) return Move.NONE;          // already GPP
-            if (c1 == P && c2 == P) return Move.ROTATE_LEFT;   // PPG -> GPP
-            if (c1 == P && c2 == G) {
-                desiredReleaseOrder = 21;
-                return Move.BRING3_TO_FRONT;                   // PGP -> GPP (depends on your reinsert order)
-            }
-            return Move.NONE;
+        if (c1 == P && c2 == P) return Move.NONE;          // already PPG
+        if (c1 == G && c2 == P) return Move.ROTATE_LEFT;   // GPP -> PPG
+        if (c1 == P && c2 == G) {
+            desiredReleaseOrder = 12;                      // for PGP -> PPG
+            return Move.BRING3_TO_FRONT;
         }
-
         return Move.NONE;
     }
 
     // ====== ROTATE_LEFT: [A,B,C] -> [B,C,A] ======
-    // Implementation: hold slot1 ball, feed until slot2 filled, then put slot1 back later.
     private void runRotateLeft(double nowSec) {
         if (state == SortingState.HOLD_1) {
-            openUpSort = true;
+            openUpSort = true; // hold pocket1
             if (colors[0] == 0 || (nowSec - stateStartSec) > holdTimeoutSec) {
                 state = SortingState.FEED_TO_FRONT;
                 stateStartSec = nowSec;
@@ -155,7 +144,7 @@ public class SortLogic {
         }
 
         if (state == SortingState.REINSERT_1) {
-            openUpSort = false;
+            openUpSort = false; // release pocket1 back in
             if ((nowSec - stateStartSec) > reinsertPauseSec) {
                 state = SortingState.IDLE;
                 activeMove = Move.NONE;
@@ -164,11 +153,6 @@ public class SortLogic {
     }
 
     // ====== BRING3_TO_FRONT with "must shoot before pocket1 can return" ======
-    // Sequence:
-    // 1) Hold both (slot1 & slot2 empty)
-    // 2) Feed until slot1 gets ball3
-    // 3) Shoot until slot1 becomes empty (ball3 shot)
-    // 4) Reinsert pocket1/pocket2 in chosen order
     private void runBring3ToFront(double nowSec) {
         if (state == SortingState.HOLD_BOTH) {
             openUpSort = true;
@@ -196,6 +180,7 @@ public class SortLogic {
             openDownSort = true;
             feed = true;
             shoot = true;
+
             if (colors[0] == 0 || (nowSec - stateStartSec) > shootTimeoutSec) {
                 state = (desiredReleaseOrder == 12) ? SortingState.REINSERT_1 : SortingState.REINSERT_2;
                 stateStartSec = nowSec;
@@ -204,21 +189,39 @@ public class SortLogic {
         }
 
         if (state == SortingState.REINSERT_1) {
-            openUpSort = false;
-            openDownSort = true;
-            if ((nowSec - stateStartSec) > reinsertPauseSec) {
-                state = SortingState.REINSERT_2;
-                stateStartSec = nowSec;
+            if (desiredReleaseOrder == 12) {
+                openUpSort = false;   // release pocket1 first
+                openDownSort = true;  // keep holding pocket2
+                if ((nowSec - stateStartSec) > reinsertPauseSec) {
+                    state = SortingState.REINSERT_2;
+                    stateStartSec = nowSec;
+                }
+            } else {
+                openUpSort = true;
+                openDownSort = false;
+                if ((nowSec - stateStartSec) > reinsertPauseSec) {
+                    state = SortingState.REINSERT_2;
+                    stateStartSec = nowSec;
+                }
             }
             return;
         }
 
         if (state == SortingState.REINSERT_2) {
-            openUpSort = false;
-            openDownSort = false;
-            if ((nowSec - stateStartSec) > reinsertPauseSec) {
-                state = SortingState.IDLE;
-                activeMove = Move.NONE;
+            if (desiredReleaseOrder == 12) {
+                openUpSort = false;
+                openDownSort = false; // now release pocket2
+                if ((nowSec - stateStartSec) > reinsertPauseSec) {
+                    state = SortingState.IDLE;
+                    activeMove = Move.NONE;
+                }
+            } else {
+                openUpSort = false;   // now release pocket1
+                openDownSort = false;
+                if ((nowSec - stateStartSec) > reinsertPauseSec) {
+                    state = SortingState.IDLE;
+                    activeMove = Move.NONE;
+                }
             }
         }
     }
