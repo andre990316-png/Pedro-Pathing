@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.Mechanisms.SortLogic;
 
 @Configurable
 @TeleOp
-public class TEST extends OpMode {
+public class TEST_FIXED extends OpMode {
 
     public TelemetryManager telemetryM;
 
@@ -34,9 +34,9 @@ public class TEST extends OpMode {
     private SingleColorSensor upBallSensor;
     private SingleColorSensor downBallSensor;
 
-    static double gateOpenAngle = 0.22, gateCloseAngle = 0, sortOpenAngle = 0, sortCloseAngle = 1, resetAngle = 0;
+    static double gateOpenAngle = 0.22, gateCloseAngle = 0, sortOpenAngle = 0, sortCloseAngle = 1;
 
-    public static int[] colors = {0, 0}; // 0=none, 1=purple, 2=green
+    public static int[] colors = {0, 0}; // slot2, slot3
 
     static double Kp = 0.0025;
     static double Kd = 0.0002;
@@ -55,15 +55,15 @@ public class TEST extends OpMode {
     private ButtonLogic shootBtn  = new ButtonLogic(ButtonLogic.Mode.HOLD, false);
     private ButtonLogic rpmUpBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);
     private ButtonLogic rpmDownBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);
-    private ButtonLogic servoTestBtnUp = new ButtonLogic(ButtonLogic.Mode.PULSE, false);
-    private ButtonLogic servoTestBtnDown = new ButtonLogic(ButtonLogic.Mode.PULSE, false);
     private ButtonLogic sortServoBtnUp = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);
     private ButtonLogic sortServoBtnDown = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);
-    private ButtonLogic sortServoResetBtn = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);
 
     private final SortLogic sortLogic = new SortLogic();
     private final ElapsedTime sortTimer = new ElapsedTime();
+    private final ElapsedTime shootDelayTimer = new ElapsedTime();
     static int pattern = 1; // target PPG for 2P+1G
+
+    private boolean shootDelayed = false;
 
     @Override
     public void init() {
@@ -97,6 +97,7 @@ public class TEST extends OpMode {
 
         sortTimer.reset();
         sortLogic.reset(sortTimer.seconds());
+        shootDelayTimer.reset();
     }
 
     @Override
@@ -106,37 +107,33 @@ public class TEST extends OpMode {
         shooterBtn.update(gamepad1.right_bumper);
         rpmUpBtn.update(gamepad1.dpad_up);
         rpmDownBtn.update(gamepad1.dpad_down);
-        servoTestBtnUp.update(gamepad1.dpad_right);
-        servoTestBtnDown.update(gamepad1.dpad_left);
         sortServoBtnUp.update(gamepad1.a);
         sortServoBtnDown.update(gamepad1.b);
-        sortServoResetBtn.update(gamepad1.x);
 
+        // RPM adjustment
         if (rpmUpBtn.getState()) RPM += 50;
         if (rpmDownBtn.getState()) RPM -= 50;
 
-        if (servoTestBtnUp.getState()) sortOpenAngle += 0.1;
-        if (servoTestBtnDown.getState()) sortOpenAngle -= 0.1;
-        sortOpenAngle = Range.clip(sortOpenAngle, 0.0, 1.0);
-
-        if (shooterBtn.getState()) targetRPM = RPM;
-        else targetRPM = 0;
-
+        // Shooter power control
+        targetRPM = shooterBtn.getState() ? RPM : 0;
         double shooterPower = updateShooterPD(targetRPM);
         ShooterR.setPower(-shooterPower);
         ShooterL.setPower(shooterPower);
 
+        // Update sensors
         upBallSensor.update();
-        colors[0] = upBallSensor.getBallColor();
+        colors[0] = upBallSensor.getBallColor();   // slot2
         downBallSensor.update();
-        colors[1] = downBallSensor.getBallColor();
+        colors[1] = downBallSensor.getBallColor(); // slot3
 
+        // Update sorting logic
         sortLogic.update(colors, pattern);
-
-        boolean triggerSort = shootBtn.getState(); // AUTO SORT WHEN SHOOT HELD
+        boolean triggerSort = shootBtn.getState();
         sortLogic.step(sortTimer.seconds(), triggerSort);
-        boolean sortingActive = sortLogic.isBusy();
 
+        boolean sortingActive = triggerSort || sortLogic.isBusy();
+
+        // Sorting servos & intake
         if (sortingActive) {
             SortServo1.setPosition(sortLogic.isOpenUpSort() ? sortOpenAngle : sortCloseAngle);
             SortServo2.setPosition(sortLogic.isOpenDownSort() ? sortOpenAngle : sortCloseAngle);
@@ -145,16 +142,24 @@ public class TEST extends OpMode {
             IntakeL.setPower(feedPower);
             IntakeR.setPower(feedPower);
 
-            ShooterServo.setPosition(shootBtn.getState() ? gateOpenAngle : gateCloseAngle);
-        } else {
-            if(sortServoResetBtn.getState()) {
-                SortServo1.setPosition(resetAngle);
-                SortServo2.setPosition(resetAngle);
+            // Shoot delayed 2 seconds after balls switch
+            if (sortLogic.isShootOn()) {
+                if (!shootDelayed) {
+                    shootDelayTimer.reset();
+                    shootDelayed = true;
+                    ShooterServo.setPosition(gateCloseAngle); // close gate during delay
+                }
+                if (shootDelayTimer.seconds() >= 2.0) {
+                    ShooterServo.setPosition(gateOpenAngle);
+                }
+            } else {
+                shootDelayed = false;
+                ShooterServo.setPosition(gateCloseAngle);
             }
-            else {
-                SortServo1.setPosition(sortServoBtnUp.getState() ? sortOpenAngle : sortCloseAngle);
-                SortServo2.setPosition(sortServoBtnDown.getState() ? sortOpenAngle : sortCloseAngle);
-            }
+
+        } else { // manual intake & servo control
+            SortServo1.setPosition(sortServoBtnUp.getState() ? sortOpenAngle : sortCloseAngle);
+            SortServo2.setPosition(sortServoBtnDown.getState() ? sortOpenAngle : sortCloseAngle);
 
             double intakePower = intakeBtn.getState() ? -1.0 : 0.0;
             IntakeL.setPower(intakePower);
@@ -163,20 +168,16 @@ public class TEST extends OpMode {
             ShooterServo.setPosition(shootBtn.getState() ? gateOpenAngle : gateCloseAngle);
         }
 
+        // Telemetry
         telemetry.addData("Target RPM", RPM);
         telemetry.addData("Current RPM", currentRPM);
         telemetry.addData("Shooter Power", shooterPower);
-        telemetry.addData("ShooterR Position", ShooterR.getCurrentPosition());
-        telemetry.addData("ShooterL Position", ShooterL.getCurrentPosition());
-
         telemetry.addData("Colors", "%d %d", colors[0], colors[1]);
-        telemetry.addData("Sorting", sortingActive);
+        telemetry.addData("Sorting Active", sortingActive);
         telemetry.addData("Sort Up/Down", "%b %b", sortLogic.isOpenUpSort(), sortLogic.isOpenDownSort());
-        telemetry.addData("Sort feed/shoot", "%b %b", sortLogic.isFeedOn(), sortLogic.isShootOn());
-
+        telemetry.addData("Sort Feed/Shoot", "%b %b", sortLogic.isFeedOn(), sortLogic.isShootOn());
         upBallSensor.telemetry(telemetry, "UP");
         downBallSensor.telemetry(telemetry, "DOWN");
-
         telemetry.update();
         telemetryM.update();
     }
@@ -188,8 +189,7 @@ public class TEST extends OpMode {
         if (dt > 0.2) dt = 0.02;
 
         int pos = (ShooterR.getCurrentPosition() + ShooterL.getCurrentPosition()) / 2;
-        int dPos = pos - lastShooterPos;
-        dPos = -dPos;
+        int dPos = - (pos - lastShooterPos);
 
         double rev = dPos / TICKS_PER_REV;
         currentRPM = (rev / dt) * 60.0;

@@ -2,14 +2,13 @@ package org.firstinspires.ftc.teamcode.Mechanisms;
 
 import android.graphics.Color;
 
-import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
-import com.qualcomm.robotcore.util.Range;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class DualBallColorSensor {
+public class DualColorSensor {
     private final NormalizedColorSensor s1;
     private final NormalizedColorSensor s2;
 
@@ -23,7 +22,7 @@ public class DualBallColorSensor {
     private int lastColor2 = 0;
     private int fusedColor = 0;
 
-    public DualBallColorSensor(HardwareMap hw, String name1, String name2, float gain) {
+    public DualColorSensor(HardwareMap hw, String name1, String name2, float gain) {
         s1 = hw.get(NormalizedColorSensor.class, name1);
         s2 = hw.get(NormalizedColorSensor.class, name2);
         s1.setGain(gain);
