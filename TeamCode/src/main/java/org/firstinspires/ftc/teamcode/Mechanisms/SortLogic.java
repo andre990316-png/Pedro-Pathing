@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode.Mechanisms;
 public class SortLogic {
 
     private static final int NONE = 0;
-    private static final int P = 1;
-    private static final int G = 2;
+    private static final int P = 2;
+    private static final int G = 1;
 
     private int[] colors = {0, 0};
     private int gamePattern = 0; // use 1 for PPG target behavior
@@ -40,8 +40,8 @@ public class SortLogic {
 
     public void update(int[] colors, int pattern) {
         if (colors != null && colors.length >= 2) {
-            this.colors[0] = colors[1];
-            this.colors[1] = colors[0];
+            this.colors[0] = colors[0];
+            this.colors[1] = colors[1];
         }
         this.gamePattern = pattern;
     }
@@ -101,53 +101,6 @@ public class SortLogic {
         if (c2 == G) return Move.HOLDG_SHOOT2_SLOT2;
         return Move.NONE; // no green in front two -> no special action
     }
-
-    // ===== Case A: green in slot1 =====
-    // Hold pocket1 (green), then feed+shoot twice, then release pocket1
-//    private void runHoldGreenSlot1(double nowSec) {
-//        if (state == S_HOLD) {
-//            openUpSort = true;
-//            if (colors[0] == NONE || (nowSec - t0) > holdTimeoutSec) {
-//                state = S_FEED1;
-//                t0 = nowSec;
-//            }
-//            return;
-//        }
-//
-//        if (state == S_FEED1) {
-//            openUpSort = true;
-//            feed = true;
-//            if ((nowSec - t0) > feedStepSec) {
-//                state = S_SHOT1_OPEN;
-//                t0 = nowSec;
-//            }
-//            return;
-//        }
-//
-//        if (state == S_SHOT1_OPEN) {
-//            openUpSort = true;
-//            shoot = true;      // IMPORTANT: no feed while gate open
-//            if ((nowSec - t0) > gatePulseSec) {
-//                state = S_SETTLE;
-//                t0 = nowSec;
-//            }
-//            return;
-//        }
-//
-//        if (state == S_SETTLE) {
-//            openUpSort = true;
-//            if ((nowSec - t0) > settleSec) {
-//                // second shot: feed then shoot again
-//                state = S_FEED1;
-//                t0 = nowSec;
-//                // but we need to know whether we already shot once
-//                // quick hack: if slot1 is still green held and slot2 is not green,
-//                // we use a counter-less 2-shot by running FEED->SHOT twice using slot2 marker.
-//                // Better: use a counter:
-//                // We'll do a simple counter using a field:
-//            }
-//        }
-//    }
 
     // ===== Case B: green in slot2 =====
     // Hold pocket2 (green), shoot slot1 purple, feed next purple, shoot again, release pocket2

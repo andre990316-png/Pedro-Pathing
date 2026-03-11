@@ -62,7 +62,7 @@ public class TEST extends OpMode {
     private ButtonLogic sortServoResetBtn = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);
 
     private final SortLogic sortLogic = new SortLogic();
-    private final ElapsedTime sortTimer = new ElapsedTime();
+    private final ElapsedTime Timer = new ElapsedTime();
     static int pattern = 1; // target PPG for 2P+1G
 
     @Override
@@ -95,8 +95,8 @@ public class TEST extends OpMode {
         lastShooterPos = (ShooterR.getCurrentPosition() + ShooterL.getCurrentPosition()) / 2;
         lastTimeNs = System.nanoTime();
 
-        sortTimer.reset();
-        sortLogic.reset(sortTimer.seconds());
+        Timer.reset();
+        sortLogic.reset(Timer.seconds());
     }
 
     @Override
@@ -132,9 +132,7 @@ public class TEST extends OpMode {
         colors[1] = downBallSensor.getBallColor();
 
         sortLogic.update(colors, pattern);
-
-        boolean triggerSort = shootBtn.getState(); // AUTO SORT WHEN SHOOT HELD
-        sortLogic.step(sortTimer.seconds(), triggerSort);
+        sortLogic.step(Timer.seconds(), shootBtn.getState());
         boolean sortingActive = sortLogic.isBusy();
 
         if (sortingActive) {
@@ -145,7 +143,7 @@ public class TEST extends OpMode {
             IntakeL.setPower(feedPower);
             IntakeR.setPower(feedPower);
 
-            ShooterServo.setPosition(shootBtn.getState() ? gateOpenAngle : gateCloseAngle);
+            ShooterServo.setPosition(sortLogic.isShootOn() ? gateOpenAngle : gateCloseAngle);
         } else {
             if(sortServoResetBtn.getState()) {
                 SortServo1.setPosition(resetAngle);
