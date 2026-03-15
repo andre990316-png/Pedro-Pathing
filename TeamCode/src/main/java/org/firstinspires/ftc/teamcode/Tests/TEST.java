@@ -10,17 +10,18 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-
+import com.arcrobotics.ftclib.controller.PIDController;
 import org.firstinspires.ftc.teamcode.Mechanisms.ButtonLogic;
 import org.firstinspires.ftc.teamcode.Mechanisms.DualColorSensor;
 import org.firstinspires.ftc.teamcode.Mechanisms.SingleColorSensor;
-import org.firstinspires.ftc.teamcode.Mechanisms.SortLogic;
+import org.firstinspires.ftc.teamcode.Mechanisms.NewSortLogic;
 
 @Configurable
 @TeleOp
 public class TEST extends OpMode {
 
     public TelemetryManager telemetryM;
+    private PIDController shooterPID;
 
     private DcMotorEx ShooterR;
     private DcMotorEx ShooterL;
@@ -33,17 +34,21 @@ public class TEST extends OpMode {
 
     private SingleColorSensor upBallSensor;
     private SingleColorSensor downBallSensor;
+//    private DualColorSensor upBallSensor;
+//    private DualColorSensor downBallSensor;
 
-    static double gateOpenAngle = 0.22, gateCloseAngle = 0, sortOpenAngle = 0, sortCloseAngle = 1, resetAngle = 0;
+    static double gateOpenAngle = 0.2, gateCloseAngle = 0, sortOpenAngle = 0, sortCloseAngle = 1, resetAngle = 0;
 
     public static int[] colors = {0, 0}; // 0=none, 1=purple, 2=green
 
-    static double Kp = 0.0025;
-    static double Kd = 0.0002;
+    static double Kp = 0.0018;
+    static double Kd = 0.0005;
+    static double Ki = 0;
 
     private static final double TICKS_PER_REV = 28.0;
     private int lastShooterPos = 0;
     private long lastTimeNs = 0;
+    private double maxShooterRPM = 5400;
 
     private double targetRPM = 0.0;
     static double RPM = 0.0;
@@ -51,6 +56,7 @@ public class TEST extends OpMode {
     private double lastError = 0.0;
 
     private ButtonLogic intakeBtn = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);
+    private ButtonLogic reverseIntakeBtn = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);
     private ButtonLogic shooterBtn = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);
     private ButtonLogic shootBtn  = new ButtonLogic(ButtonLogic.Mode.HOLD, false);
     private ButtonLogic rpmUpBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);
@@ -60,8 +66,8 @@ public class TEST extends OpMode {
     private ButtonLogic sortServoBtnUp = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);
     private ButtonLogic sortServoBtnDown = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);
     private ButtonLogic sortServoResetBtn = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);
-
-    private final SortLogic sortLogic = new SortLogic();
+    private ButtonLogic patternBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);
+    private final NewSortLogic sortLogic = new NewSortLogic();
     private final ElapsedTime Timer = new ElapsedTime();
     static int pattern = 1; // target PPG for 2P+1G
 
@@ -76,8 +82,11 @@ public class TEST extends OpMode {
         SortServo1 = hardwareMap.get(Servo.class, "sortServo1");
         SortServo2 = hardwareMap.get(Servo.class, "sortServo2");
 
+        //upBallSensor = new DualColorSensor(hardwareMap, "colorSensorUp1", "colorSensorUp2", 16.0f);
+        //downBallSensor = new DualColorSensor(hardwareMap, "colorSensorDown1", "colorSensorDown2", 16.0f);
+
         upBallSensor = new SingleColorSensor(hardwareMap, "colorSensorUp1", 16.0f);
-        downBallSensor = new SingleColorSensor(hardwareMap, "colorSensorUp2", 16.0f);
+        downBallSensor = new SingleColorSensor(hardwareMap, "colorSensorDown1", 16.0f);
 
         IntakeR.setDirection(DcMotor.Direction.REVERSE);
 
@@ -92,8 +101,10 @@ public class TEST extends OpMode {
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
-        lastShooterPos = (ShooterR.getCurrentPosition() + ShooterL.getCurrentPosition()) / 2;
+        lastShooterPos = (Math.abs(ShooterR.getCurrentPosition()) + Math.abs(ShooterL.getCurrentPosition())) / 2;
         lastTimeNs = System.nanoTime();
+
+        shooterPID = new PIDController(Kp, Ki, Kd);
 
         Timer.reset();
         sortLogic.reset(Timer.seconds());
@@ -102,8 +113,9 @@ public class TEST extends OpMode {
     @Override
     public void loop() {
         intakeBtn.update(gamepad1.left_bumper);
-        shootBtn.update(gamepad1.right_trigger >= 0.3);
+        reverseIntakeBtn.update(gamepad1.left_trigger > 0.3);
         shooterBtn.update(gamepad1.right_bumper);
+        shootBtn.update(gamepad1.right_trigger >= 0.3);
         rpmUpBtn.update(gamepad1.dpad_up);
         rpmDownBtn.update(gamepad1.dpad_down);
         servoTestBtnUp.update(gamepad1.dpad_right);
@@ -111,6 +123,12 @@ public class TEST extends OpMode {
         sortServoBtnUp.update(gamepad1.a);
         sortServoBtnDown.update(gamepad1.b);
         sortServoResetBtn.update(gamepad1.x);
+        patternBtn.update(gamepad1.y);
+
+        if(patternBtn.getState()) {
+            pattern += 1;
+            pattern %= 4;
+        }
 
         if (rpmUpBtn.getState()) RPM += 50;
         if (rpmDownBtn.getState()) RPM -= 50;
@@ -122,7 +140,7 @@ public class TEST extends OpMode {
         if (shooterBtn.getState()) targetRPM = RPM;
         else targetRPM = 0;
 
-        double shooterPower = updateShooterPD(targetRPM);
+        double shooterPower = updateShooterPID(targetRPM);
         ShooterR.setPower(-shooterPower);
         ShooterL.setPower(shooterPower);
 
@@ -131,8 +149,7 @@ public class TEST extends OpMode {
         downBallSensor.update();
         colors[1] = downBallSensor.getBallColor();
 
-        sortLogic.update(colors, pattern);
-        sortLogic.step(Timer.seconds(), shootBtn.getState());
+        sortLogic.update(colors, pattern, shootBtn.getState(), Timer.seconds());
         boolean sortingActive = sortLogic.isBusy();
 
         if (sortingActive) {
@@ -154,7 +171,16 @@ public class TEST extends OpMode {
                 SortServo2.setPosition(sortServoBtnDown.getState() ? sortOpenAngle : sortCloseAngle);
             }
 
-            double intakePower = intakeBtn.getState() ? -1.0 : 0.0;
+            double intakePower;
+            if(intakeBtn.getState() && !reverseIntakeBtn.getState()) {
+                intakePower = -1;
+            }
+            else if(!intakeBtn.getState() && reverseIntakeBtn.getState()) {
+                intakePower = 0.5;
+            }
+            else {
+                intakePower = 0;
+            }
             IntakeL.setPower(intakePower);
             IntakeR.setPower(intakePower);
 
@@ -166,6 +192,9 @@ public class TEST extends OpMode {
         telemetry.addData("Shooter Power", shooterPower);
         telemetry.addData("ShooterR Position", ShooterR.getCurrentPosition());
         telemetry.addData("ShooterL Position", ShooterL.getCurrentPosition());
+        telemetry.addData("Pattern", pattern);
+        telemetry.addData("State", sortLogic.getState());
+        telemetry.addData("Move", sortLogic.getMove());
 
         telemetry.addData("Colors", "%d %d", colors[0], colors[1]);
         telemetry.addData("Sorting", sortingActive);
@@ -185,9 +214,9 @@ public class TEST extends OpMode {
         if (dt <= 0) dt = 0.02;
         if (dt > 0.2) dt = 0.02;
 
-        int pos = (ShooterR.getCurrentPosition() + ShooterL.getCurrentPosition()) / 2;
+        int pos = (Math.abs(ShooterR.getCurrentPosition()) + Math.abs(ShooterL.getCurrentPosition())) / 2;
         int dPos = pos - lastShooterPos;
-        dPos = -dPos;
+        //dPos = -dPos;
 
         double rev = dPos / TICKS_PER_REV;
         currentRPM = (rev / dt) * 60.0;
@@ -201,6 +230,35 @@ public class TEST extends OpMode {
 
         double power = (Kp * error) + (Kd * dError);
         if (targetRPM <= 1) power = 0;
+
+        return Range.clip(power, 0.0, 1.0);
+    }
+    private double updateShooterPID(double targetRPM) {
+        long nowNs = System.nanoTime();
+        double dt = (nowNs - lastTimeNs) / 1e9;
+        if (dt <= 0) dt = 0.02;
+        if (dt > 0.2) dt = 0.02;
+
+        int pos = (Math.abs(ShooterR.getCurrentPosition()) + Math.abs(ShooterL.getCurrentPosition())) / 2;
+        int dPos = pos - lastShooterPos;
+
+        double rev = dPos / TICKS_PER_REV;
+        currentRPM = (rev / dt) * 60.0;
+
+        lastShooterPos = pos;
+        lastTimeNs = nowNs;
+
+        shooterPID.setPID(Kp, Ki, Kd);
+
+        double pidOutput = shooterPID.calculate(currentRPM, targetRPM);
+        double ff = targetRPM / maxShooterRPM;
+
+        double power = pidOutput + ff;
+
+        if (targetRPM <= 1) {
+            power = 0.0;
+            shooterPID.reset();
+        }
 
         return Range.clip(power, 0.0, 1.0);
     }

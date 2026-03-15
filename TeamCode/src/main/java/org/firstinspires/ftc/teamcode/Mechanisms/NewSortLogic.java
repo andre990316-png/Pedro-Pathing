@@ -12,14 +12,15 @@ public class NewSortLogic {
     private boolean feed = false;
     private boolean shoot = false;
     private static double OpenAndCloseSortDuration = 1.0;
-    private static double[] feedBallDuration = {1.0, 2.0, 3.0}; // [0] = feed first ball duration, [1] = feed second ball duration, [2] = feed third ball duration
-    private enum Move {NONE
+    private static double[] feedBallDuration = {0.5, 0.7, 0.9}; // [0] = feed first ball duration, [1] = feed second ball duration, [2] = feed third ball duration
+    public enum Move {NONE
+        , SHOOT_ALL
         , HOLD_SLOT1_SHOOT_REST_RESET_SHOOT
         , HOLD_SLOT2_SHOOT_REST_RESET_SHOOT
         , HOLD_SLOT12_SHOOT_REST_RESET_SHOOT
         , HOLD_SLOT1_SHOOT_SLOT2_RESET_SHOOT_REST}
     private Move move = Move.NONE;
-    private enum State {IDLE, START, FEED, HOLD1, HOLD2, RELEASE1, RELEASE2, HOLD12, RELEASE12, SHOOTFROM1, SHOOTFROM2, SHOOTFROM3, SHOOTFROM2AGAIN}
+    public enum State {IDLE, START, FEED, SHOOTALL, HOLD1, HOLD2, RELEASE1, RELEASE2, HOLD12, RELEASE12, SHOOTFROM1, SHOOTFROM2, SHOOTFROM3, SHOOTFROM2AGAIN}
     private State state = State.IDLE;
     private double lastTime = 0;
 
@@ -46,6 +47,8 @@ public class NewSortLogic {
         }
 
         switch(move) {
+            case SHOOT_ALL:
+                shootAll(currentTime);
             case HOLD_SLOT1_SHOOT_REST_RESET_SHOOT:
                 holdSlot1ShootRestResetShoot(currentTime);
                 break;
@@ -89,25 +92,46 @@ public class NewSortLogic {
     public boolean isShootOn() {
         return shoot;
     }
+    public State getState() {
+        return state;
+    }
+    public Move getMove() {
+        return move;
+    }
 
     private Move chooseMovePPG(int c1, int c2) {
         if(c1 == G && c2 == G) return Move.HOLD_SLOT12_SHOOT_REST_RESET_SHOOT; // GGP, GGG
         else if(c1 == G) return Move.HOLD_SLOT1_SHOOT_REST_RESET_SHOOT; // GPP, GPG
         else if(c2 == G) return Move.HOLD_SLOT2_SHOOT_REST_RESET_SHOOT; // PGP, PGG
-        else return Move.NONE; // PPG, PPP
+        else return Move.SHOOT_ALL; // PPG, PPP
     }
     private Move chooseMovePGP(int c1, int c2) {
         if(c1 == G && c2 == G) return Move.HOLD_SLOT12_SHOOT_REST_RESET_SHOOT; // GGP, GGG
-        else if(c1 == G) return Move.HOLD_SLOT1_SHOOT_SLOT2_RESET_SHOOT_REST; // GPP, GPG
-        else if(c2 == P) return Move.HOLD_SLOT2_SHOOT_REST_RESET_SHOOT; // PPG, PPP
-        else return Move.NONE; // PGP, PGG
+        else if(c1 == G) return Move.HOLD_SLOT12_SHOOT_REST_RESET_SHOOT; // GPP, GPG
+        else if(c2 == P) return Move.HOLD_SLOT2_SHOOT_REST_RESET_SHOOT; // PPG, PPP -< problem
+        else return Move.SHOOT_ALL; // PGP, PGG
     }
     private Move chooseMoveGPP(int c1, int c2) {
-        if(c1 == P && c2 == P) return Move.HOLD_SLOT12_SHOOT_REST_RESET_SHOOT; // PPG, PPP
+        if(c1 == P && c2 == P) return Move.HOLD_SLOT12_SHOOT_REST_RESET_SHOOT; // PPG, PPP <- problem
         else if(c1 == P) return Move.HOLD_SLOT1_SHOOT_REST_RESET_SHOOT; // PGP, PGG
-        else return Move.NONE; // GGP, GGG, GPG, GPP
+        else return Move.SHOOT_ALL; // GGP, GGG, GPG, GPP
     }
-
+    private void shootAll(double currentTime) {
+        switch(state) {
+            case START:
+                state = State.SHOOTALL;
+                lastTime = currentTime;
+                break;
+            case SHOOTALL:
+                feed = true;
+                shoot = true;
+                if(currentTime - lastTime > feedBallDuration[2]) {
+                    reset(currentTime);
+                }
+            case IDLE:
+                break;
+        }
+    }
     private void holdSlot1ShootRestResetShoot(double currentTime) {
         switch(state) {
             case START:
@@ -142,11 +166,10 @@ public class NewSortLogic {
                 feed = true;
                 shoot = true;
                 if(currentTime - lastTime > feedBallDuration[0]) {
-                    feed = false;
-                    shoot = false;
-                    state = State.IDLE;
-                    lastTime = currentTime;
+                    reset(currentTime);
                 }
+                break;
+            case IDLE:
                 break;
         }
     }
@@ -184,11 +207,10 @@ public class NewSortLogic {
                 feed = true;
                 shoot = true;
                 if(currentTime - lastTime > feedBallDuration[0]) {
-                    feed = false;
-                    shoot = false;
-                    state = State.IDLE;
-                    lastTime = currentTime;
+                    reset(currentTime);
                 }
+                break;
+            case IDLE:
                 break;
         }
     }
@@ -228,11 +250,10 @@ public class NewSortLogic {
                 feed = true;
                 shoot = true;
                 if(currentTime - lastTime > feedBallDuration[1]) {
-                    feed = false;
-                    shoot = false;
-                    state = State.IDLE;
-                    lastTime = currentTime;
+                    reset(currentTime);
                 }
+                break;
+            case IDLE:
                 break;
         }
     }
@@ -270,11 +291,10 @@ public class NewSortLogic {
                 feed = true;
                 shoot = true;
                 if(currentTime - lastTime > feedBallDuration[1]) {
-                    feed = false;
-                    shoot = false;
-                    state = State.IDLE;
-                    lastTime = currentTime;
+                    reset(currentTime);
                 }
+                break;
+            case IDLE:
                 break;
         }
     }

@@ -31,7 +31,6 @@ import org.firstinspires.ftc.teamcode.Mechanisms.LEDClass;
 import org.firstinspires.ftc.teamcode.Mechanisms.LimelightAim;
 import org.firstinspires.ftc.teamcode.Tests.AutoShooting;
 import org.firstinspires.ftc.teamcode.Data.FlywheelAndHoodData;
-import org.firstinspires.ftc.teamcode.Mechanisms.TeleopGate;
 import org.firstinspires.ftc.teamcode.Mechanisms.PatternLogic;
 import org.firstinspires.ftc.teamcode.Mechanisms.ColorSensorLogic;
 
@@ -47,11 +46,7 @@ public class Teleop extends OpMode {
     private DcMotor MotorFrontLeft;
     private DcMotor MotorFrontRight;
     private DcMotor MotorBackRight;
-    private DcMotor ShooterM1;
-    private DcMotor ShooterM2;
     private DcMotor ShooterRotateMotor;
-    private Servo ShooterS1;
-    private Servo ShooterS2;
     // Vision + turret
     private Limelight3A limelight;
     private IMU imu;
@@ -67,7 +62,6 @@ public class Teleop extends OpMode {
 
     private double currentSensitivity;
     private double Sensitivity;
-    private AutoShooting shot;
     private double pos;
     private double XL, YL, XR, YR;
     private double TempMax1, TempMax2, MaxPower;
@@ -144,11 +138,6 @@ public class Teleop extends OpMode {
         MotorFrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         MotorBackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         MotorBackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        ShooterM1 = hardwareMap.get(DcMotor.class, "Shooter M1");
-        ShooterM2 = hardwareMap.get(DcMotor.class, "Shooter M2");
-        ShooterS1 = hardwareMap.get(Servo.class, "Shooter S1");
-        ShooterS2 = hardwareMap.get(Servo.class, "Shooter S2");
         ShooterRotateMotor = hardwareMap.get(DcMotor.class, "ShooterRotateMotor");
         battery = hardwareMap.voltageSensor.iterator().next();
         LED1.init(hardwareMap, 1);
@@ -168,10 +157,6 @@ public class Teleop extends OpMode {
         // Motor setup
         MotorBackLeft.setDirection(DcMotor.Direction.REVERSE);
         MotorFrontLeft.setDirection(DcMotor.Direction.REVERSE);
-
-        ShooterM1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        ShooterM1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        ShooterM2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         shooter.setTargetRPM(0);
 
@@ -212,7 +197,6 @@ public class Teleop extends OpMode {
             selectedStartPose = Auto_lastPose.currentPose;
         }
 
-
         telemetry.addLine("=== ALLIANCE SELECT ===");
         telemetry.addData("Alliance", AllianceData.selectedAlliance);
         telemetry.addLine("D-pad LEFT = BLUE");
@@ -220,8 +204,6 @@ public class Teleop extends OpMode {
         telemetry.addLine(AutoPoseAvailable ? "D-pad DOWN = Auto" : "D-pad DOWN = Auto (NOT AVAILABLE)");
         telemetry.addLine("                                 ");
         telemetry.addData("Selected Start Pose", selectedStartPose);
-
-
         telemetry.update();
     }
 
@@ -243,18 +225,14 @@ public class Teleop extends OpMode {
         }
         allianceBannerTimer.reset();
         showAllianceBanner = true;
-        ShooterS1.setPosition(0.84);
-
     }
-
-
 
     //====================
     //Main Loop
     //====================
     @Override
     public void loop() {
-        shooter.update(intake);
+        shooter.update(intake, telemetry, telemetryM);
         intake.update();
         follower.updatePose();
         ColorSensorLogic.update(telemetry);
@@ -290,7 +268,6 @@ public class Teleop extends OpMode {
         }
         LED1.setGreenLED(true);
         RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.29);
-        //teleopGate.update(shooter.getTargetRPM(), gamepad2.right_trigger > 0.3);
         LLResult ll = limelight.getLatestResult();
 
 /*        if (!poseSnapped && ll != null && ll.isValid()) {
@@ -315,7 +292,7 @@ public class Teleop extends OpMode {
         rpmUpBtn.update(gamepad2.dpad_up);
         rpmDownBtn.update(gamepad2.dpad_down);
         shoot3Btn.update(gamepad2.right_trigger > 0.3);
-        gateHoldBtn.update(gamepad2.right_trigger > 0.03);
+        //gateHoldBtn.update(gamepad2.right_trigger > 0.03);
         autoAimHoldBtn.update(gamepad2.left_trigger > 0.3);
         autoSort.update(gamepad2.left_bumper);
         greenBtn.update(gamepad1.a);
@@ -329,33 +306,30 @@ public class Teleop extends OpMode {
         autoFlywheelAndHoodToggleBtn.update(gamepad2.right_bumper);
         fieldOrientedModeToggleBtn.update(gamepad1.right_bumper);
         precisionModeHoldBtn.update(gamepad1.right_trigger > 0.3);
-        //precisionModeToggleBtn.update(gamepad1.right_bumper);
         sensitivityDownBtn.update(gamepad1.dpad_down);
         sensitivityUpBtn.update(gamepad1.dpad_up);
 
-        ShooterS2.setPosition(gateHoldBtn.getState()? 0.527 : 0.575);
-        /*if (shoot3Btn.getState() && !shooter.isBusy()) {
+//        ShooterS2.setPosition(gateHoldBtn.getState()? 0.527 : 0.575);
+//
+//        if (gateHoldBtn.getState()) {
+//            intake.setTargetRPM(IntakeLogic.shootPower);
+//            intake.intakeReady(true);
+//        }
+        if(shoot3Btn.getState()) {
             shooter.fireShots(3);
-            shooter.getIntake().setIntakeOnVelocity(-0.6);
-            shooter.getIntake().intakeReady(true);
-        }else if (shoot3Btn.getState()) {
-            shooter.getIntake().setIntakeOnVelocity(-0.6);
-            shooter.getIntake().intakeReady(true);
-        }*/
-
-        if (gateHoldBtn.getState()) {
-            intake.setTargetRPM(IntakeLogic.shootRPM);
-            intake.intakeReady(true);
         }
-
-        if (!shooter.isBusy() && intakeHoldBtn.getState()) {
-            intake.setTargetRPM(-1);
-            intake.intakeReady(true);
-        } else if (!shooter.isBusy() && intakeReverseHoldBtn.getState() && !shoot3Btn.getState() && !intakeHoldBtn.getState()) {
-            intake.setTargetRPM(0.4);
-            intake.intakeReady(true);
-        } else if (!shooter.isBusy() && !shoot3Btn.getState() && !intakeHoldBtn.getState() && !intakeReverseHoldBtn.getState()){
-            intake.intakeReady(false);
+        if(!shooter.isBusy()) {
+            if (intakeHoldBtn.getState()) {
+                intake.setTargetRPM(-1);
+                intake.intakeReady(true);
+            }
+            else if (intakeReverseHoldBtn.getState()) {
+                intake.setTargetRPM(0.4);
+                intake.intakeReady(true);
+            }
+            else {
+                intake.intakeReady(false);
+            }
         }
 
         if (showAllianceBanner) {
@@ -369,10 +343,6 @@ public class Teleop extends OpMode {
                 showAllianceBanner = false;
             }
         }
-
-//        if (precisionModeToggleBtn.getState()) {
-//            precisionMode = !precisionMode;
-//        }
 
         precisionMode = precisionModeHoldBtn.getState();
 
@@ -489,7 +459,7 @@ public class Teleop extends OpMode {
             turretPower = autoAim.update(getRuntime(), ll, telemetry);
         } else {
             double manual = gamepad2.right_stick_x;
-            turretPower = (Math.abs(manual) > 0.08) ? Range.clip(manual, -0.8, 0.8) : 0;
+            turretPower = (Math.abs(manual) > 0.08) ? Range.clip(manual, -0.6, 0.6) : 0;
             autoAim.resetHistory(getRuntime());
         }
         ShooterRotateMotor.setPower(turretPower);
@@ -498,23 +468,6 @@ public class Teleop extends OpMode {
         double dx = AllianceData.getGoalPose().getX() - robotPose.getX();
         double dy = AllianceData.getGoalPose().getY() - robotPose.getY();
         double distToGoal = Math.hypot(dx, dy);
-
-/*        if(autoFlywheelAndHoodToggleBtn.justPressed()) shooter.setTargetRPM(0);
-        if (autoFlywheelAndHoodToggleBtn.getState()) {
-            if(llValid) {
-                shot = (ta >= 0.7) ? FlywheelAndHoodData.lookupA(ta) : FlywheelAndHoodData.lookupB(ta);
-                shooter.setTargetRPM(shot.rpm);
-                shooter.setHoodPosition(shot.hood);
-            }
-        } else {
-            if (rpmUpBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() + 50);
-            if (rpmDownBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() - 50);
-            if (hoodUpBtn.getState()) pos += 0.01;
-            if (hoodDownBtn.getState()) pos -= 0.01;
-            pos = Range.clip(pos, 0.84, 1.0);
-            ShooterS1.setPosition(pos);
-        };d
-        */
 
         if(autoFlywheelAndHoodToggleBtn.justPressed()) shooter.setTargetRPM(0);
         if (autoFlywheelAndHoodToggleBtn.getState()) {
@@ -525,20 +478,8 @@ public class Teleop extends OpMode {
             if (hoodUpBtn.getState()) pos += 0.01;
             if (hoodDownBtn.getState()) pos -= 0.01;
             pos = Range.clip(pos, 0.84, 1.0);
-            ShooterS1.setPosition(pos);
+            shooter.getHoodServo().setPosition(pos);
         }
-       /* if(intakeUpBtn.justPressed()){
-            IntakeLogic.intakeOnVelocity+=0.05;
-            if(IntakeLogic.intakeOnVelocity>0){
-                IntakeLogic.intakeOnVelocity=0;
-            }
-        }
-        if(intakeDownBtn.justPressed()){
-            IntakeLogic.intakeOnVelocity-=0.05;
-            if(IntakeLogic.intakeOnVelocity<-1){
-                IntakeLogic.intakeOnVelocity=-1;
-            }
-        }*/
 
         if (!patternLocked) {
 
@@ -562,46 +503,27 @@ public class Teleop extends OpMode {
             }
         }
         // Telemetry
-        telemetry.addLine("In-Game");
-        telemetry.addLine("                                  ");
         telemetry.addData("Driver Entry", driverPatternEntry);
         telemetry.addData("Desired Pattern (brain)", patternLogic.getPatternSnapshot());
         telemetry.addData("Pattern Locked", patternLocked);
         telemetry.addLine("                                  ");
-        telemetry.addData("Target RPM ", shooter.getTargetRPM());
-        telemetry.addData("RPM ", shooter.getFlywheelRpm());
-        telemetry.addLine("                                  ");
         telemetry.addData("Current Sensitivity", currentSensitivity);
         telemetry.addData("Sensitivity", Sensitivity);
         telemetry.addData("Precision Mode Hold", precisionModeHoldBtn.getState());
-        telemetry.addLine("                                  ");
-        telemetry.addLine("                                  ");
-
-        telemetry.addLine("Debug");
         telemetry.addLine("                                  ");
         telemetry.addData("Motor 1 Power","%.3f",MotorFrontLeft.getPower());
         telemetry.addData("Motor 2 Power","%.3f", MotorFrontRight.getPower());
         telemetry.addData("Motor 3 Power","%.3f", MotorBackLeft.getPower());
         telemetry.addData("Motor 4 Power","%.3f", MotorBackRight.getPower());
         telemetry.addLine("                                  ");
-        telemetry.addData("Shooter Servo", ShooterS1.getPosition());
-        telemetry.addData("Shooter Servo2", ShooterS2.getPosition());
-        telemetry.addData("Shooter M1 Input", ShooterM1.getPower());
-        telemetry.addData("Shooter M2 Input", ShooterM2.getPower());
+        telemetry.addData("Hood Servo", shooter.getHoodServo().getPosition());
         telemetry.addLine("                                  ");
-        telemetry.addData("Target RPM", shooter.getTargetRPM());
-        telemetry.addData("RPM", shooter.getFlywheelRpm());
-        telemetry.addData("Flywheel Error", shooter.getError());
-        telemetry.addData("Flywheel Power", shooter.getFlywheelPower());
-        telemetry.addData("Calculated RPM", shooter.getCalcRPM());
-        telemetry.addData("Battery Voltage", "%.2f V", battery.getVoltage());
-        telemetry.addLine(""                       );
         telemetry.addData("Start Pose", AutoPoseOn ? "AUTO" : "TOP LEFT");
         if (AutoPoseOn){
-        telemetry.addData("Autonomous", Auto_lastPose.currentPose);}
-        telemetry.addData("X", follower.getPose().getX());
-        telemetry.addData("Y", follower.getPose().getY());
-        telemetry.addData("Heading", Math.toDegrees(robotPose.getHeading()));
+            telemetry.addData("Autonomous", Auto_lastPose.currentPose);}
+            telemetry.addData("X", follower.getPose().getX());
+            telemetry.addData("Y", follower.getPose().getY());
+            telemetry.addData("Heading", Math.toDegrees(robotPose.getHeading()));
         if (ll != null && ll.isValid()) {
             telemetry.addData("MT2_LLX", ll.getBotpose_MT2().getPosition().x);
             telemetry.addData("MT2_LLY", ll.getBotpose_MT2().getPosition().y);
@@ -617,6 +539,7 @@ public class Teleop extends OpMode {
         telemetry.addData("Intake RPM", intake.getCurrentRPM());
         telemetry.addData("Intake PID Output", intake.getPidPower());
 
+        telemetryM.update();
         telemetry.update();
 
     }

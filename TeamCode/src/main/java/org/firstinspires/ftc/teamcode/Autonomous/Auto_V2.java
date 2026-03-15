@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
@@ -29,6 +31,7 @@ import java.util.ArrayList;
 
 @Autonomous(name = "Auto_V2")
 public class Auto_V2 extends OpMode {
+    public TelemetryManager telemetryM;
 
     // Motors / hardware you already had
     private DcMotor ShooterRotateMotor;
@@ -720,9 +723,10 @@ public class Auto_V2 extends OpMode {
         imu.initialize(new IMU.Parameters(revHubOrientationOnRobot));
 
         shooter.init(hardwareMap);
-
+        telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
         telemetry.addData("Init", "OK");
         telemetry.update();
+        telemetryM.update();
     }
 
     @Override
@@ -852,7 +856,7 @@ public class Auto_V2 extends OpMode {
     public void loop() {
         follower.update();
 
-        shooter.update(intake);
+        shooter.update(intake, telemetry, telemetryM);
         intake.update();
 
         RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.29);
@@ -918,6 +922,7 @@ public class Auto_V2 extends OpMode {
 //        telemetry.addData("normal y", follower.getPose().getY());
 //        telemetry.addData("normal h", follower.getPose().getHeading());
         telemetry.update();
+        telemetryM.update();
     }
 //    private Pose getRobotPoseFromCamera() {
 //        ///Fill this out to get the robot Pose from the camera's output (apply any filters if you need to using follower.getPose() for fusion)
