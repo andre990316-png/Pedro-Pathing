@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.Data;
 
-public class CalcStuff {
+public class LinearPointToPointCalculation {
 
-    public static double iwrotethiswithoutchatgptyouguysarenooooobs(double[] ranges, double[] values, double val) {
+    public static double calculate(double[] ranges, double[] values, double val) {
         // Preconditions:
         // ranges.length == values.length
         // ranges is strictly increasing

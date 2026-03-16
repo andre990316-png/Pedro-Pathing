@@ -23,8 +23,8 @@ public class FlywheelAndHoodData {
 
     public static AutoShooting lookupA(double distance) {
         double flywheelRPM, hoodAngle;
-        flywheelRPM = CalcStuff.iwrotethiswithoutchatgptyouguysarenooooobs(flywheelRanges, flywheelValues, distance);
-        hoodAngle = CalcStuff.iwrotethiswithoutchatgptyouguysarenooooobs(hoodRanges, hoodValues, distance);
+        flywheelRPM = LinearPointToPointCalculation.calculate(flywheelRanges, flywheelValues, distance);
+        hoodAngle = LinearPointToPointCalculation.calculate(hoodRanges, hoodValues, distance);
         /*if(distance < 40) {
             flywheelRPM = 3300;
             hoodAngle = 0.84;

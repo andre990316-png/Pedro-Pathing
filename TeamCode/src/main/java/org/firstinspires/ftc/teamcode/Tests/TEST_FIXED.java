@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Tests;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.TelemetryManager;
 import com.bylazar.telemetry.PanelsTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -15,7 +16,7 @@ import org.firstinspires.ftc.teamcode.Mechanisms.ButtonLogic;
 import org.firstinspires.ftc.teamcode.Mechanisms.DualColorSensor;
 import org.firstinspires.ftc.teamcode.Mechanisms.SingleColorSensor;
 import org.firstinspires.ftc.teamcode.Mechanisms.SortLogic;
-
+@Disabled
 @Configurable
 @TeleOp
 public class TEST_FIXED extends OpMode {

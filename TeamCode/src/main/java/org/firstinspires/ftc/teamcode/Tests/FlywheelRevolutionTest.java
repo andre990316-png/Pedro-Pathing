@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Tests;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -21,6 +22,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
  * - Press X to "zero" and also reset encoder in software.
  * - Press Y to run motor slowly (helps you rotate consistently), press Y again to stop.
  */
+@Disabled
 @TeleOp(name = "Flywheel Revolution Test", group = "Tests")
 public class FlywheelRevolutionTest extends OpMode {
 
