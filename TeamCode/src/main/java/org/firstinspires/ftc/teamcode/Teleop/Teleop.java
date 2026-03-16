@@ -15,13 +15,13 @@ import org.firstinspires.ftc.teamcode.Mechanisms.FlywheelLogic;
 import org.firstinspires.ftc.teamcode.Mechanisms.LimelightAim;
 import org.firstinspires.ftc.teamcode.Mechanisms.AutoShooting;
 import org.firstinspires.ftc.teamcode.Data.FlywheelAndHoodData;
+import org.firstinspires.ftc.teamcode.Mechanisms.TeleopGate;
+
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 
 @TeleOp(name = "Teleop")
 public class Teleop extends OpMode {
-    public static final double TICKS_PER_REV = 28;
-
     // Drive + mechanisms
     private DcMotor MotorBackLeft;
     private DcMotor MotorFrontLeft;
@@ -33,7 +33,7 @@ public class Teleop extends OpMode {
     private DcMotor ShooterRotateMotor;
     private Servo ShooterS1;
     private Servo ShooterS2;
-
+    private TeleopGate teleopGate;
     // Vision + turret
     private Limelight3A limelight;
     private IMU imu;
@@ -85,6 +85,7 @@ public class Teleop extends OpMode {
         ShooterS1 = hardwareMap.get(Servo.class, "Shooter S1");
         ShooterS2 = hardwareMap.get(Servo.class, "Shooter S2");
         ShooterRotateMotor = hardwareMap.get(DcMotor.class, "ShooterRotateMotor");
+        teleopGate = new TeleopGate(ShooterS2);
         battery = hardwareMap.voltageSensor.iterator().next();
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(
@@ -129,7 +130,7 @@ public class Teleop extends OpMode {
     @Override
     public void loop() {
         shooter.update();
-
+        teleopGate.update(shooter.getTargetRPM(), gamepad2.right_trigger > 0.3);
         //Update Buttons
         hoodUpBtn.update(gamepad2.dpad_right);
         hoodDownBtn.update(gamepad2.dpad_left);
@@ -244,7 +245,6 @@ public class Teleop extends OpMode {
         telemetry.addData("Precision Mode Toggle", precisionModeToggleBtn.getState());
         telemetry.addData("Precision Mode Hold", precisionModeHoldBtn.getState());
 
-        telemetry.addLine("                                  ");
         telemetry.addLine("                                  ");
         telemetry.addLine("                                  ");
 
