@@ -9,6 +9,8 @@ public class TeleopGate {
     private ElapsedTime timer = new ElapsedTime();
     private boolean gateOpen = false;
 
+    private FlywheelLogic flywheel;
+
     // Servo positions
     private static final double OPEN = 0.0;
     private static final double CLOSED = 0.2;
@@ -18,6 +20,7 @@ public class TeleopGate {
     private static final double HIGH_RPM_FREQ = 80.0 / 60.0;  // 80 times per minute
 
     private double period = 0.0;
+    private double rpmRange = 400.0;
 
     public TeleopGate(Servo servo) {
         gateServo = servo;
@@ -37,10 +40,16 @@ public class TeleopGate {
         period = (targetRPM <= 4500) ? 1.0 / LOW_RPM_FREQ : 1.0 / HIGH_RPM_FREQ;
 
         // Toggle gate if period elapsed
-        if (timer.seconds() >= period / 2.0) {  // divide by 2 because each cycle = open+close
-            gateOpen = !gateOpen;
-            gateServo.setPosition(gateOpen ? OPEN : CLOSED);
-            timer.reset();
+        if (flywheel.getError() <= rpmRange){
+            if (timer.seconds() >= period / 2.0) {  // divide by 2 because each cycle = open+close
+                gateOpen = !gateOpen;
+                gateServo.setPosition(gateOpen ? OPEN : CLOSED);
+                timer.reset();
+            }
         }
+        else {
+        gateServo.setPosition(CLOSED);
+        }
+
     }
 }
