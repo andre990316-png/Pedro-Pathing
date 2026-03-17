@@ -573,7 +573,7 @@ public class Auto_V2 extends OpMode {
 
             case INTAKE_ON:
                 // You were already using shooter.getIntake().intakeReady(true)
-                intake.setTargetRPM(-1);
+                intake.setTargetRPM(-1); //<-
                 intake.intakeReady(true);
                 break;
 
@@ -857,7 +857,7 @@ public class Auto_V2 extends OpMode {
         follower.update();
 
         shooter.update(intake, telemetry, telemetryM);
-        intake.update();
+        intake.update(telemetryM, telemetry);
 
         RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.29);
         Auto_lastPose.currentPose = follower.getPose();

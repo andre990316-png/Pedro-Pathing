@@ -38,14 +38,11 @@ public class FlywheelLogic {
     // --- Gate / shot settings ---
     private double gateCloseAngle = 0.575;
     private double gateOpenAngle  = 0.527;
-//    private double gateOpenTime   = 0.06;
-//    private double gateCloseTime  = 0.06;
     private double launchTime = 1.7; // seconds gate stays open
     private int shotsRemaining = 0;
     private double singleShotTime = 2;
 
     // --- Velocity targets (RPM) ---
-    //private double targetRPM = 0;
     private double flywheelMaxSpinupTime = 0.7;
     private double currentRPM = 0;
     private double error = 0;
@@ -87,7 +84,6 @@ public class FlywheelLogic {
         shooterL_power = clamp(shooterL_power + velocity2, -1, 1.0);
         shooterR.setPower(shooterR_power);
         shooterL.setPower(shooterL_power);
-        intake.update();
 
         telemetry.addData("Target RPM", targetRPM);
         telemetry.addData("Right RPM", rRPM);
@@ -97,7 +93,7 @@ public class FlywheelLogic {
 
         telemetryM.addData("rRPM", rRPM);
         telemetryM.addData("lRPM", lRPM);
-        telemetryM.addData("targetVelocitty", targetRPM);
+        telemetryM.addData("targetVelocity", targetRPM);
 //        telemetryM.update();
 
         switch (flyWheelState) {
@@ -170,7 +166,7 @@ public class FlywheelLogic {
     public Servo getHoodServo() {
         return HoodServo;
     }
-    public double geLRpm() {
+    public double geLRPM() {
         return lRPM;
     }
     public double getRRPM() {

@@ -233,7 +233,7 @@ public class Teleop extends OpMode {
     @Override
     public void loop() {
         shooter.update(intake, telemetry, telemetryM);
-        intake.update();
+        intake.update(telemetryM, telemetry);
         follower.updatePose();
         ColorSensorLogic.update(telemetry);
         int[] colors = colorSensorLogic.returnCurrentColors();
@@ -320,11 +320,11 @@ public class Teleop extends OpMode {
         }
         if(!shooter.isBusy()) {
             if (intakeHoldBtn.getState()) {
-                intake.setTargetRPM(-1);
+                intake.setTargetRPM(-1); //<-
                 intake.intakeReady(true);
             }
             else if (intakeReverseHoldBtn.getState()) {
-                intake.setTargetRPM(0.4);
+                intake.setTargetRPM(0.4); //<-
                 intake.intakeReady(true);
             }
             else {
@@ -535,9 +535,6 @@ public class Teleop extends OpMode {
             telemetry.addData("LLPose", "no valid tag");
         }
         telemetry.addData("DistanceToGoal", distToGoal);
-        telemetry.addData("Intake Target RPM", intake.getTargetRPM());
-        telemetry.addData("Intake RPM", intake.getCurrentRPM());
-        telemetry.addData("Intake PID Output", intake.getPidPower());
 
         telemetryM.update();
         telemetry.update();

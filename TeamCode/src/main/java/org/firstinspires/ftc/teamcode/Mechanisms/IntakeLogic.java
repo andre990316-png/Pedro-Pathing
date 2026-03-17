@@ -1,92 +1,63 @@
 package org.firstinspires.ftc.teamcode.Mechanisms;
 
+import static com.pedropathing.math.MathFunctions.clamp;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import com.arcrobotics.ftclib.controller.PIDController;
+import com.bylazar.telemetry.TelemetryManager;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class IntakeLogic {
 
-    private DcMotor IntakeMotor;
+    protected DcMotorEx IntakeMotor;
+    double iRPM, intake_power;
+    double kp = 0.0065, ki = 0, kd = 0.00004;
+    public PIDController IntakePID = new PIDController(0, 0, 0);
+    static double targetRPM = 0;
+    double MaxIntakeRPM = 1650;
+//    private enum IntakeState {
+//        IDLE,
+//        INTAKE
+//    }
 
-    private ElapsedTime pidTimer = new ElapsedTime();
-
-    private enum IntakeState {
-        IDLE,
-        INTAKE
-    }
-
-    private IntakeState intakeState = IntakeState.IDLE;
+//    private IntakeState intakeState = IntakeState.IDLE;
     private boolean startIntake = false;
-
-    // PID tuning (start here)
-    private double kp = 0.0065;
-    private double ki = 0.00;
-    private double kd = 0.00004;
-
-    private double integral = 0;
-    private double lastError = 0;
-    private double pidPower = 0;
 
     public static double shootPower = -0.39;
 
-    private int lastPos = 0;
-
-    private double currentRPM = 0;
-    private double targetRPM = 0;
-
-    // GoBilda 5203 encoder
-    private static final double TICKS_PER_REV = 145.1;
-
     public void init(HardwareMap hardwareMap) {
 
-        IntakeMotor = hardwareMap.get(DcMotor.class, "Intake Motor");
+        IntakeMotor = hardwareMap.get(DcMotorEx.class, "Intake Motor");
 
         IntakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         IntakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
+        IntakeMotor.setPower(0);
         IntakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        pidTimer.reset();
-        lastPos = IntakeMotor.getCurrentPosition();
-
-//        IntakeMotor.setPower(0);
     }
 
-    public void update() {
+    public void update(TelemetryManager telemetryM, Telemetry telemetry) {
+        double velocity = targetRPM / MaxIntakeRPM;
+        iRPM = -(IntakeMotor.getVelocity() / 28.0) * 60.0;
+        double Inorm = iRPM / MaxIntakeRPM;
+        IntakePID.setPID(kp, ki, kd);
+        intake_power = IntakePID.calculate(Inorm, velocity);
+        intake_power = clamp(intake_power + velocity, 0.0, 1.0);
 
-        // --- RPM calculation ---
-        double dt = pidTimer.seconds();
-        pidTimer.reset();
-        if (dt < 0.01) dt = 0.02;
-
-        int pos = IntakeMotor.getCurrentPosition();
-        int deltaTicks = pos - lastPos;
-        lastPos = pos;
-
-        double ticksPerRev = 145.1;
-        double revs = deltaTicks / ticksPerRev;
-        currentRPM = Math.abs((revs / dt) * 60.0);
-
-        // --- PID ---
-        double error = Math.abs(targetRPM) - currentRPM;
-
-        integral = 0;
-
-        double derivative = (error - lastError) / dt;
-        lastError = error;
-
-        pidPower = kp * error + ki * integral + kd * derivative;
-        pidPower = Range.clip(pidPower, -1, 1);
-
-        // --- APPLY POWER ---
-        if (startIntake) {
-            //IntakeMotor.setPower(Math.signum(targetRPM) * pidPower);
-            IntakeMotor.setPower(targetRPM);
-        } else {
-            IntakeMotor.setPower(0);
-            integral = 0;
+        if(startIntake) {
+            IntakeMotor.setPower(intake_power);
         }
+
+        telemetry.addData("Target RPM", targetRPM);
+        telemetry.addData("Intake RPM", iRPM);
+        telemetry.addData("Intake RPM Error", iRPM - targetRPM);
+
+        telemetryM.addData("iRPM", iRPM);
+        telemetryM.addData("targetVelocity", targetRPM);
     }
 
 
@@ -94,25 +65,15 @@ public class IntakeLogic {
         startIntake = start;
     }
 
-
-    public boolean isBusy() {
-        return intakeState == IntakeState.INTAKE;
-    }
-
-    public double getCurrentRPM() {
-        return currentRPM;
-    }
+//    public boolean isBusy() {
+//        return intakeState == IntakeState.INTAKE;
+//    }
 
     public double getTargetRPM() {
         return targetRPM;
     }
 
-    public double getPidPower() {
-        return pidPower;
-    }
-
     public void setTargetRPM(double rpm) {
         targetRPM = rpm;
     }
-
 }
