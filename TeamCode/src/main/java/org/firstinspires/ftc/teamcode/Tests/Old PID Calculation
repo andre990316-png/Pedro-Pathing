@@ -62,3 +62,27 @@
         /// set shooter motors
         shooterL.setPower(calcRPM);
         shooterR.setPower(-calcRPM);
+
+        double tx = llResult.getTx();
+                    double error = -tx; // same as your working test
+
+                    double Aim_dt = runtimeSeconds - lastAimTime;
+                    if (Aim_dt <= 0.02) Aim_dt = 0.02;
+
+                    double dTx = (tx - lastTx) / Aim_dt;
+
+                    if (Math.abs(tx) <= deadband) {
+                        turretPower = 0;
+                    } else {
+                        turretPower = Kp * error - Kd * dTx;
+                    }
+
+                    turretPower = Range.clip(turretPower, -maxTurretPower, maxTurretPower);
+
+                    if (Math.abs(tx) > deadband && Math.abs(turretPower) < minTurretPower) {
+                        turretPower = Math.copySign(minTurretPower, turretPower);
+                    }
+
+                    lastTx = tx;
+                    lastAimTime = runtimeSeconds;
+                    lastTurretPower = turretPower;

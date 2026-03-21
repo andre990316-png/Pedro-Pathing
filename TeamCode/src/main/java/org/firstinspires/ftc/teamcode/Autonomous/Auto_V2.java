@@ -26,17 +26,13 @@ import org.firstinspires.ftc.teamcode.Mechanisms.LimelightAim;
 import org.firstinspires.ftc.teamcode.Mechanisms.FlywheelLogic;
 import com.pedropathing.geometry.PedroCoordinates;
 import com.pedropathing.ftc.FTCCoordinates;
+import com.qualcomm.robotcore.util.Range;
 
 import java.util.ArrayList;
 
 @Autonomous(name = "Auto_V2")
 public class Auto_V2 extends OpMode {
     public TelemetryManager telemetryM;
-
-    // Motors / hardware you already had
-    private DcMotor ShooterRotateMotor;
-    private Servo ShooterS2;
-
     private LEDClass LED1 = new LEDClass();
     private LEDClass LED2 = new LEDClass();
     private LEDClass LED3 = new LEDClass();
@@ -44,7 +40,6 @@ public class Auto_V2 extends OpMode {
     private Follower follower;
     private Timer pathTimer, opModeTimer;
     private Pose goalPose;
-
     private double gateCloseAngle = 1;
     private double gateOpenAngle  = 0.7;
     // Flywheel Logic
@@ -173,7 +168,7 @@ public class Auto_V2 extends OpMode {
     public boolean[] inputs=new boolean[]{false, false, false};
     public boolean[] lastinputs;
     public boolean[] inputpressed;
-    public boolean selectedAuto=false;
+    public boolean selectedAuto = false;
 
     // ------------------------------------------------------------
     // Build Steps (pose + action) ONCE
@@ -344,10 +339,6 @@ public class Auto_V2 extends OpMode {
         PATH6LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH6LEFT.add(new AutoStep(bottonLeftEndPose, AutoAction.NONE, 0));
 
-
-
-
-
         //PATH7
         PATH7LEFT.clear();
 
@@ -361,10 +352,6 @@ public class Auto_V2 extends OpMode {
         PATH7LEFT.add(new AutoStep(blueShootPoseClose, AutoAction.NONE, 0));
         PATH7LEFT.add(new AutoStep(null, AutoAction.SHOOT_3, 0));
         PATH7LEFT.add(new AutoStep(topLeftEndPose, AutoAction.NONE, 0));
-
-
-
-
 
         //PATH8
         PATH8LEFT.clear();
@@ -525,9 +512,6 @@ public class Auto_V2 extends OpMode {
         paths.add(PATH7RIGHT);
         paths.add(PATH8RIGHT);
         paths.add(PATHNKSHRIMPRIGHT);
-
-
-
     }
 
     // ------------------------------------------------------------
@@ -568,7 +552,7 @@ public class Auto_V2 extends OpMode {
 
         switch (step.action) {
             case NONE:
-                ShooterS2.setPosition(gateCloseAngle);
+                shooter.getHoodServo().setPosition(0.84);
                 break;
 
             case INTAKE_ON:
@@ -584,9 +568,6 @@ public class Auto_V2 extends OpMode {
             case SHOOT_3:
                 autoAimEnabled = true;
                 shooter.fireShots(3);
-                //intake.setTargetRPM(-0.37);
-                //intake.intakeReady(true);
-                //ShooterS2.setPosition(gateOpenAngle);
                 waitingForShooter = shooter.isBusy();   // keep your existing blocking behavior
                 if (!waitingForShooter) actionActioned = false;  // retry SHOOT_3 next loop
                 break;
@@ -597,7 +578,6 @@ public class Auto_V2 extends OpMode {
 
             case AIM_OFF:
                 autoAimEnabled = false;
-                autoAim.resetHistory(getRuntime());
                 break;
         }
     }
@@ -673,40 +653,12 @@ public class Auto_V2 extends OpMode {
     @Override
     public void init() {
         buildSteps();
-        ShooterS2 = hardwareMap.get(Servo.class, "Shooter S2");
-        ShooterS2.setPosition(gateCloseAngle);
         limelight = hardwareMap.get(Limelight3A.class, "Limelight");
         pathTimer = new Timer();
         opModeTimer = new Timer();
 
         follower = Constants.createFollower(hardwareMap);
 
-        intake.init(hardwareMap);
-
-//        buildSteps();
-//
-//        STEPS.clear();
-//        STEPS.addAll(paths.get(PATHNUM));
-//        buildChainsFromSteps();
-//
-//        currentIndex = 0;
-//        actionActioned = false;
-//        waitingForShooter = false;
-//        pauseEndTimeMs = 0;
-//
-//        follower.setStartingPose(STEPS.get(0).pose);
-//
-//        if(PATHNUM<8){
-//            AllianceData.selectedAlliance = AllianceData.Alliance.BLUE;
-//            limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
-//        }else{
-//            AllianceData.selectedAlliance = AllianceData.Alliance.RED;
-//            limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
-//        }
-
-
-
-        ShooterRotateMotor = hardwareMap.get(DcMotor.class, "ShooterRotateMotor");
         LED1.init(hardwareMap, 1);
         LED2.init(hardwareMap, 2);
         LED3.init(hardwareMap, 3);
@@ -715,6 +667,7 @@ public class Auto_V2 extends OpMode {
         LED2.setGreenLED(true);
         LED3.setGreenLED(true);
         RGB.setPosition(0.48);
+
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
@@ -722,7 +675,9 @@ public class Auto_V2 extends OpMode {
         );
         imu.initialize(new IMU.Parameters(revHubOrientationOnRobot));
 
-        shooter.init(hardwareMap);
+        autoAim.init(hardwareMap);
+        intake.init(hardwareMap);
+
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
         telemetry.addData("Init", "OK");
         telemetry.update();
@@ -731,8 +686,6 @@ public class Auto_V2 extends OpMode {
 
     @Override
     public void init_loop(){
-
-
         lastinputs = new boolean[inputs.length];
         for(int i=0; i<inputs.length; i++){
             lastinputs[i]=inputs[i];
@@ -775,8 +728,6 @@ public class Auto_V2 extends OpMode {
                     }
                 }
             }
-
-
         }
 
         if(inputpressed[2]){
@@ -797,7 +748,6 @@ public class Auto_V2 extends OpMode {
                 uitab=0;
             }
         }
-
 
         if(uitab==0){//alliance select
             telemetry.addLine("select ALLIANCE plz");
@@ -820,14 +770,13 @@ public class Auto_V2 extends OpMode {
             telemetry.addLine("press (A) to reset selection if you messed up");
         }
 
-
         telemetry.update();
     }
 
     @Override
     public void start() {
         limelight.start();
-
+        shooter.init(hardwareMap);
         STEPS.clear();
         STEPS.addAll(paths.get(PATHNUM));
         buildChainsFromSteps();
@@ -838,8 +787,6 @@ public class Auto_V2 extends OpMode {
         pauseEndTimeMs = 0;
 
         follower.setStartingPose(STEPS.get(0).pose);
-        ShooterS2.setPosition(gateCloseAngle);
-
 
         opModeTimer.resetTimer();
         pathTimer.resetTimer();
@@ -848,43 +795,35 @@ public class Auto_V2 extends OpMode {
         currentIndex = 0;
         pauseEndTimeMs = 0;
         waitingForShooter = false;
-
-        autoAim.resetHistory(getRuntime());
     }
 
     @Override
     public void loop() {
         follower.update();
 
+        limelight.updateRobotOrientation(imu.getRobotYawPitchRollAngles().getYaw());
+        LLResult ll = limelight.getLatestResult();
+
         shooter.update(intake, telemetry, telemetryM);
         intake.update(telemetryM, telemetry);
-
+        autoAim.update(ll, telemetry, telemetryM);
         RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.29);
         Auto_lastPose.currentPose = follower.getPose();
 
-        Pose robotPose = follower.getPose();
-        Pose goalPose = AllianceData.getGoalPose();  // dynamically get current alliance
-        double dx = goalPose.getX() - robotPose.getX();
-        double dy = goalPose.getY() - robotPose.getY();
-        distToGoal = Math.hypot(dx, dy);
-        shooter.autoAim(distToGoal);
-        // run sequencer
+        shooter.findFlywheelSpeedAndHoodPosition(follower, AllianceData.getGoalPose());
 
         updateAuto();
-
-        limelight.updateRobotOrientation(imu.getRobotYawPitchRollAngles().getYaw());
-        LLResult ll = limelight.getLatestResult();
 
 //        if(ll != null && ll.isValid()){
 //            follower.setPose(getRobotPoseFromCamera()); /// questionable
 //        }
 
         // turret auto-aim
-        if (waitingForShooter) {
-            double turretPower = autoAimEnabled ? autoAim.update(getRuntime(), ll, telemetry) : 0;
-            ShooterRotateMotor.setPower(turretPower);
-        } else {
-            ShooterRotateMotor.setPower(0);
+        if (!waitingForShooter) {
+            autoAim.EnableManualPower(true, 0);
+        }
+        else {
+            autoAim.EnableManualPower(false, 0);
         }
 
         telemetry.addData("Current State", (currentIndex < STEPS.size()) ? STEPS.get(currentIndex).action.name() : "DONE");
@@ -897,6 +836,7 @@ public class Auto_V2 extends OpMode {
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
         telemetry.addData("stuckon", stuckon);
+
         if (currentIndex < STEPS.size()) {
             Pose currentPose = follower.getPose();
             Pose nextPose = STEPS.get(currentIndex).pose;

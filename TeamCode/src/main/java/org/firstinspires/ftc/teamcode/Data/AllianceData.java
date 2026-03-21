@@ -14,10 +14,10 @@ public class AllianceData {
 
     // Fixed poses
     private static final Pose BLUE_GOAL_POSE =
-            new Pose(0, 144, Math.toRadians(144));
+            new Pose(0, 144, Math.toRadians(144)); //<- Change later to the aiming location
 
     private static final Pose RED_GOAL_POSE =
-            new Pose(144, 144, Math.toRadians(36));
+            new Pose(144, 144, Math.toRadians(36)); //<- Change later to the aiming location
 
     public static boolean isRed() {
         return selectedAlliance == Alliance.RED;

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Mechanisms;
 
 import static com.pedropathing.math.MathFunctions.clamp;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -11,15 +12,15 @@ import com.arcrobotics.ftclib.controller.PIDController;
 import com.bylazar.telemetry.TelemetryManager;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-
+@Configurable
 public class IntakeLogic {
 
     protected DcMotorEx IntakeMotor;
     double iRPM, intake_power;
-    double kp = 0.0065, ki = 0, kd = 0.00004;
+    static double kp = 0.0065, ki = 0, kd = 0.00004;
     public PIDController IntakePID = new PIDController(0, 0, 0);
     static double targetRPM = 0;
-    double MaxIntakeRPM = 1650;
+    double MaxIntakeRPM = 1150;
 //    private enum IntakeState {
 //        IDLE,
 //        INTAKE
@@ -42,14 +43,18 @@ public class IntakeLogic {
 
     public void update(TelemetryManager telemetryM, Telemetry telemetry) {
         double velocity = targetRPM / MaxIntakeRPM;
-        iRPM = -(IntakeMotor.getVelocity() / 28.0) * 60.0;
+        iRPM = (IntakeMotor.getVelocity() / 145.6) * 60.0;
         double Inorm = iRPM / MaxIntakeRPM;
         IntakePID.setPID(kp, ki, kd);
         intake_power = IntakePID.calculate(Inorm, velocity);
-        intake_power = clamp(intake_power + velocity, 0.0, 1.0);
+        intake_power = clamp(intake_power + velocity, -1.0, 1.0);
 
         if(startIntake) {
             IntakeMotor.setPower(intake_power);
+        }
+        else {
+            IntakeMotor.setPower(0);
+            IntakePID.reset();   // optional but recommended to clear stored state
         }
 
         telemetry.addData("Target RPM", targetRPM);
@@ -57,7 +62,7 @@ public class IntakeLogic {
         telemetry.addData("Intake RPM Error", iRPM - targetRPM);
 
         telemetryM.addData("iRPM", iRPM);
-        telemetryM.addData("targetVelocity", targetRPM);
+        telemetryM.addData("IntakeTargetRPM", targetRPM);
     }
 
 

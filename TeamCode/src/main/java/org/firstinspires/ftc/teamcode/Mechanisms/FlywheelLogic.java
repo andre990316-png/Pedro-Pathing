@@ -4,6 +4,9 @@ import static com.arcrobotics.ftclib.util.MathUtils.clamp;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Vector;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -14,10 +17,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Data.AllianceData;
 import org.firstinspires.ftc.teamcode.Data.FlywheelAndHoodData;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+
 @Configurable
 public class FlywheelLogic {
     protected DcMotorEx shooterL, shooterR;
@@ -29,6 +34,9 @@ public class FlywheelLogic {
     static double targetRPM = 0;
     double MaxLeftRPM = 6000, MaxRightPM = 6000;
     private Servo HoodServo, TriggerServo;
+    static boolean predictEnabled = false;
+    static double distanceToGoal = 0;
+    static double g = -9.81;
     private final ElapsedTime stateTimer = new ElapsedTime();
 
     // --- State machine ---
@@ -38,14 +46,10 @@ public class FlywheelLogic {
     // --- Gate / shot settings ---
     private double gateCloseAngle = 0.575;
     private double gateOpenAngle  = 0.527;
-    private double launchTime = 1.7; // seconds gate stays open
+    private double launchTime = 1.7;
     private int shotsRemaining = 0;
     private double singleShotTime = 2;
-
-    // --- Velocity targets (RPM) ---
     private double flywheelMaxSpinupTime = 0.7;
-    private double currentRPM = 0;
-    private double error = 0;
     private boolean swapNextTwoBalls = false;
     private boolean switchAngle = false;
     private Integer swaped = 0;
@@ -90,10 +94,11 @@ public class FlywheelLogic {
         telemetry.addData("Left RPM", lRPM);
         telemetry.addData("Right RPM Error", rRPM - targetRPM);
         telemetry.addData("Left RPM Error", lRPM - targetRPM);
+        telemetry.addData("DistanceToGoal", distanceToGoal);
 
         telemetryM.addData("rRPM", rRPM);
         telemetryM.addData("lRPM", lRPM);
-        telemetryM.addData("targetVelocity", targetRPM);
+        telemetryM.addData("FlywheelTargetVelocity", targetRPM);
 //        telemetryM.update();
 
         switch (flyWheelState) {
@@ -103,7 +108,7 @@ public class FlywheelLogic {
                 case SPIN_UP:
                     if ((Math.abs(rRPM - targetRPM) <= 100 && Math.abs(lRPM - targetRPM) <= 100)  || stateTimer.seconds() > flywheelMaxSpinupTime) {
                         TriggerServo.setPosition(gateOpenAngle);
-                        intake.setTargetRPM(-0.39);
+                        intake.setTargetRPM(-400);
                         intake.intakeReady(true);
                         stateTimer.reset();
                         flyWheelState = FlywheelState.LAUNCH;
@@ -114,7 +119,7 @@ public class FlywheelLogic {
                     if (stateTimer.seconds() > singleShotTime) {
                         shotsRemaining--;
                         if (shotsRemaining > 0) {
-                            intake.setTargetRPM(-0.39);
+                            intake.setTargetRPM(-400);
                             intake.intakeReady(true);
                             stateTimer.reset();
                             flyWheelState = FlywheelState.SPIN_UP;
@@ -195,10 +200,38 @@ public class FlywheelLogic {
             swapNextTwoBalls = true;
         }
     }
-    public void autoAim(double distToGoal){
+    public void findFlywheelSpeedAndHoodPosition(Follower follower, Pose GoalPose) {
+        Pose RobotPose = follower.getPose();
+        double robotHeading = follower.getPose().getHeading();
+        double cos = Math.cos(robotHeading);
+        double sin = Math.sin(robotHeading);
+        double x = GoalPose.getX();
+        double y = GoalPose.getY();
+
+        if(predictEnabled) {
+            double robotCentricXVelocity = follower.getVelocity().getXComponent();
+            double robotCentricYVelocity = follower.getVelocity().getYComponent();
+            double fieldCentricXVelocity = robotCentricXVelocity * cos - robotCentricYVelocity * sin;
+            double fieldCentricYVelocity = robotCentricXVelocity * sin + robotCentricYVelocity * cos;
+            double predictedX = x - fieldCentricXVelocity * getTime();
+            double predictedY = y - fieldCentricYVelocity * getTime();
+            //double predictedHeading = heading + follower.getAngularVelocity() * getTime();
+            distanceToGoal = Math.hypot(predictedX, predictedY);
+        }
+        else {
+            double dx = GoalPose.getX() - RobotPose.getX();
+            double dy = GoalPose.getY() - RobotPose.getY();
+            distanceToGoal = Math.hypot(dx, dy);
+        }
+        autoAim();
+    }
+    public double getTime() {
+        return 0;
+    }
+    public void autoAim(){
         org.firstinspires.ftc.teamcode.Tests.AutoShooting shot;
 
-        shot = (distToGoal < 125) ? FlywheelAndHoodData.lookupA(distToGoal) : FlywheelAndHoodData.lookupB(distToGoal);
+        shot = (distanceToGoal < 125) ? FlywheelAndHoodData.lookupA(distanceToGoal) : FlywheelAndHoodData.lookupB(distanceToGoal);
         setTargetRPM(shot.rpm);
         setHoodPosition(shot.hood);
     }

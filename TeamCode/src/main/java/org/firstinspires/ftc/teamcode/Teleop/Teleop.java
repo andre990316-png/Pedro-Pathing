@@ -46,7 +46,6 @@ public class Teleop extends OpMode {
     private DcMotor MotorFrontLeft;
     private DcMotor MotorFrontRight;
     private DcMotor MotorBackRight;
-    private DcMotor ShooterRotateMotor;
     // Vision + turret
     private Limelight3A limelight;
     private IMU imu;
@@ -54,7 +53,6 @@ public class Teleop extends OpMode {
     private LEDClass LED2 = new LEDClass();
     private LEDClass LED3 = new LEDClass();
     private Servo RGB = null;
-    private LimelightAim autoAim = new LimelightAim();
     private boolean precisionMode;
     private boolean poseSnapped = false;
     private boolean AutoPoseAvailable = false;
@@ -66,9 +64,6 @@ public class Teleop extends OpMode {
     private double XL, YL, XR, YR;
     private double TempMax1, TempMax2, MaxPower;
     private double shooterPower = 0.0;
-
-    //Battery Voltage
-    private VoltageSensor battery;
 
     // Linear Flywheels
     double targetRPM = 0;
@@ -83,6 +78,7 @@ public class Teleop extends OpMode {
 
     private IntakeLogic intake = new IntakeLogic();
     private FlywheelLogic shooter = new FlywheelLogic();
+    private LimelightAim autoAim = new LimelightAim();
 
     private ButtonLogic hoodUpBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);  // dpad_right
     private ButtonLogic hoodDownBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);  // dpad_left
@@ -138,8 +134,8 @@ public class Teleop extends OpMode {
         MotorFrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         MotorBackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         MotorBackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        ShooterRotateMotor = hardwareMap.get(DcMotor.class, "ShooterRotateMotor");
-        battery = hardwareMap.voltageSensor.iterator().next();
+        MotorBackLeft.setDirection(DcMotor.Direction.REVERSE);
+        MotorFrontLeft.setDirection(DcMotor.Direction.REVERSE);
         LED1.init(hardwareMap, 1);
         LED2.init(hardwareMap, 2);
         LED3.init(hardwareMap, 3);
@@ -155,15 +151,12 @@ public class Teleop extends OpMode {
         limelight = hardwareMap.get(Limelight3A.class, "Limelight");
         limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
         // Motor setup
-        MotorBackLeft.setDirection(DcMotor.Direction.REVERSE);
-        MotorFrontLeft.setDirection(DcMotor.Direction.REVERSE);
-
-        shooter.setTargetRPM(0);
 
         currentSensitivity = 1.0;
         Sensitivity = 1.0;
 
         intake.init(hardwareMap);
+        autoAim.init(hardwareMap);
 
         if (Auto_lastPose.currentPose != null){
             selectedStartPose = Auto_lastPose.currentPose;
@@ -211,6 +204,7 @@ public class Teleop extends OpMode {
     @Override
     public void start() {
         shooter.init(hardwareMap);
+        shooter.setTargetRPM(0);
         follower.setStartingPose(selectedStartPose);
         limelight.start();
         autoAim.resetHistory(getRuntime());
@@ -225,6 +219,7 @@ public class Teleop extends OpMode {
         }
         allianceBannerTimer.reset();
         showAllianceBanner = true;
+        follower.startTeleopDrive();
     }
 
     //====================
@@ -234,7 +229,6 @@ public class Teleop extends OpMode {
     public void loop() {
         shooter.update(intake, telemetry, telemetryM);
         intake.update(telemetryM, telemetry);
-        follower.updatePose();
         ColorSensorLogic.update(telemetry);
         int[] colors = colorSensorLogic.returnCurrentColors();
         for (int i=0; i<3; i++) {
@@ -270,21 +264,17 @@ public class Teleop extends OpMode {
         RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.29);
         LLResult ll = limelight.getLatestResult();
 
-/*        if (!poseSnapped && ll != null && ll.isValid()) {
-            // Example: botpose_MT2 gives a Pose3D-like object in FTC SDK
-            double x = (ll.getBotpose().getPosition().x - 1.83) * 39.3442622951;
-            double y = (ll.getBotpose().getPosition().y + 1.83) * 39.3442622951;
-            double yawDeg = ll.getBotpose().getOrientation().getYaw(AngleUnit.DEGREES);
+//        if (!poseSnapped && ll != null && ll.isValid()) {
+//            // Example: botpose_MT2 gives a Pose3D-like object in FTC SDK
+//            double x = (ll.getBotpose().getPosition().x - 1.83) * 39.3442622951;
+//            double y = (ll.getBotpose().getPosition().y + 1.83) * 39.3442622951;
+//            double yawDeg = ll.getBotpose().getOrientation().getYaw(AngleUnit.DEGREES);
+//
+//            Pose snapped = new Pose(x, y, Math.toRadians(yawDeg));
+//            follower.setPose(snapped);      // or follower.setStartingPose(snapped) depending on your Pedro version
+//            poseSnapped = true;
+//       }
 
-            // If Limelight is in meters and Pedro is in inches, convert:
-            // x *= 39.3701; y *= 39.3701;
-
-
-            Pose snapped = new Pose(x, y, Math.toRadians(yawDeg));
-            follower.setPose(snapped);      // or follower.setStartingPose(snapped) depending on your Pedro version
-            poseSnapped = true;
-       }
-        */
 
         //Update Buttons
         hoodUpBtn.update(gamepad2.dpad_right);
@@ -292,22 +282,22 @@ public class Teleop extends OpMode {
         rpmUpBtn.update(gamepad2.dpad_up);
         rpmDownBtn.update(gamepad2.dpad_down);
         shoot3Btn.update(gamepad2.right_trigger > 0.3);
-        //gateHoldBtn.update(gamepad2.right_trigger > 0.03);
+        autoFlywheelAndHoodToggleBtn.update(gamepad2.right_bumper);
         autoAimHoldBtn.update(gamepad2.left_trigger > 0.3);
         autoSort.update(gamepad2.left_bumper);
+        //gateHoldBtn.update(gamepad2.right_trigger > 0.03);
         greenBtn.update(gamepad1.a);
         purpleBtn.update(gamepad1.x);
         patternResetBtn.update(gamepad1.start);
         patternConfirmBtn.update(gamepad1.right_bumper);
         intakeUpBtn.update(gamepad1.dpad_right);
         intakeDownBtn.update(gamepad1.dpad_left);
-        intakeHoldBtn.update(gamepad1.left_trigger > 0.3);
-        intakeReverseHoldBtn.update(gamepad1.left_bumper);
-        autoFlywheelAndHoodToggleBtn.update(gamepad2.right_bumper);
-        fieldOrientedModeToggleBtn.update(gamepad1.right_bumper);
-        precisionModeHoldBtn.update(gamepad1.right_trigger > 0.3);
         sensitivityDownBtn.update(gamepad1.dpad_down);
         sensitivityUpBtn.update(gamepad1.dpad_up);
+        intakeHoldBtn.update(gamepad1.left_trigger > 0.3);
+        intakeReverseHoldBtn.update(gamepad1.left_bumper);
+        precisionModeHoldBtn.update(gamepad1.right_trigger > 0.3);
+        fieldOrientedModeToggleBtn.update(gamepad1.right_bumper);
 
 //        ShooterS2.setPosition(gateHoldBtn.getState()? 0.527 : 0.575);
 //
@@ -320,14 +310,15 @@ public class Teleop extends OpMode {
         }
         if(!shooter.isBusy()) {
             if (intakeHoldBtn.getState()) {
-                intake.setTargetRPM(-1); //<-
+                intake.setTargetRPM(-1150); //<-
                 intake.intakeReady(true);
             }
             else if (intakeReverseHoldBtn.getState()) {
-                intake.setTargetRPM(0.4); //<-
+                intake.setTargetRPM(460); //<-
                 intake.intakeReady(true);
             }
             else {
+                intake.setTargetRPM(0); //<-
                 intake.intakeReady(false);
             }
         }
@@ -357,121 +348,136 @@ public class Teleop extends OpMode {
             Sensitivity = Range.clip(Sensitivity - 0.1, 0, 1);
             currentSensitivity = Sensitivity;
         }
-
-        // Raw joystick (FIELD intent)
-        double fieldStrafe  = gamepad1.left_stick_x;
-        double fieldForward = -gamepad1.left_stick_y;
-        double rotation = gamepad1.right_stick_x;
-
-        double strafe;
-        double forward;
-
-        if (fieldOrientedModeToggleBtn.getState()) {
-            double heading = follower.getPose().getHeading();
-
-            double cos = Math.cos(heading);
-            double sin = Math.sin(heading);
-
-            strafe  = fieldStrafe * cos + fieldForward * sin;
-            forward = -fieldStrafe * sin + fieldForward * cos;
-            strafe *= side;
-            forward *= side;
-        } else {
-            strafe  = fieldStrafe;
-            forward = fieldForward;
-        }
-
-        strafe  *= currentSensitivity;
-        forward *= currentSensitivity;
-        rotation *= currentSensitivity;
-
-        XL = strafe;
-        YL = forward;
-        XR = rotation;
-
-        TempMax1 = Math.max(Math.abs(YL + XL + XR), Math.abs((YL - XL) - XR));
-        TempMax2 = Math.max(Math.abs((YL - XL) + XR), Math.abs((YL + XL) - XR));
-        MaxPower = Math.max(TempMax1, TempMax2);
-
-        autogating = gamepad1.x;
-        autosuctiongating = gamepad1.y;
-        parking = gamepad1.b;
-
-        if(autogating){
-            if (!isHoldingPosition){
-            if(AllianceData.isRed()){
-                follower.holdPoint(redgate, Math.toRadians(90));
-            }else{
-                follower.holdPoint(bluegate, Math.toRadians(90));
+        if(fieldOrientedModeToggleBtn.getState()) {
+            if(AllianceData.isRed()) {
+                follower.setTeleOpDrive(
+                        -gamepad1.left_stick_y,
+                        -gamepad1.left_stick_x,
+                        -gamepad1.right_stick_x,
+                        false);
             }
-                isHoldingPosition = true;
-            }
-            follower.update();
-        }else if(autosuctiongating){
-            if (!isHoldingPosition) {
-                if (AllianceData.isRed()) {
-                    follower.holdPoint(Auto_V2.redGateIntakePose);
-                } else {
-                    follower.holdPoint(Auto_V2.blueGateIntakePose);
-                }
-                isHoldingPosition = true;
-            }
-            follower.update();
-        }else if (parking) {
-            // 只有在 "還沒鎖定" 的時候，才發送一次指令
-            if (!isHoldingPosition) {
-                if (AllianceData.isRed()) {
-                    follower.holdPoint(redpark, Math.toRadians(-90));
-                } else {
-                    follower.holdPoint(bluepark, Math.toRadians(-90));
-                }
-                isHoldingPosition = true;
-            }
-            follower.update();
-        }else{
-            // 如果剛剛是停車模式，現在手放開了 B 鍵 -> 解除鎖定，把控制權還給手把
-            if (isHoldingPosition) {
-                follower.breakFollowing();
-                //follower.startTeleopDrive();
-                isHoldingPosition = false;
-                follower.update();
-
-            }
-            if (MaxPower > 1) {
-                MotorFrontLeft.setPower((YL + XL + XR) / MaxPower);
-                MotorFrontRight.setPower(((YL - XL) - XR) / MaxPower);
-                MotorBackLeft.setPower(((YL - XL) + XR) / MaxPower);
-                MotorBackRight.setPower(((YL + XL) - XR) / MaxPower);
-            } else {
-                MotorFrontLeft.setPower(YL + XL + XR);
-                MotorFrontRight.setPower((YL - XL) - XR);
-                MotorBackLeft.setPower((YL - XL) + XR);
-                MotorBackRight.setPower((YL + XL) - XR);
+            else {
+                follower.setTeleOpDrive(
+                        gamepad1.left_stick_y,
+                        gamepad1.left_stick_x,
+                        -gamepad1.right_stick_x,
+                        false);
             }
         }
+        else {
+            follower.setTeleOpDrive(
+                    -gamepad1.left_stick_y,
+                    -gamepad1.left_stick_x,
+                    -gamepad1.right_stick_x,
+                    true);
+        }
+
+//        // Raw joystick (FIELD intent)
+//        double fieldStrafe  = gamepad1.left_stick_x;
+//        double fieldForward = -gamepad1.left_stick_y;
+//        double rotation = gamepad1.right_stick_x;
+//
+//        double strafe;
+//        double forward;
+//
+//        if (fieldOrientedModeToggleBtn.getState()) {
+//            double heading = follower.getPose().getHeading();
+//
+//            double cos = Math.cos(heading);
+//            double sin = Math.sin(heading);
+//
+//            strafe  = fieldStrafe * cos + fieldForward * sin;
+//            forward = -fieldStrafe * sin + fieldForward * cos;
+//            strafe *= side;
+//            forward *= side;
+//        } else {
+//            strafe  = fieldStrafe;
+//            forward = fieldForward;
+//        }
+//
+//        strafe  *= currentSensitivity;
+//        forward *= currentSensitivity;
+//        rotation *= currentSensitivity;
+//
+//        XL = strafe;
+//        YL = forward;
+//        XR = rotation;
+//
+//        TempMax1 = Math.max(Math.abs(YL + XL + XR), Math.abs((YL - XL) - XR));
+//        TempMax2 = Math.max(Math.abs((YL - XL) + XR), Math.abs((YL + XL) - XR));
+//        MaxPower = Math.max(TempMax1, TempMax2);
+//
+//        autogating = gamepad1.x;
+//        autosuctiongating = gamepad1.y;
+//        parking = gamepad1.b;
+//
+//        if(autogating){
+//            if (!isHoldingPosition){
+//            if(AllianceData.isRed()){
+//                follower.holdPoint(redgate, Math.toRadians(90));
+//            }else{
+//                follower.holdPoint(bluegate, Math.toRadians(90));
+//            }
+//                isHoldingPosition = true;
+//            }
+//            follower.update();
+//        }else if(autosuctiongating){
+//            if (!isHoldingPosition) {
+//                if (AllianceData.isRed()) {
+//                    follower.holdPoint(Auto_V2.redGateIntakePose);
+//                } else {
+//                    follower.holdPoint(Auto_V2.blueGateIntakePose);
+//                }
+//                isHoldingPosition = true;
+//            }
+//            follower.update();
+//        }else if (parking) {
+//            // 只有在 "還沒鎖定" 的時候，才發送一次指令
+//            if (!isHoldingPosition) {
+//                if (AllianceData.isRed()) {
+//                    follower.holdPoint(redpark, Math.toRadians(-90));
+//                } else {
+//                    follower.holdPoint(bluepark, Math.toRadians(-90));
+//                }
+//                isHoldingPosition = true;
+//            }
+//            follower.update();
+//        }else{
+//            // 如果剛剛是停車模式，現在手放開了 B 鍵 -> 解除鎖定，把控制權還給手把
+//            if (isHoldingPosition) {
+//                follower.breakFollowing();
+//                //follower.startTeleopDrive();
+//                isHoldingPosition = false;
+//                follower.update();
+//
+//            }
+//            if (MaxPower > 1) {
+//                MotorFrontLeft.setPower((YL + XL + XR) / MaxPower);
+//                MotorFrontRight.setPower(((YL - XL) - XR) / MaxPower);
+//                MotorBackLeft.setPower(((YL - XL) + XR) / MaxPower);
+//                MotorBackRight.setPower(((YL + XL) - XR) / MaxPower);
+//            } else {
+//                MotorFrontLeft.setPower(YL + XL + XR);
+//                MotorFrontRight.setPower((YL - XL) - XR);
+//                MotorBackLeft.setPower((YL - XL) + XR);
+//                MotorBackRight.setPower((YL + XL) - XR);
+//            }
+//        }
 
 
         double yaw = imu.getRobotYawPitchRollAngles().getYaw();
         limelight.updateRobotOrientation(yaw);
 
-        double turretPower;
         if (autoAimHoldBtn.getState()) {
-            turretPower = autoAim.update(getRuntime(), ll, telemetry);
+            autoAim.EnableManualPower(false, 0);
         } else {
             double manual = gamepad2.right_stick_x;
-            turretPower = (Math.abs(manual) > 0.08) ? Range.clip(manual, -0.6, 0.6) : 0;
-            autoAim.resetHistory(getRuntime());
+            autoAim.EnableManualPower(true, (Math.abs(manual) > 0.08) ? Range.clip(manual, -0.6, 0.6) : 0);
         }
-        ShooterRotateMotor.setPower(turretPower);
+        autoAim.update(ll, telemetry, telemetryM);
 
-        Pose robotPose = follower.getPose();
-        double dx = AllianceData.getGoalPose().getX() - robotPose.getX();
-        double dy = AllianceData.getGoalPose().getY() - robotPose.getY();
-        double distToGoal = Math.hypot(dx, dy);
-
-        if(autoFlywheelAndHoodToggleBtn.justPressed()) shooter.setTargetRPM(0);
         if (autoFlywheelAndHoodToggleBtn.getState()) {
-            shooter.autoAim(distToGoal);
+            shooter.findFlywheelSpeedAndHoodPosition(follower, AllianceData.getGoalPose());
         } else {
             if (rpmUpBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() + 50);
             if (rpmDownBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() - 50);
@@ -481,27 +487,27 @@ public class Teleop extends OpMode {
             shooter.getHoodServo().setPosition(pos);
         }
 
-        if (!patternLocked) {
-
-            if (greenBtn.justPressed() && driverPatternEntry.size() < 3)
-                driverPatternEntry.add(PatternLogic.Color.G);
-
-            if (purpleBtn.justPressed() && driverPatternEntry.size() < 3)
-                driverPatternEntry.add(PatternLogic.Color.P);
-            /// TODO: add LED lights to confirm selection‎‎
-
-            if (patternResetBtn.justPressed()) {
-                driverPatternEntry.clear();
-                patternLogic.clearAll();
-                patternLocked = false;
-            }
-
-            if (patternConfirmBtn.justPressed() && driverPatternEntry.size() == 3) {
-                patternLogic.setDesiredPatternFromEntry(driverPatternEntry);
-                patternLocked = true;
-                driverPatternEntry.clear();
-            }
-        }
+//        if (!patternLocked) {
+//
+//            if (greenBtn.justPressed() && driverPatternEntry.size() < 3)
+//                driverPatternEntry.add(PatternLogic.Color.G);
+//
+//            if (purpleBtn.justPressed() && driverPatternEntry.size() < 3)
+//                driverPatternEntry.add(PatternLogic.Color.P);
+//            /// TODO: add LED lights to confirm selection‎‎
+//
+//            if (patternResetBtn.justPressed()) {
+//                driverPatternEntry.clear();
+//                patternLogic.clearAll();
+//                patternLocked = false;
+//            }
+//
+//            if (patternConfirmBtn.justPressed() && driverPatternEntry.size() == 3) {
+//                patternLogic.setDesiredPatternFromEntry(driverPatternEntry);
+//                patternLocked = true;
+//                driverPatternEntry.clear();
+//            }
+//        }
         // Telemetry
         telemetry.addData("Driver Entry", driverPatternEntry);
         telemetry.addData("Desired Pattern (brain)", patternLogic.getPatternSnapshot());
@@ -523,7 +529,7 @@ public class Teleop extends OpMode {
             telemetry.addData("Autonomous", Auto_lastPose.currentPose);}
             telemetry.addData("X", follower.getPose().getX());
             telemetry.addData("Y", follower.getPose().getY());
-            telemetry.addData("Heading", Math.toDegrees(robotPose.getHeading()));
+            telemetry.addData("Heading", Math.toDegrees(follower.getHeading()));
         if (ll != null && ll.isValid()) {
             telemetry.addData("MT2_LLX", ll.getBotpose_MT2().getPosition().x);
             telemetry.addData("MT2_LLY", ll.getBotpose_MT2().getPosition().y);
@@ -534,10 +540,10 @@ public class Teleop extends OpMode {
         } else {
             telemetry.addData("LLPose", "no valid tag");
         }
-        telemetry.addData("DistanceToGoal", distToGoal);
 
         telemetryM.update();
         telemetry.update();
+        follower.update();
 
     }
 }
