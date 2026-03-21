@@ -49,11 +49,11 @@ public class FlywheelAndHoodData {
 //    }
 
     public static AutoShooting lookupB(double distance) {
-        if (distance < 140) return new AutoShooting(4400, 0.99);
-        if (distance < 145) return new AutoShooting(4500, 1);
-        if (distance < 150) return new AutoShooting(4600, 1);
-        if (distance < 155) return new AutoShooting(4700, 1);
-        return new AutoShooting(4800, 1);
+        if (distance < 140) return new AutoShooting(4300, 0.99);
+        if (distance < 145) return new AutoShooting(4400, 1);
+        if (distance < 150) return new AutoShooting(4500, 1);
+        if (distance < 155) return new AutoShooting(4600, 1);
+        return new AutoShooting(4700, 1);
     }
 }
 
