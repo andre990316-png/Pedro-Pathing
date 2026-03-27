@@ -32,7 +32,7 @@ public class LimelightAim {
         ShooterRotateMotor.setPower(0);
         RotatePID.setTolerance(0.041);
     }
-    public void update(LLResult llResult, Telemetry telemetry, TelemetryManager telemetryM) {
+    public void update(LLResult llResult, Telemetry telemetry, TelemetryManager telemetryM, double limelightAimPredictedGoalAngle) {
         if(manualEnabled) {
             ShooterRotateMotor.setPower(manualPower);
         }
@@ -41,7 +41,7 @@ public class LimelightAim {
                 RPM = (ShooterRotateMotor.getVelocity() / 383.6) * 60.0;
                 double Norm = RPM / MaxRPM;
                 RotatePID.setPID(kp, ki, kd);
-                rotatePower = RotatePID.calculate(llResult.getTx(), 0);
+                rotatePower = RotatePID.calculate(llResult.getTx(), limelightAimPredictedGoalAngle);
                 rotatePower = clamp(rotatePower, -1, 1);
                 lastRotatePower = rotatePower;
                 telemetry.addData("AutoAim", "ON");
@@ -72,6 +72,7 @@ public class LimelightAim {
             case "PPG": return 2;
             case "Blue": return 3;
             case "Red": return 4;
+            case "Ramp": return 5;
             default: return 3;
         }
     }

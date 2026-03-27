@@ -39,7 +39,7 @@ public class FlywheelAndHoodData {
             flywheelRPM = 4400;
             hoodAngle = 1.00;
         }*/
-        return new AutoShooting(flywheelRPM + 150, hoodAngle + 0.04);
+        return new AutoShooting(flywheelRPM + 100, hoodAngle + 0.04);
     }
 //    public static AutoShooting lookupA(double ta) {
 //        if (ta >= 2.37) return new AutoShooting(3500, 0.90);
@@ -49,11 +49,11 @@ public class FlywheelAndHoodData {
 //    }
 
     public static AutoShooting lookupB(double distance) {
-        if (distance < 140) return new AutoShooting(4300, 0.99);
-        if (distance < 145) return new AutoShooting(4400, 1);
+        if (distance < 140) return new AutoShooting(4400, 0.99);
+        if (distance < 145) return new AutoShooting(4450, 1);
         if (distance < 150) return new AutoShooting(4500, 1);
-        if (distance < 155) return new AutoShooting(4600, 1);
-        return new AutoShooting(4700, 1);
+        if (distance < 155) return new AutoShooting(4550, 1);
+        return new AutoShooting(4600, 1);
     }
 }
 

@@ -29,6 +29,7 @@ import org.firstinspires.ftc.teamcode.Mechanisms.FlywheelLogic;
 import org.firstinspires.ftc.teamcode.Mechanisms.IntakeLogic;
 import org.firstinspires.ftc.teamcode.Mechanisms.LEDClass;
 import org.firstinspires.ftc.teamcode.Mechanisms.LimelightAim;
+import org.firstinspires.ftc.teamcode.Mechanisms.RampBallSequencer;
 import org.firstinspires.ftc.teamcode.Tests.AutoShooting;
 import org.firstinspires.ftc.teamcode.Data.FlywheelAndHoodData;
 import org.firstinspires.ftc.teamcode.Mechanisms.PatternLogic;
@@ -105,8 +106,12 @@ public class Teleop extends OpMode {
     private ButtonLogic sensitivityUpBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);//gamepad1.dpad_up
     private ButtonLogic sensitivityDownBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);//gamepad1.dpad_down
     private ButtonLogic fieldOrientedModeToggleBtn = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);
+    private ButtonLogic addValueBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);
+    private ButtonLogic popValueBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);
+    private ButtonLogic rampDetectionBtn = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);
     private Follower follower;
 
+    private RampBallSequencer rampBallSequencer = new RampBallSequencer();
     private Pose selectedStartPose;
     private final Pose topLeftStartPose = new Pose(30, 125, Math.toRadians(93));
     private final Pose topRightStartPose = new Pose(114, 125, Math.toRadians(87));
@@ -227,9 +232,49 @@ public class Teleop extends OpMode {
     //====================
     @Override
     public void loop() {
-        shooter.update(intake, telemetry, telemetryM);
+        //Update Buttons
+        hoodUpBtn.update(gamepad2.dpad_right);
+        hoodDownBtn.update(gamepad2.dpad_left);
+        rpmUpBtn.update(gamepad2.dpad_up);
+        rpmDownBtn.update(gamepad2.dpad_down);
+        shoot3Btn.update(gamepad2.right_trigger > 0.3);
+        autoFlywheelAndHoodToggleBtn.update(gamepad2.right_bumper);
+        autoAimHoldBtn.update(gamepad2.left_trigger > 0.3);
+        autoSort.update(gamepad2.left_bumper);
+        //gateHoldBtn.update(gamepad2.right_trigger > 0.03);
+        greenBtn.update(gamepad1.a);
+        purpleBtn.update(gamepad1.x);
+        patternResetBtn.update(gamepad1.start);
+        patternConfirmBtn.update(gamepad1.right_bumper);
+        intakeUpBtn.update(gamepad1.dpad_right);
+        intakeDownBtn.update(gamepad1.dpad_left);
+        sensitivityDownBtn.update(gamepad1.dpad_down);
+        sensitivityUpBtn.update(gamepad1.dpad_up);
+        intakeHoldBtn.update(gamepad1.left_trigger > 0.3);
+        intakeReverseHoldBtn.update(gamepad1.left_bumper);
+        precisionModeHoldBtn.update(gamepad1.right_trigger > 0.3);
+        fieldOrientedModeToggleBtn.update(gamepad1.right_bumper);
+        addValueBtn.update(gamepad2.a);
+        popValueBtn.update(gamepad2.b);
+        rampDetectionBtn.update(gamepad2.x);
+        
+        follower.update();
+        shooter.update(intake, telemetry, telemetryM, shoot3Btn.justPressed(), popValueBtn.justPressed(), shoot3Btn.justReleased(), addValueBtn.getState());
         intake.update(telemetryM, telemetry);
         ColorSensorLogic.update(telemetry);
+
+        if (rampDetectionBtn.justPressed() && rampDetectionBtn.getState()) {
+            limelight.pipelineSwitch(LimelightAim.pipelineFromName("Ramp"));
+        }
+        else if(rampDetectionBtn.justPressed() && !rampDetectionBtn.getState()) {
+            if (AllianceData.isRed()) {
+                limelight.pipelineSwitch(LimelightAim.pipelineFromName("Red"));
+            }
+            else {
+                limelight.pipelineSwitch(LimelightAim.pipelineFromName("Blue"));
+            }
+        }
+
         int[] colors = colorSensorLogic.returnCurrentColors();
         for (int i=0; i<3; i++) {
             if (colors[i] == 0) {
@@ -264,6 +309,10 @@ public class Teleop extends OpMode {
         RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.29);
         LLResult ll = limelight.getLatestResult();
 
+        if (rampDetectionBtn.getState()) {
+            rampBallSequencer.update(follower.getPose(), ll, AllianceData.isRed(), telemetry, telemetryM);
+        }
+
 //        if (!poseSnapped && ll != null && ll.isValid()) {
 //            // Example: botpose_MT2 gives a Pose3D-like object in FTC SDK
 //            double x = (ll.getBotpose().getPosition().x - 1.83) * 39.3442622951;
@@ -274,30 +323,6 @@ public class Teleop extends OpMode {
 //            follower.setPose(snapped);      // or follower.setStartingPose(snapped) depending on your Pedro version
 //            poseSnapped = true;
 //       }
-
-
-        //Update Buttons
-        hoodUpBtn.update(gamepad2.dpad_right);
-        hoodDownBtn.update(gamepad2.dpad_left);
-        rpmUpBtn.update(gamepad2.dpad_up);
-        rpmDownBtn.update(gamepad2.dpad_down);
-        shoot3Btn.update(gamepad2.right_trigger > 0.3);
-        autoFlywheelAndHoodToggleBtn.update(gamepad2.right_bumper);
-        autoAimHoldBtn.update(gamepad2.left_trigger > 0.3);
-        autoSort.update(gamepad2.left_bumper);
-        //gateHoldBtn.update(gamepad2.right_trigger > 0.03);
-        greenBtn.update(gamepad1.a);
-        purpleBtn.update(gamepad1.x);
-        patternResetBtn.update(gamepad1.start);
-        patternConfirmBtn.update(gamepad1.right_bumper);
-        intakeUpBtn.update(gamepad1.dpad_right);
-        intakeDownBtn.update(gamepad1.dpad_left);
-        sensitivityDownBtn.update(gamepad1.dpad_down);
-        sensitivityUpBtn.update(gamepad1.dpad_up);
-        intakeHoldBtn.update(gamepad1.left_trigger > 0.3);
-        intakeReverseHoldBtn.update(gamepad1.left_bumper);
-        precisionModeHoldBtn.update(gamepad1.right_trigger > 0.3);
-        fieldOrientedModeToggleBtn.update(gamepad1.right_bumper);
 
 //        ShooterS2.setPosition(gateHoldBtn.getState()? 0.527 : 0.575);
 //
@@ -474,10 +499,10 @@ public class Teleop extends OpMode {
             double manual = gamepad2.right_stick_x;
             autoAim.EnableManualPower(true, (Math.abs(manual) > 0.08) ? Range.clip(manual, -0.6, 0.6) : 0);
         }
-        autoAim.update(ll, telemetry, telemetryM);
+        autoAim.update(ll, telemetry, telemetryM, shooter.getLimelightAimPredictedGoalAngle());
 
         if (autoFlywheelAndHoodToggleBtn.getState()) {
-            shooter.findFlywheelSpeedAndHoodPosition(follower, AllianceData.getGoalPose());
+            shooter.findFlywheelSpeedAndHoodPosition(follower, AllianceData.getGoalPose(), telemetryM);
         } else {
             if (rpmUpBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() + 50);
             if (rpmDownBtn.getState()) shooter.setTargetRPM(shooter.getTargetRPM() - 50);
@@ -541,9 +566,9 @@ public class Teleop extends OpMode {
             telemetry.addData("LLPose", "no valid tag");
         }
 
+        telemetryM.addData("limelightAimPredictedGoalAngle", shooter.getLimelightAimPredictedGoalAngle());
         telemetryM.update();
         telemetry.update();
-        follower.update();
 
     }
 }

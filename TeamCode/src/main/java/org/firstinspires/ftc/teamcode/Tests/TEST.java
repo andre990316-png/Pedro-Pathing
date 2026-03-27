@@ -160,7 +160,8 @@ public class TEST extends OpMode {
             IntakeL.setPower(feedPower);
             IntakeR.setPower(feedPower);
 
-            ShooterServo.setPosition(sortLogic.isShootOn() ? gateOpenAngle : gateCloseAngle);
+            //ShooterServo.setPosition(sortLogic.isShootOn() ? gateOpenAngle : gateCloseAngle);
+            ShooterServo.setPosition(gateOpenAngle);
         } else {
             if(sortServoResetBtn.getState()) {
                 SortServo1.setPosition(resetAngle);

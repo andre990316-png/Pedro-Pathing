@@ -134,7 +134,7 @@ public class Auto_V2 extends OpMode {
     private final Pose blueBallPosition2Start = new Pose(50, 62, Math.toRadians(180));
     private final Pose blueBallPosition2End = new Pose(13, 62, Math.toRadians(180));
     private final Pose blueBallPosition2EndAndGate = new Pose(11, 58, Math.toRadians(180));
-    private final Pose blueBallPosition3Start = new Pose(50, 84, Math.toRadians(180));
+    private final Pose blueBallPosition3Start = new Pose(49, 84, Math.toRadians(180));
     private final Pose blueBallPosition3End = new Pose(20, 84, Math.toRadians(180));
 
     //artifact intaking poses (red)
@@ -557,7 +557,7 @@ public class Auto_V2 extends OpMode {
 
             case INTAKE_ON:
                 // You were already using shooter.getIntake().intakeReady(true)
-                intake.setTargetRPM(-1); //<-
+                intake.setTargetRPM(-1150); //<-
                 intake.intakeReady(true);
                 break;
 
@@ -804,13 +804,10 @@ public class Auto_V2 extends OpMode {
         limelight.updateRobotOrientation(imu.getRobotYawPitchRollAngles().getYaw());
         LLResult ll = limelight.getLatestResult();
 
-        shooter.update(intake, telemetry, telemetryM);
-        intake.update(telemetryM, telemetry);
-        autoAim.update(ll, telemetry, telemetryM);
         RGB.setPosition(shooter.isFlywheelReady()? 0.48 : 0.29);
         Auto_lastPose.currentPose = follower.getPose();
 
-        shooter.findFlywheelSpeedAndHoodPosition(follower, AllianceData.getGoalPose());
+        shooter.findFlywheelSpeedAndHoodPosition(follower, AllianceData.getGoalPose(), telemetryM);
 
         updateAuto();
 
@@ -863,6 +860,9 @@ public class Auto_V2 extends OpMode {
 //        telemetry.addData("normal h", follower.getPose().getHeading());
         telemetry.update();
         telemetryM.update();
+        shooter.update(intake, telemetry, telemetryM, false, false, false, false);
+        intake.update(telemetryM, telemetry);
+        autoAim.update(ll, telemetry, telemetryM, shooter.getLimelightAimPredictedGoalAngle());
     }
 //    private Pose getRobotPoseFromCamera() {
 //        ///Fill this out to get the robot Pose from the camera's output (apply any filters if you need to using follower.getPose() for fusion)
