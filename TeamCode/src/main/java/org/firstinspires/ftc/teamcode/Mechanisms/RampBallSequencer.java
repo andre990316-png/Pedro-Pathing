@@ -379,7 +379,7 @@ public class RampBallSequencer {
     private double safeGetArea(LLResultTypes.DetectorResult d) {
         // Some SDK versions use getTargetArea(), some use getArea(), some none.
         try { return d.getTargetArea(); } catch (Throwable ignored) {}
-        try { return d.getArea(); } catch (Throwable ignored) {}
+        try { return d.getTargetArea(); } catch (Throwable ignored) {}
         return 0;
     }
 
