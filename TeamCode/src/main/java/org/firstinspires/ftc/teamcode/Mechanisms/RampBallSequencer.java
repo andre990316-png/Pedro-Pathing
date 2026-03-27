@@ -210,16 +210,19 @@ public class RampBallSequencer {
         // x_right = -x_left
         // y_down  = -z_up
         // z_fwd   = +y_fwd
-        double xCam = vRobotRot.x;
-        double yCam = vRobotRot.z;
-        double zCam = -vRobotRot.y;
+        // Step B: robot axes -> camera axes
+// robot: +X forward, +Y left, +Z up   (Pedro-consistent)
+// cam:   +Z forward, +X right, +Y down
+        double xCam = -vRobotRot.y;  // right
+        double yCam = -vRobotRot.z;  // down
+        double zCam =  vRobotRot.x;  // forward
 
         if (telemetry != null) {
             telemetry.addData("vRobotRot", "x=%.2f y=%.2f z=%.2f", vRobotRot.x, vRobotRot.y, vRobotRot.z);
             telemetry.addData("camXYZ", "x=%.2f y=%.2f z=%.2f", xCam, yCam, zCam);
         }
 
-        // Behind camera or too close
+// Behind camera or too close
         if (zCam <= 0.5) return Pixel.invalid();
 
         // Pinhole projection
