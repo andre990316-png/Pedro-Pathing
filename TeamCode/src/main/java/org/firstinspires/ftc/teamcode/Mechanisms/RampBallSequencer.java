@@ -210,9 +210,9 @@ public class RampBallSequencer {
         // x_right = -x_left
         // y_down  = -z_up
         // z_fwd   = +y_fwd
-        double xCam = -vRobotRot.x;
-        double yCam = -vRobotRot.z;
-        double zCam =  vRobotRot.y;
+        double xCam = vRobotRot.x;
+        double yCam = vRobotRot.z;
+        double zCam = -vRobotRot.y;
 
         if (telemetry != null) {
             telemetry.addData("vRobotRot", "x=%.2f y=%.2f z=%.2f", vRobotRot.x, vRobotRot.y, vRobotRot.z);
