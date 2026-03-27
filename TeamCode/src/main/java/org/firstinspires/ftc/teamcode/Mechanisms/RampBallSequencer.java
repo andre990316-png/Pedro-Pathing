@@ -95,8 +95,8 @@ public class RampBallSequencer {
         Vec3 p0 = isRedAlliance ? RED_BOTTOM_NOT_EDGE : BLUE_BOTTOM_NOT_EDGE;
         Vec3 p1 = isRedAlliance ? RED_TOP_NOT_EDGE    : BLUE_TOP_NOT_EDGE;
 
-        Pixel a = projectFieldPointToPixel(robotFieldPose, p0);
-        Pixel b = projectFieldPointToPixel(robotFieldPose, p1);
+        Pixel a = projectFieldPointToPixel(robotFieldPose, p0, telemetry);
+        Pixel b = projectFieldPointToPixel(robotFieldPose, p1, telemetry);
 
         if (!a.valid || !b.valid) {
             if (telemetry != null) telemetry.addLine("[Ramp] Ramp edge projection failed (behind camera?)");
@@ -169,7 +169,7 @@ public class RampBallSequencer {
     // Projection math
     // ----------------------------
 
-    private Pixel projectFieldPointToPixel(Pose robotPoseField, Vec3 fieldPoint) {
+    private Pixel projectFieldPointToPixel(Pose robotPoseField, Vec3 fieldPoint, Telemetry telemetry) {
         // Intrinsics from FOV
         double fx = (imageW / 2.0) / Math.tan(Math.toRadians(hfovDeg) / 2.0);
         double fy = (imageH / 2.0) / Math.tan(Math.toRadians(vfovDeg) / 2.0);
@@ -186,7 +186,8 @@ public class RampBallSequencer {
         // robot +Y forward, +X left
         double dxField = camForwardIn * cosH - camLeftIn * sinH;
         double dyField = camForwardIn * sinH + camLeftIn * cosH;
-
+        dxField = camForwardIn * cosH - camLeftIn * sinH;
+        dyField = camForwardIn * sinH + camLeftIn * cosH;
         Vec3 camPosField = new Vec3(
                 robotPoseField.getX() + dxField,
                 robotPoseField.getY() + dyField,
@@ -212,6 +213,11 @@ public class RampBallSequencer {
         double xCam = -vRobotRot.x;
         double yCam = -vRobotRot.z;
         double zCam =  vRobotRot.y;
+
+        if (telemetry != null) {
+            telemetry.addData("vRobotRot", "x=%.2f y=%.2f z=%.2f", vRobotRot.x, vRobotRot.y, vRobotRot.z);
+            telemetry.addData("camXYZ", "x=%.2f y=%.2f z=%.2f", xCam, yCam, zCam);
+        }
 
         // Behind camera or too close
         if (zCam <= 0.5) return Pixel.invalid();
