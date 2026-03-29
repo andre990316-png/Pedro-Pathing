@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode.Mechanisms;
+import com.bylazar.configurables.annotations.Configurable;
 
 @Configurable
 public class LaunchPhysics {
