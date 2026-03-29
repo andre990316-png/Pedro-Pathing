@@ -3,23 +3,35 @@ package org.firstinspires.ftc.teamcode.Tests;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.TelemetryManager;
 import com.bylazar.telemetry.PanelsTelemetry;
+import com.pedropathing.geometry.Pose;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import com.arcrobotics.ftclib.controller.PIDController;
+
+import org.firstinspires.ftc.teamcode.Data.AllianceData;
 import org.firstinspires.ftc.teamcode.Mechanisms.ButtonLogic;
 import org.firstinspires.ftc.teamcode.Mechanisms.DualColorSensor;
 import org.firstinspires.ftc.teamcode.Mechanisms.SingleColorSensor;
 import org.firstinspires.ftc.teamcode.Mechanisms.NewSortLogic;
+import org.firstinspires.ftc.teamcode.Mechanisms.RampBallSequencer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configurable
 @TeleOp
 public class TEST extends OpMode {
-
+    private Limelight3A limelight;
+    private IMU imu;
     public TelemetryManager telemetryM;
     private PIDController shooterPID;
 
@@ -32,14 +44,17 @@ public class TEST extends OpMode {
     private Servo SortServo1;
     private Servo SortServo2;
 
-    private SingleColorSensor upBallSensor;
-    private SingleColorSensor downBallSensor;
-//    private DualColorSensor upBallSensor;
-//    private DualColorSensor downBallSensor;
+    private SingleColorSensor firstBallSensor;
+    private SingleColorSensor secondBallSensor;
+    private SingleColorSensor thirdBallSensor;
+    
+//    private DualColorSensor firstBallSensor;
+//    private DualColorSensor secondBallSensor;
+//    private DualColorSensor thirdBallSensor;
 
     static double gateOpenAngle = 0.2, gateCloseAngle = 0, sortOpenAngle = 0, sortCloseAngle = 1, resetAngle = 0;
 
-    public static int[] colors = {0, 0}; // 0=none, 1=purple, 2=green
+    public static int[] colors = {0, 0, 0}; // 0=none, 1=purple, 2=green
 
     static double Kp = 0.0018;
     static double Kd = 0.0005;
@@ -67,9 +82,14 @@ public class TEST extends OpMode {
     private ButtonLogic sortServoBtnDown = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);
     private ButtonLogic sortServoResetBtn = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);
     private ButtonLogic patternBtn = new ButtonLogic(ButtonLogic.Mode.PULSE, false);
+    private ButtonLogic rampDetectionBtn = new ButtonLogic(ButtonLogic.Mode.TOGGLE, false);
     private final NewSortLogic sortLogic = new NewSortLogic();
     private final ElapsedTime Timer = new ElapsedTime();
     static int pattern = 1; // target PPG for 2P+1G
+    private RampBallSequencer rampBallSequencer = new RampBallSequencer();
+    private Pose blueScanRampPose = new Pose(50, 70);
+    private Pose redScanRampPose = new Pose(94, 70);
+    private List<RampBallSequencer.BallObs> rampBallColors = new ArrayList<>();
 
     @Override
     public void init() {
@@ -82,11 +102,13 @@ public class TEST extends OpMode {
         SortServo1 = hardwareMap.get(Servo.class, "sortServo1");
         SortServo2 = hardwareMap.get(Servo.class, "sortServo2");
 
-        //upBallSensor = new DualColorSensor(hardwareMap, "colorSensorUp1", "colorSensorUp2", 16.0f);
-        //downBallSensor = new DualColorSensor(hardwareMap, "colorSensorDown1", "colorSensorDown2", 16.0f);
+        //firstBallSensor = new DualColorSensor(hardwareMap, "colorSensorFirst1", "colorSensorFirst2", 16.0f);
+        //secondBallSensor = new DualColorSensor(hardwareMap, "colorSensorSecond1", "colorSensorSecond2", 16.0f);
+        //thirdBallSensor = new DualColorSensor(hardwareMap, "colorSensorThird1", "colorSensorThird2", 16.0f);
 
-        upBallSensor = new SingleColorSensor(hardwareMap, "colorSensorUp1", 16.0f);
-        downBallSensor = new SingleColorSensor(hardwareMap, "colorSensorDown1", 16.0f);
+        firstBallSensor = new SingleColorSensor(hardwareMap, "colorSensorFirst1", 16.0f);
+        secondBallSensor = new SingleColorSensor(hardwareMap, "colorSensorSecond1", 16.0f);
+        thirdBallSensor = new SingleColorSensor(hardwareMap, "colorSensorThird1", 16.0f);
 
         IntakeR.setDirection(DcMotor.Direction.REVERSE);
 
@@ -106,8 +128,21 @@ public class TEST extends OpMode {
 
         shooterPID = new PIDController(Kp, Ki, Kd);
 
+        imu = hardwareMap.get(IMU.class, "imu");
+        RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                RevHubOrientationOnRobot.UsbFacingDirection.UP
+        );
+        imu.initialize(new IMU.Parameters(revHubOrientationOnRobot));
+        limelight = hardwareMap.get(Limelight3A.class, "Limelight");
+
         Timer.reset();
         sortLogic.reset(Timer.seconds());
+    }
+
+    @Override
+    public void start() {
+        limelight.start();
     }
 
     @Override
@@ -124,6 +159,16 @@ public class TEST extends OpMode {
         sortServoBtnDown.update(gamepad1.b);
         sortServoResetBtn.update(gamepad1.x);
         patternBtn.update(gamepad1.y);
+
+        LLResult ll = limelight.getLatestResult();
+        if (rampDetectionBtn.getState()) {
+            rampBallSequencer.update(blueScanRampPose, ll, AllianceData.isRed(), telemetry, telemetryM);
+            rampBallColors = rampBallSequencer.getOnRampBalls();
+            // Example: print the ordered ramp sequence colors
+            for (int i = 0; i < rampBallSequencer.getOnRampBalls().size(); i++) {
+                telemetry.addData("RampSeq " + i, rampBallSequencer.getOnRampBalls().get(i).color);
+            }
+        }
 
         if(patternBtn.getState()) {
             pattern += 1;
@@ -144,12 +189,14 @@ public class TEST extends OpMode {
         ShooterR.setPower(-shooterPower);
         ShooterL.setPower(shooterPower);
 
-        upBallSensor.update();
-        colors[0] = upBallSensor.getBallColor();
-        downBallSensor.update();
-        colors[1] = downBallSensor.getBallColor();
+        firstBallSensor.update();
+        colors[0] = firstBallSensor.getBallColor();
+        secondBallSensor.update();
+        colors[1] = secondBallSensor.getBallColor();
+        thirdBallSensor.update();
+        colors[2] = thirdBallSensor.getBallColor();
 
-        sortLogic.update(colors, pattern, shootBtn.getState(), Timer.seconds());
+        sortLogic.update(colors, pattern, shootBtn.getState(), Timer.seconds(), rampBallColors);
         boolean sortingActive = sortLogic.isBusy();
 
         if (sortingActive) {
@@ -202,8 +249,8 @@ public class TEST extends OpMode {
         telemetry.addData("Sort Up/Down", "%b %b", sortLogic.isOpenUpSort(), sortLogic.isOpenDownSort());
         telemetry.addData("Sort feed/shoot", "%b %b", sortLogic.isFeedOn(), sortLogic.isShootOn());
 
-        upBallSensor.telemetry(telemetry, "UP");
-        downBallSensor.telemetry(telemetry, "DOWN");
+        firstBallSensor.telemetry(telemetry, "UP");
+        secondBallSensor.telemetry(telemetry, "DOWN");
 
         telemetry.update();
         telemetryM.update();

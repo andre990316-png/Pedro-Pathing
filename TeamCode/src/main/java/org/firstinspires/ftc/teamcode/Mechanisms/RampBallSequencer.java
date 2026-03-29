@@ -11,103 +11,97 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * RampBallSequencer (horizontal divider version)
- *
- * - Uses ONLY the LOW ramp point (bottom-not-edge) to compute a horizontal divider line in pixels.
- * - Above divider = on-ramp (or below divider, configurable).
- * - Optional alliance-only filtering by classId.
- * - Optional duplicate suppression (remove near-duplicates).
- *
- * Assumptions:
- * - Robot pose is FIELD inches, heading radians. Heading 0 = +X (right), CCW positive.
- * - Robot offset convention (your stated convention):
- *      +Y = forward, +X = left, +Z = up
- * - Image coords: (0,0) top-left, +x right, +y down
- */
 @Configurable
 public class RampBallSequencer {
 
     // ----------------------------
-    // Camera / image params
+    // Image + intrinsics
     // ----------------------------
     public int imageW = 640;
     public int imageH = 480;
 
-    // Limelight 3A specs (you gave)
     public double hfovDeg = 54.5;
     public double vfovDeg = 42.0;
 
-    // Principal point offsets (pixels) from Limelight calibration screen
-    public double cxOffsetPx = -2.774;
-    public double cyOffsetPx = 22.549;
+    // Principal point offsets (px) from Limelight calibration (optional)
+    public double cxOffsetPx = 0.0;
+    public double cyOffsetPx = 0.0;
 
     // ----------------------------
-    // Camera extrinsics relative to robot (INCHES, DEGREES)
-    // Robot frame assumption for OFFSETS:
-    //   +Y = forward, +X = left, +Z = up
+    // Camera extrinsics relative robot (INCHES, DEGREES)
+    // Your stated convention:
+    // +Y = forward, +X = left, +Z = up
     // ----------------------------
-    public double camForwardIn = 8.7;   // +Y
-    public double camLeftIn    = 0.0;   // +X
-    public double camUpIn      = 9.55;  // +Z
+    public double camForwardIn = 8.7;  // +Y
+    public double camLeftIn    = 0.0;  // +X
+    public double camUpIn      = 9.55; // +Z
 
-    // camera rotation relative robot (degrees)
-    public double camYawDeg   = 0.0;    // about +Z (up)
-    public double camPitchDeg = 0.0;    // about +X (left)
-    public double camRollDeg  = 0.0;    // about +Y (forward)
+    // camera rotation relative robot
+    public double camYawDeg   = 0.0;   // about +Z (up)
+    public double camPitchDeg = 0.0;   // about +X (left)
+    public double camRollDeg  = 0.0;   // about +Y (forward)
 
     // ----------------------------
     // Horizontal divider behavior
     // ----------------------------
-    // If true: py < dividerY => ON ramp (above the line)
-    // If false: py > dividerY => ON ramp (below the line)
+    // If true: py < dividerY => ON ramp (above line)
+    // If false: py > dividerY => ON ramp (below line)
     public boolean rampIsAboveLine = true;
 
-    // Cushion margin to reduce jitter near divider
+    // Add cushion margin (px) to avoid jitter near boundary
     public double dividerMarginPx = 0.0;
 
     // ----------------------------
-    // Alliance filtering (by class ID)
-    // You must set these to match your model classes.
-    // If you are detecting balls with 2 classes (blue ball / red ball),
-    // set those IDs here and enable filterByAllianceBallColor=true.
+    // Alliance-specific ramp filtering
+    // You said: only detect BLUE ramp on blue team, RED ramp on red team.
+    // Set these to your model's class IDs.
     // ----------------------------
-    public boolean filterByAllianceBallColor = false;
-    public int blueBallClassId = 0;
-    public int redBallClassId  = 1;
-
-    // ----------------------------
-    // Duplicate suppression (near-duplicate detections)
-    // ----------------------------
-    public boolean enableDuplicateFilter = true;
-
-    // If two detections are within this many pixels, treat as duplicates.
-    public double duplicateDistPx = 25.0;
-
-    // Also require confidence similarity check (optional)
-    public boolean useConfInDuplicateCheck = false;
-    public double duplicateConfDiff = 0.20;
-
-    // Optional: if area is available, you can use it. (SDK differences)
-    public boolean useAreaInDuplicateCheck = true;
-
-    // If both areas are "high", duplicates are more likely.
-    // This threshold depends on your model’s area scale.
-    public double highAreaThreshold = 0.08;
-
-    // When duplicates are found, keep the one with higher confidence (or larger area if enabled)
-    public boolean keepHigherAreaInsteadOfHigherConf = false;
+    public boolean filterRampByAlliance = true;
+    public int blueRampClassId = 0;   // TODO: set to your NN classId for "blue ramp"
+    public int redRampClassId  = 1;   // TODO: set to your NN classId for "red ramp"
 
     // ----------------------------
-    // Ramp LOW point (FIELD inches)
-    // You provided for RED:
-    //   bottom not on edge (137.7, 71, 8.6)
-    // BLUE mirrored with x' = 144 - x
+    // Ball color class IDs (what you REALLY want to store)
+    // Set these to your model's class IDs for the balls.
+    // ----------------------------
+    public int greenBallClassId  = 2; // TODO: set to your NN classId for green ball
+    public int purpleBallClassId = 3; // TODO: set to your NN classId for purple ball
+
+    // If true: ignore any detection that isn't purple/green (after ramp filtering)
+    public boolean ignoreNonBallClasses = true;
+
+    // ----------------------------
+    // Duplicate suppression
+    // If two detections are very close AND both have high area, treat as duplicates.
+    // ----------------------------
+    public boolean dedupeEnabled = true;
+    public double dedupeMaxCenterDistPx = 18.0;  // distance threshold between centers
+    public double dedupeAreaHigh = 0.08;         // area threshold (tune for your pipeline)
+    public double dedupeAreaRatioMax = 1.6;      // (bigger/smaller) max ratio to still merge
+    public boolean keepHigherConfidenceOnDedupe = true;
+
+    // ----------------------------
+    // Ramp LOW point (field inches)
+    // bottom-not-on-edge point from your ramp data
     // ----------------------------
     private static final double FIELD_SIZE = 144.0;
 
     private static final Vec3 RED_BOTTOM_NOT_EDGE  = new Vec3(137.7, 71.0, 8.6);
     private static final Vec3 BLUE_BOTTOM_NOT_EDGE = new Vec3(FIELD_SIZE - 137.7, 71.0, 8.6);
+
+    // ----------------------------
+    // Outputs you can read from TeleOp
+    // ----------------------------
+    private final ArrayList<BallObs> onRampBalls = new ArrayList<>();
+    private final ArrayList<BallObs> offRampBalls = new ArrayList<>();
+
+    public enum BallColor { GREEN, PURPLE, UNKNOWN }
+
+    /** Returns latest on-ramp sequence, sorted top->bottom (fall direction). */
+    public List<BallObs> getOnRampBalls() { return onRampBalls; }
+
+    /** Returns latest off-ramp detections (no particular ordering unless you want one). */
+    public List<BallObs> getOffRampBalls() { return offRampBalls; }
 
     // ----------------------------
     // Main update
@@ -117,6 +111,9 @@ public class RampBallSequencer {
                        boolean isRedAlliance,
                        Telemetry telemetry,
                        TelemetryManager telemetryM) {
+
+        onRampBalls.clear();
+        offRampBalls.clear();
 
         if (ll == null) {
             if (telemetry != null) telemetry.addLine("[Ramp] LLResult null");
@@ -133,12 +130,12 @@ public class RampBallSequencer {
             return;
         }
 
-        // 1) Project ONLY the LOW ramp point => dividerY
+        // 1) DividerY from low ramp point projection
         Vec3 lowRamp = isRedAlliance ? RED_BOTTOM_NOT_EDGE : BLUE_BOTTOM_NOT_EDGE;
         Pixel lowPx = projectFieldPointToPixel(robotFieldPose, lowRamp);
 
         if (!lowPx.valid) {
-            if (telemetry != null) telemetry.addLine("[Ramp] Low ramp projection invalid (zCam<=0 behind camera?)");
+            if (telemetry != null) telemetry.addLine("[Ramp] Low ramp projection invalid (behind camera?)");
             return;
         }
 
@@ -146,155 +143,159 @@ public class RampBallSequencer {
 
         if (telemetry != null) {
             telemetry.addData("[Ramp] dividerY", "%.1f", dividerY);
-            telemetry.addData("[Ramp] rampIsAboveLine", rampIsAboveLine);
         }
-        if (telemetryM != null) telemetryM.addData("rampDividerY", dividerY);
+        if (telemetryM != null) {
+            telemetryM.addData("rampDividerY", dividerY);
+        }
 
-        // 2) Build list of detections (px/py/class/area/conf)
-        ArrayList<DetPx> all = new ArrayList<>();
+        // 2) Gather candidate detections (alliance ramp filter + optional ball-only filter)
+        ArrayList<Det2D> candidates = new ArrayList<>();
+
+        int allowedRampClass = isRedAlliance ? redRampClassId : blueRampClassId;
 
         for (int i = 0; i < dets.size(); i++) {
             LLResultTypes.DetectorResult d = dets.get(i);
-
             int classId = d.getClassId();
 
-            // Alliance-only ball filtering (blue only on blue, red only on red)
-            if (filterByAllianceBallColor) {
-                if (isRedAlliance && classId != redBallClassId) continue;
-                if (!isRedAlliance && classId != blueBallClassId) continue;
-            }
+            if (filterRampByAlliance && classId != allowedRampClass) continue;
 
-            double px = safeGetX(d);
-            double py = safeGetY(d);
-            double conf = safeGetConf(d);
+            BallColor color = classIdToBallColor(classId);
+            if (ignoreNonBallClasses && color == BallColor.UNKNOWN) continue;
+
+            double px = safeGetXPx(d);
+            double py = safeGetYPx(d);
             double area = safeGetArea(d);
+            double conf = d.getConfidence();
 
-            all.add(new DetPx(i, classId, conf, area, px, py));
+            candidates.add(new Det2D(i, classId, color, conf, area, px, py));
         }
 
-        if (all.isEmpty()) {
-            if (telemetry != null) telemetry.addLine("[Ramp] No detections after alliance filter");
-            return;
+        // 3) De-dupe
+        if (dedupeEnabled && candidates.size() >= 2) {
+            candidates = dedupe(candidates);
         }
 
-        // 3) Optional: remove near-duplicates
-        if (enableDuplicateFilter) {
-            all = suppressDuplicates(all);
-        }
-
-        // 4) Split ramp vs off-ramp by py relative to dividerY
-        ArrayList<DetPx> onRamp = new ArrayList<>();
-        ArrayList<DetPx> offRamp = new ArrayList<>();
-
-        for (DetPx d : all) {
+        // 4) Classify ramp vs off-ramp using divider
+        for (Det2D det : candidates) {
             boolean isOnRamp;
             if (rampIsAboveLine) {
-                isOnRamp = d.py < (dividerY - dividerMarginPx);
+                isOnRamp = det.py < (dividerY - dividerMarginPx);
             } else {
-                isOnRamp = d.py > (dividerY + dividerMarginPx);
+                isOnRamp = det.py > (dividerY + dividerMarginPx);
             }
-            if (isOnRamp) onRamp.add(d);
-            else offRamp.add(d);
+
+            BallObs obs = new BallObs(det.color, det.px, det.py, det.conf, det.area, det.classId, det.index);
+
+            if (isOnRamp) onRampBalls.add(obs);
+            else offRampBalls.add(obs);
         }
 
-        // 5) Sequence: balls fall top -> bottom => sort onRamp by py descending (bigger y = lower)
-        onRamp.sort(Comparator.comparingDouble(o -> -o.py));
+        // 5) Sequence ordering: you said balls flow top->bottom.
+        // In image coords, "lower" is larger py. If balls fall downward, sort DESC by py.
+        onRampBalls.sort(Comparator.comparingDouble(o -> -o.py));
 
         // 6) Telemetry
         if (telemetry != null) {
-            telemetry.addData("[Ramp] detRaw", dets.size());
-            telemetry.addData("[Ramp] detUsed", all.size());
-            telemetry.addData("[Ramp] onRamp", onRamp.size());
-            telemetry.addData("[Ramp] offRamp", offRamp.size());
+            telemetry.addData("[Ramp] rawDetCount", dets.size());
+            telemetry.addData("[Ramp] candAfterFilter", candidates.size());
+            telemetry.addData("[Ramp] onRamp", onRampBalls.size());
+            telemetry.addData("[Ramp] offRamp", offRampBalls.size());
 
-            for (int i = 0; i < onRamp.size(); i++) {
-                DetPx d = onRamp.get(i);
+            for (int i = 0; i < onRampBalls.size(); i++) {
+                BallObs b = onRampBalls.get(i);
                 telemetry.addData("[Ramp] ON #" + i,
-                        "idx=%d class=%d conf=%.2f area=%.3f px=%.1f py=%.1f",
-                        d.index, d.classId, d.conf, d.area, d.px, d.py);
+                        "%s px=%.1f py=%.1f conf=%.2f area=%.3f",
+                        b.color, b.px, b.py, b.conf, b.area);
             }
         }
 
         if (telemetryM != null) {
-            telemetryM.addData("onRampCount", onRamp.size());
-            telemetryM.addData("offRampCount", offRamp.size());
-            if (!onRamp.isEmpty()) {
-                telemetryM.addData("onRamp0_px", onRamp.get(0).px);
-                telemetryM.addData("onRamp0_py", onRamp.get(0).py);
-                telemetryM.addData("onRamp0_conf", onRamp.get(0).conf);
-                telemetryM.addData("onRamp0_area", onRamp.get(0).area);
+            telemetryM.addData("onRampCount", onRampBalls.size());
+            telemetryM.addData("offRampCount", offRampBalls.size());
+            if (!onRampBalls.isEmpty()) {
+                telemetryM.addData("onRamp0_py", onRampBalls.get(0).py);
+                telemetryM.addData("onRamp0_color", onRampBalls.get(0).color.toString());
             }
         }
     }
 
     // ----------------------------
-    // Duplicate suppression
+    // Helpers
     // ----------------------------
-    private ArrayList<DetPx> suppressDuplicates(ArrayList<DetPx> input) {
-        ArrayList<DetPx> kept = new ArrayList<>();
 
-        // simple O(n^2) is fine for small detector counts
-        for (DetPx cur : input) {
-            boolean merged = false;
+    private BallColor classIdToBallColor(int classId) {
+        if (classId == greenBallClassId) return BallColor.GREEN;
+        if (classId == purpleBallClassId) return BallColor.PURPLE;
+        return BallColor.UNKNOWN;
+    }
 
-            for (int k = 0; k < kept.size(); k++) {
-                DetPx prev = kept.get(k);
+    private ArrayList<Det2D> dedupe(ArrayList<Det2D> in) {
+        // O(n^2) is fine for small detection counts
+        boolean[] removed = new boolean[in.size()];
 
-                double dx = cur.px - prev.px;
-                double dy = cur.py - prev.py;
+        for (int i = 0; i < in.size(); i++) {
+            if (removed[i]) continue;
+            Det2D a = in.get(i);
+
+            for (int j = i + 1; j < in.size(); j++) {
+                if (removed[j]) continue;
+                Det2D b = in.get(j);
+
+                // only consider dupes if same BALL COLOR (otherwise don't merge)
+                if (a.color != b.color) continue;
+
+                double dx = a.px - b.px;
+                double dy = a.py - b.py;
                 double dist = Math.hypot(dx, dy);
 
-                if (dist > duplicateDistPx) continue;
+                if (dist > dedupeMaxCenterDistPx) continue;
 
-                // Optional: confidence difference gate
-                if (useConfInDuplicateCheck) {
-                    if (Math.abs(cur.conf - prev.conf) > duplicateConfDiff) continue;
-                }
+                // require both fairly large area to avoid merging small far objects
+                if (!(a.area >= dedupeAreaHigh && b.area >= dedupeAreaHigh)) continue;
 
-                // Optional: "area is high" heuristic to confirm duplicate
-                if (useAreaInDuplicateCheck) {
-                    boolean bothHigh = (cur.area >= highAreaThreshold) && (prev.area >= highAreaThreshold);
-                    // if area info exists but neither is high, we still allow duplicate removal by distance,
-                    // because same-ball duplicates often sit on top of each other.
-                    // If you want stricter: require bothHigh.
-                    // if (!bothHigh) continue;
-                }
+                double bigger = Math.max(a.area, b.area);
+                double smaller = Math.max(1e-6, Math.min(a.area, b.area));
+                double ratio = bigger / smaller;
 
-                // Decide which to keep
-                DetPx winner;
-                if (keepHigherAreaInsteadOfHigherConf && useAreaInDuplicateCheck) {
-                    winner = (cur.area >= prev.area) ? cur : prev;
+                if (ratio > dedupeAreaRatioMax) continue;
+
+                // decide which to remove
+                int removeIdx;
+                if (keepHigherConfidenceOnDedupe) {
+                    removeIdx = (a.conf >= b.conf) ? j : i;
                 } else {
-                    winner = (cur.conf >= prev.conf) ? cur : prev;
+                    // keep larger area by default
+                    removeIdx = (a.area >= b.area) ? j : i;
                 }
 
-                kept.set(k, winner);
-                merged = true;
-                break;
-            }
+                removed[removeIdx] = true;
 
-            if (!merged) kept.add(cur);
+                // if we removed i, stop comparing it
+                if (removeIdx == i) break;
+            }
         }
 
-        return kept;
+        ArrayList<Det2D> out = new ArrayList<>();
+        for (int i = 0; i < in.size(); i++) {
+            if (!removed[i]) out.add(in.get(i));
+        }
+        return out;
     }
 
     // ----------------------------
-    // Projection math
+    // Projection
     // ----------------------------
     private Pixel projectFieldPointToPixel(Pose robotPoseField, Vec3 fieldPoint) {
-        // Intrinsics from FOV
         double fx = (imageW / 2.0) / Math.tan(Math.toRadians(hfovDeg) / 2.0);
         double fy = (imageH / 2.0) / Math.tan(Math.toRadians(vfovDeg) / 2.0);
         double cx = (imageW / 2.0) + cxOffsetPx;
         double cy = (imageH / 2.0) + cyOffsetPx;
 
-        // Robot pose heading: 0 = +X, CCW positive
+        // Robot pose: (x,y,heading) where heading 0 = +X, CCW positive
         double h = robotPoseField.getHeading();
         double cosH = Math.cos(h);
         double sinH = Math.sin(h);
 
-        // Robot frame offset -> field offset
         // robot +Y forward, +X left
         double dxField = camForwardIn * cosH - camLeftIn * sinH;
         double dyField = camForwardIn * sinH + camLeftIn * cosH;
@@ -305,26 +306,23 @@ public class RampBallSequencer {
                 camUpIn
         );
 
-        // Vector from camera to point in FIELD
         Vec3 vField = fieldPoint.minus(camPosField);
 
         // Rotate field vector into ROBOT frame by -heading
         Vec3 vRobot = rotateAboutZ(vField, -h);
 
-        // Apply camera mount inverse rotation
+        // Apply inverse mount rotation
         Vec3 vRobotRot = applyInverseCamExtrinsic(vRobot);
 
-        // ROBOT -> CAMERA axis mapping
+        // ROBOT -> CAMERA mapping
         // robot: +X left, +Y forward, +Z up
         // cam:   +Z forward, +X right, +Y down
-        double xCam = -vRobotRot.x; // right
-        double yCam = -vRobotRot.z; // down
-        double zCam =  vRobotRot.y; // forward
+        double xCam = -vRobotRot.x;  // right
+        double yCam = -vRobotRot.z;  // down
+        double zCam =  vRobotRot.y;  // forward
 
-        // If behind camera, invalid
         if (zCam <= 0.5) return Pixel.invalid();
 
-        // Pinhole projection
         double u = fx * (xCam / zCam) + cx;
         double v = fy * (yCam / zCam) + cy;
 
@@ -332,11 +330,11 @@ public class RampBallSequencer {
     }
 
     private Vec3 applyInverseCamExtrinsic(Vec3 vRobot) {
-        double yaw = Math.toRadians(camYawDeg);
+        double yaw   = Math.toRadians(camYawDeg);
         double pitch = Math.toRadians(camPitchDeg);
-        double roll = Math.toRadians(camRollDeg);
+        double roll  = Math.toRadians(camRollDeg);
 
-        // Inverse = apply negative angles in reverse order
+        // inverse = apply negative angles in reverse order
         Vec3 r1 = rotateAboutY(vRobot, -roll);
         Vec3 r2 = rotateAboutX(r1, -pitch);
         Vec3 r3 = rotateAboutZ(r2, -yaw);
@@ -347,44 +345,33 @@ public class RampBallSequencer {
         double c = Math.cos(a), s = Math.sin(a);
         return new Vec3(v.x, v.y * c - v.z * s, v.y * s + v.z * c);
     }
-
     private static Vec3 rotateAboutY(Vec3 v, double a) {
         double c = Math.cos(a), s = Math.sin(a);
         return new Vec3(v.x * c + v.z * s, v.y, -v.x * s + v.z * c);
     }
-
     private static Vec3 rotateAboutZ(Vec3 v, double a) {
         double c = Math.cos(a), s = Math.sin(a);
         return new Vec3(v.x * c - v.y * s, v.x * s + v.y * c, v.z);
     }
 
     // ----------------------------
-    // SDK-safe getters
+    // Safe getters (SDK differences)
     // ----------------------------
-    private double safeGetX(LLResultTypes.DetectorResult d) {
+    private double safeGetXPx(LLResultTypes.DetectorResult d) {
         try { return d.getTargetXPixels(); } catch (Throwable ignored) {}
         return 0;
     }
-
-    private double safeGetY(LLResultTypes.DetectorResult d) {
+    private double safeGetYPx(LLResultTypes.DetectorResult d) {
         try { return d.getTargetYPixels(); } catch (Throwable ignored) {}
         return 0;
     }
-
-    private double safeGetConf(LLResultTypes.DetectorResult d) {
-        try { return d.getConfidence(); } catch (Throwable ignored) {}
-        return 0;
-    }
-
     private double safeGetArea(LLResultTypes.DetectorResult d) {
-        // Some SDK versions use getTargetArea(), some use getArea(), some none.
         try { return d.getTargetArea(); } catch (Throwable ignored) {}
-        try { return d.getArea(); } catch (Throwable ignored) {}
         return 0;
     }
 
     // ----------------------------
-    // Helper structs
+    // Small structs
     // ----------------------------
     private static class Vec3 {
         final double x, y, z;
@@ -399,20 +386,41 @@ public class RampBallSequencer {
         static Pixel invalid() { return new Pixel(0, 0, false); }
     }
 
-    private static class DetPx {
+    private static class Det2D {
         final int index;
         final int classId;
+        final BallColor color;
         final double conf;
         final double area;
         final double px, py;
 
-        DetPx(int index, int classId, double conf, double area, double px, double py) {
+        Det2D(int index, int classId, BallColor color, double conf, double area, double px, double py) {
             this.index = index;
             this.classId = classId;
+            this.color = color;
             this.conf = conf;
             this.area = area;
             this.px = px;
             this.py = py;
+        }
+    }
+
+    public static class BallObs {
+        public final BallColor color;
+        public final double px, py;
+        public final double conf;
+        public final double area;
+        public final int classId;
+        public final int rawIndex;
+
+        public BallObs(BallColor color, double px, double py, double conf, double area, int classId, int rawIndex) {
+            this.color = color;
+            this.px = px;
+            this.py = py;
+            this.conf = conf;
+            this.area = area;
+            this.classId = classId;
+            this.rawIndex = rawIndex;
         }
     }
 }

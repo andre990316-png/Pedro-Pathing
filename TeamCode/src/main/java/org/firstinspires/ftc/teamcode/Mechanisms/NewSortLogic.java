@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.Mechanisms;
 
+import java.util.List;
+
 public class NewSortLogic {
 
     private static final int NONE = 0;
     private static final int P = 2;
     private static final int G = 1;
-    private static int[] colors = {0, 0};
+    private static int[] colors = {0, 0, 0};
     private static int targetPattern = 0; // 1 - PPG, 2 - PGP, 3 - GPP
     private boolean openUpSort = false;     // true = HOLD pocket1, false = RELEASE pocket1
     private boolean openDownSort = false;   // true = HOLD pocket2, false = RELEASE pocket2
@@ -13,6 +15,7 @@ public class NewSortLogic {
     private boolean shoot = false;
     private static double OpenAndCloseSortDuration = 1.0;
     private static double[] feedBallDuration = {0.5, 0.7, 0.9}; // [0] = feed first ball duration, [1] = feed second ball duration, [2] = feed third ball duration
+    private static boolean threeColorSensorsEnabled = true;
     public enum Move {NONE
         , SHOOT_ALL
         , HOLD_SLOT1_SHOOT_REST_RESET_SHOOT
@@ -24,22 +27,33 @@ public class NewSortLogic {
     private State state = State.IDLE;
     private double lastTime = 0;
 
-    public void update(int[] newColors, int newPattern, boolean sort, double currentTime) {
+    public void update(int[] newColors, int newPattern, boolean sort, double currentTime, List<RampBallSequencer.BallObs> rampBallColors) {
         if(colors != null && colors.length >= 2) {
             colors[0] = newColors[0];
             colors[1] = newColors[1];
+            colors[2] = newColors[2];
         }
-        targetPattern = newPattern;
+
+        targetPattern = newPattern + rampBallColors.size() % 3;
 
         if(sort && move == Move.NONE && state == State.IDLE) {
-            if(targetPattern == 1) {
-                move = chooseMovePPG(colors[0], colors[1]);
+            if(threeColorSensorsEnabled) {
+                if (targetPattern == 1) {
+                    move = chooseMovePPG3(colors[0], colors[1], colors[2]);
+                } else if (targetPattern == 2) {
+                    move = chooseMovePGP3(colors[0], colors[1], colors[2]);
+                } else if (targetPattern == 3) {
+                    move = chooseMoveGPP3(colors[0], colors[1], colors[2]);
+                }
             }
-            else if(targetPattern == 2) {
-                move = chooseMovePGP(colors[0], colors[1]);
-            }
-            else if(targetPattern == 3) {
-                move = chooseMoveGPP(colors[0], colors[1]);
+            else {
+                if (targetPattern == 1) {
+                    move = chooseMovePPG(colors[0], colors[1]);
+                } else if (targetPattern == 2) {
+                    move = chooseMovePGP(colors[0], colors[1]);
+                } else if (targetPattern == 3) {
+                    move = chooseMoveGPP(colors[0], colors[1]);
+                }
             }
             if(move == Move.NONE) state = State.IDLE;
             else state = State.START;
@@ -115,6 +129,39 @@ public class NewSortLogic {
         if(c1 == P && c2 == P) return Move.HOLD_SLOT12_SHOOT_REST_RESET_SHOOT; // PPG, PPP <- problem
         else if(c1 == P) return Move.HOLD_SLOT1_SHOOT_REST_RESET_SHOOT; // PGP, PGG
         else return Move.SHOOT_ALL; // GGP, GGG, GPG, GPP
+    }
+
+    private Move chooseMovePPG3(int c1, int c2, int c3) {
+        if((c1 == P && c2 == P && c3 == P) || (c1 == P && c2 == P && c3 == G) || (c1 == P && c2 == G && c3 == G) || (c1 == G && c2 == P && c3 == G) || (c1 == G && c2 == G && c3 == G))
+            return Move.SHOOT_ALL;  // PPP, PPG, PGG, GPG, GGG
+        else if(c1 == G && c2 == G && c3 == P)
+            return Move.HOLD_SLOT12_SHOOT_REST_RESET_SHOOT; // GGP
+        else if(c1 == G && c2 == P && c3 == P)
+            return Move.HOLD_SLOT1_SHOOT_REST_RESET_SHOOT; // GPP
+        else if(c1 == P && c2 == G && c3 == P)
+            return Move.HOLD_SLOT2_SHOOT_REST_RESET_SHOOT; // PGP
+        else
+            return Move.SHOOT_ALL;
+    }
+    private Move chooseMovePGP3(int c1, int c2, int c3) {
+        if((c1 == P && c2 == P && c3 == P) || (c1 == P && c2 == G && c3 == P) || (c1 == P && c2 == G && c3 == G) || (c1 == G && c2 == G && c3 == P) || (c1 == G && c2 == G && c3 == G))
+            return Move.SHOOT_ALL;  // PPP, PGP, PGG, GGP, GGG
+        else if(c1 == G && c2 == P && c3 == P)
+            return Move.HOLD_SLOT12_SHOOT_REST_RESET_SHOOT; // GPP
+        else if((c1 == G && c2 == P && c3 == G) || (c1 == P && c2 == P && c3 == G))
+            return Move.HOLD_SLOT2_SHOOT_REST_RESET_SHOOT; // GPG, PPG
+        else
+            return Move.SHOOT_ALL;
+    }
+    private Move chooseMoveGPP3(int c1, int c2, int c3) {
+        if((c1 == P && c2 == P && c3 == P) || (c1 == G && c2 == P && c3 == P) || (c1 == G && c2 == P && c3 == G) || (c1 == G && c2 == G && c3 == P) || (c1 == G && c2 == G && c3 == G))
+            return Move.SHOOT_ALL;  // PPP, GPP, GPG, GGP, GGG
+        else if(c1 == P && c2 == P && c3 == G)
+            return Move.HOLD_SLOT12_SHOOT_REST_RESET_SHOOT; // PPG
+        else if((c1 == P && c2 == G && c3 == G) || (c1 == P && c2 == G && c3 == P))
+            return Move.HOLD_SLOT1_SHOOT_REST_RESET_SHOOT; // PGG, PGP
+        else
+            return Move.SHOOT_ALL;
     }
     private void shootAll(double currentTime) {
         switch(state) {

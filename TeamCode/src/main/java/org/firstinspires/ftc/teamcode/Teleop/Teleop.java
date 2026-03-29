@@ -37,6 +37,12 @@ import org.firstinspires.ftc.teamcode.Mechanisms.ColorSensorLogic;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.firstinspires.ftc.teamcode.Mechanisms.RampBallSequencer.BallObs;
+
 @Configurable
 @TeleOp(name = "Teleop")
 public class Teleop extends OpMode {
@@ -127,6 +133,7 @@ public class Teleop extends OpMode {
     public static BezierPoint redpark = new BezierPoint(29, 41.8);
     public static BezierPoint bluepark = new BezierPoint(105.4, 36.5);
     private boolean isHoldingPosition = false;
+    private List<BallObs> rampBallColors = new ArrayList<>();
 
     @Override
     public void init() {
@@ -261,7 +268,6 @@ public class Teleop extends OpMode {
         follower.update();
         shooter.update(intake, telemetry, telemetryM, shoot3Btn.justPressed(), popValueBtn.justPressed(), shoot3Btn.justReleased(), addValueBtn.getState());
         intake.update(telemetryM, telemetry);
-        ColorSensorLogic.update(telemetry);
 
         if (rampDetectionBtn.justPressed() && rampDetectionBtn.getState()) {
             limelight.pipelineSwitch(LimelightAim.pipelineFromName("Ramp"));
@@ -311,8 +317,12 @@ public class Teleop extends OpMode {
 
         if (rampDetectionBtn.getState()) {
             rampBallSequencer.update(follower.getPose(), ll, AllianceData.isRed(), telemetry, telemetryM);
+            rampBallColors = rampBallSequencer.getOnRampBalls();
+            // Example: print the ordered ramp sequence colors
+            for (int i = 0; i < rampBallSequencer.getOnRampBalls().size(); i++) {
+                telemetry.addData("RampSeq " + i, rampBallSequencer.getOnRampBalls().get(i).color);
+            }
         }
-
 //        if (!poseSnapped && ll != null && ll.isValid()) {
 //            // Example: botpose_MT2 gives a Pose3D-like object in FTC SDK
 //            double x = (ll.getBotpose().getPosition().x - 1.83) * 39.3442622951;
