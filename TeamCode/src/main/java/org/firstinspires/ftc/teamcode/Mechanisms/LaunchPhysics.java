@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Mechanisms;
 
+@Configurable
 public class LaunchPhysics {
 
     private static final double GRAVITY = 9.81;  // m/s²
@@ -40,6 +41,30 @@ public class LaunchPhysics {
         double angle = Math.toDegrees(Math.atan2(vSinTheta, vCosTheta));
 
         return new Result(velocity, angle, flightTime);
+    }
+
+    /**
+     * Calculate launch angle given a fixed velocity
+     * Uses projectile motion equations
+     */
+    public double calculateAngleFromVelocity(
+            double launchX, double launchY,
+            double targetX, double targetY,
+            double velocity) {
+
+        double dx = (targetX - launchX) * INCH_TO_METER;
+        double dy = (targetY - launchY) * INCH_TO_METER;
+        double distance = Math.hypot(dx, dy);
+        double deltaZ = (targetHeight - launchHeight) * INCH_TO_METER;
+
+        double v2 = velocity * velocity;
+        double g = GRAVITY;
+
+        double inside = v2 * v2 - g * (g * distance * distance + 2 * deltaZ * v2);
+        if (inside < 0) inside = 0; // avoid NaN if velocity too low
+
+        double angle = Math.atan((v2 - Math.sqrt(inside)) / (g * distance));
+        return Math.toDegrees(angle);
     }
 
     public void setLaunchHeight(double inches) { this.launchHeight = inches; }

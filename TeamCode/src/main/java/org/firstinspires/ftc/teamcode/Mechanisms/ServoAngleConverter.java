@@ -14,6 +14,7 @@ public class ServoAngleConverter {
     private double minAngle = 0;
     private double maxAngle = 30;
 
+    public double getMinAngle() { return minAngle; }
     public ServoAngleConverter() {}
 
     public ServoAngleConverter(double a, double b) {
@@ -30,7 +31,7 @@ public class ServoAngleConverter {
     public double angleToServo(double angle) {
         if (angle <= minAngle) return minServo;
         if (angle >= maxAngle) return maxServo;
-        return (angle - b) / a;
+        return (angle - b) / a  ;
     }
 
     // Getters/Setters for Panels tuning
