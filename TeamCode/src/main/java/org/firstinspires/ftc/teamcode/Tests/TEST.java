@@ -32,7 +32,7 @@ import java.util.List;
 public class TEST extends OpMode {
     private Limelight3A limelight;
     private IMU imu;
-    public TelemetryManager telemetryM;
+    private TelemetryManager telemetryM;
     private PIDController shooterPID;
 
     private DcMotorEx ShooterR;
@@ -59,12 +59,10 @@ public class TEST extends OpMode {
     static double Kp = 0.0018;
     static double Kd = 0.0005;
     static double Ki = 0;
-
     private static final double TICKS_PER_REV = 28.0;
     private int lastShooterPos = 0;
     private long lastTimeNs = 0;
     private double maxShooterRPM = 5400;
-
     private double targetRPM = 0.0;
     static double RPM = 0.0;
     private double currentRPM = 0.0;

@@ -15,7 +15,7 @@ public class NewSortLogic {
     private boolean shoot = false;
     private static double OpenAndCloseSortDuration = 1.0;
     private static double[] feedBallDuration = {0.5, 0.7, 0.9}; // [0] = feed first ball duration, [1] = feed second ball duration, [2] = feed third ball duration
-    private static boolean threeColorSensorsEnabled = true;
+    private static boolean threeColorSensorsEnabled = false;
     public enum Move {NONE
         , SHOOT_ALL
         , HOLD_SLOT1_SHOOT_REST_RESET_SHOOT

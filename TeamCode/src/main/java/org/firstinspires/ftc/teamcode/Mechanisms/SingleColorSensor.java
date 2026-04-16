@@ -9,46 +9,38 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class SingleColorSensor {
-    private final NormalizedColorSensor s1;
+    private final NormalizedColorSensor s;
 
-    private final float[] hsv1 = new float[3];
-    private final float[] hsv2 = new float[3];
+    private final float[] hsv = new float[3];
 
-    private NormalizedRGBA c1 = new NormalizedRGBA();
-    private NormalizedRGBA c2 = new NormalizedRGBA();
+    private NormalizedRGBA c = new NormalizedRGBA();
 
     private int lastColor1 = 0;
-    private int lastColor2 = 0;
-    private int fusedColor = 0;
 
     public SingleColorSensor(HardwareMap hw, String name1, float gain) {
-        s1 = hw.get(NormalizedColorSensor.class, name1);
-        s1.setGain(gain);
+        s = hw.get(NormalizedColorSensor.class, name1);
+        s.setGain(gain);
     }
 
     public void update() {
-        c1 = s1.getNormalizedColors();
+        c = s.getNormalizedColors();
 
-        Color.colorToHSV(c1.toColor(), hsv1);
+        Color.colorToHSV(c.toColor(), hsv);
 
-        lastColor1 = classifyHSV(c1, hsv1);
-        fusedColor = lastColor1;
+        lastColor1 = classifyHSV(c, hsv);
     }
 
     public int getBallColor() {
-        return fusedColor;
-    }
-
-    public int getSensor1Color() {
         return lastColor1;
     }
 
+
     public NormalizedRGBA getRaw1() {
-        return c1;
+        return c;
     }
 
-    public float[] getHsv1() {
-        return hsv1;
+    public float[] getHsv() {
+        return hsv;
     }
 
     private static int classifyHSV(NormalizedRGBA c, float[] hsv) {
@@ -65,20 +57,12 @@ public class SingleColorSensor {
         return 0;
     }
 
-    private static int fuse(int a, int b) {
-        if (a == 0 && b == 0) return 0;
-        if (a == b) return a;
-        if (a == 0) return b;
-        if (b == 0) return a;
-        return 0;
-    }
-
     public void telemetry(Telemetry t, String label) {
-        t.addData(label + " ball", fusedColor);
+        t.addData(label + " ball", lastColor1);
 
         t.addLine(label + " 1")
-                .addData("RGB", "%.3f %.3f %.3f", c1.red, c1.green, c1.blue)
-                .addData("HSV", "H=%.1f S=%.2f V=%.2f", hsv1[0], hsv1[1], hsv1[2])
+                .addData("RGB", "%.3f %.3f %.3f", c.red, c.green, c.blue)
+                .addData("HSV", "H=%.1f S=%.2f V=%.2f", hsv[0], hsv[1], hsv[2])
                 .addData("C", lastColor1);
     }
 }

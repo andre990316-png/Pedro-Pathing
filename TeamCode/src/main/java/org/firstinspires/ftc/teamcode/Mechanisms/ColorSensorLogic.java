@@ -18,7 +18,7 @@ public class ColorSensorLogic {
     public static int lastColor = 0;
     public static ArrayList<Integer> lastColors = new ArrayList<>();
     public static NormalizedColorSensor colorSensor;
-    public static boolean candetect=true;
+    public static boolean candetect = true;
     public int[] returnCurrentColors() {
         return colors;
     }
