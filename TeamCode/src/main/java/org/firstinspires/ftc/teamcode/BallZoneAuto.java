@@ -20,11 +20,10 @@ public class BallZoneAuto extends LinearOpMode {
     static int    pipelineIndex = 0;
     static double minConfidence = 0.40;
 
-    // All headings shifted -180° to account for flipped heading
-    private static final Pose START_POSE  = new Pose(72, 72, Math.toRadians(-90));
-    private static final Pose LEFT_POSE   = new Pose(47, 98, Math.toRadians(45));
-    private static final Pose CENTER_POSE = new Pose(47, 47, Math.toRadians(45));
-    private static final Pose RIGHT_POSE  = new Pose(98, 47, Math.toRadians(45));
+    private static final Pose START_POSE  = new Pose(72, 72, Math.toRadians(90));
+    private static final Pose LEFT_POSE   = new Pose(47, 98, Math.toRadians(225));
+    private static final Pose CENTER_POSE = new Pose(47, 47, Math.toRadians(225));
+    private static final Pose RIGHT_POSE  = new Pose(98, 47, Math.toRadians(225));
 
     @Override
     public void runOpMode() {
@@ -45,14 +44,9 @@ public class BallZoneAuto extends LinearOpMode {
         boolean turned = false;
 
         while (opModeIsActive() && !(gamepad1.right_trigger > 0.5)) {
-            // L2 — turn to 45° (225° - 180° offset)
+            // L2 — turn 135° relative from 90° to reach 225°
             if (gamepad1.left_trigger > 0.5 && !turned) {
-                double target  = Math.toRadians(45);
-                double current = follower.getPose().getHeading();
-                double diff    = target - current;
-                while (diff >  Math.PI) diff -= 2 * Math.PI;
-                while (diff < -Math.PI) diff += 2 * Math.PI;
-                follower.turn(diff);
+                follower.turnTo(Math.toRadians(225));
                 turned = true;
             }
 
