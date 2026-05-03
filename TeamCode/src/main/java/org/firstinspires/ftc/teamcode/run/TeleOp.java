@@ -13,17 +13,16 @@ public class TeleOp extends OpObject {
 
     /// initialize variables here
     /// motors, etc
-    Drivetrain drivetrain;
+
     Follower follower;
     ArrayList<ButtonLogic> allButtons;
 
     @Override
     public void Init() {
         /// init stuff here
-        drivetrain = new Drivetrain();
-        follower = drivetrain.getFollower();
-        allButtons = new ArrayList<>();
 
+
+        allButtons = new ArrayList<>();
 
 
     }
@@ -37,11 +36,29 @@ public class TeleOp extends OpObject {
 
     @Override
     public void Loop() {
+        double axial;
+        double lateral;
+        double yaw;
+
+        axial   = gamepad1.left_stick_y;
+        lateral = gamepad1.left_stick_x;
+        yaw     = gamepad1.right_stick_x;
+
+        follower.setTeleOpDrive(axial, lateral, yaw * 0.65, true);
+
+        follower.update();
+
+        updateTelemetry();
 
     }
 
     @Override
     public void Stop() {
+        follower = null;
+    }
 
+    public void updateTelemetry(){
+        telemetry.addData("Pose",follower.getPose());
+        telemetry.update();
     }
 }
