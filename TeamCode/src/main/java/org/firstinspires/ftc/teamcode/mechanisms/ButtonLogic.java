@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.mechanisms;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
+
 public class ButtonLogic {
 
     public enum Mode {
@@ -26,6 +28,10 @@ public class ButtonLogic {
         // when switching modes, clear one-frame flags
         justPressed = false;
         justReleased = false;
+    }
+
+    public static void updateAllButtons(){
+
     }
 
     public Mode getMode() {
