@@ -30,10 +30,6 @@ public class ButtonLogic {
         justReleased = false;
     }
 
-    public static void updateAllButtons(){
-
-    }
-
     public Mode getMode() {
         return mode;
     }
